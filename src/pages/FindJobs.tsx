@@ -1,19 +1,23 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { BiBriefcaseAlt2 } from "react-icons/bi";
 import { BsStars, BsSearch } from "react-icons/bs";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 
-import { experience, jobTypes, jobs } from "../utils/data";
+import { jobs } from "../utils/data";
 import { CustomButton, JobCard } from "../components";
 
-const FindJobs = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [jobLocation, setJobLocation] = useState("");
-  const [jobField, setJobField] = useState("");
+interface FilterOption {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
 
-  const filterOptions = [
+const FindJobs = () => {
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [jobLocation, setJobLocation] = useState<string>("");
+  const [jobField, setJobField] = useState<string>("");
+
+  const filterOptions: FilterOption[] = [
     { label: "Ngành nghề", icon: BiBriefcaseAlt2 },
     { label: "Cấp bậc", icon: BsStars },
     { label: "Kinh nghiệm", icon: BiBriefcaseAlt2 },
@@ -92,7 +96,7 @@ const FindJobs = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {jobs.map((job, index) => (
-            <JobCard key={index} job={job} />
+            <JobCard key={index} job={{ ...job, id: Number(job.id) }} />
           ))}
         </div>
 

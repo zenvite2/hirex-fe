@@ -4,10 +4,18 @@ import { useSelector, useDispatch } from "react-redux";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { Logo } from "../assets";
 
-const Navbar = () => {
-  const { user } = useSelector((state) => state.user);
+// Định nghĩa kiểu cho state user
+interface UserState {
+  user: {
+    token?: string; // Token có thể không có nếu chưa đăng nhập
+  };
+}
+
+// Định nghĩa kiểu cho props
+const Navbar: React.FC = () => {
+  const { user } = useSelector((state: { user: UserState }) => state.user);
   const dispatch = useDispatch();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false); // Định kiểu cho state isOpen
 
   const handleLogout = () => {
     // Implement logout logic here
@@ -27,17 +35,17 @@ const Navbar = () => {
           </div>
         </div>
         <div className="hidden lg:flex items-center space-x-2">
-            <>
-              <Link to="/user-profile" className="text-green-600 hover:text-green-700 font-medium px-3 py-2">
-                Đăng Ký
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition duration-300"
-              >
-                Đăng Nhập
-                </button>
-            </>
+          <>
+            <Link to="/user-profile" className="text-green-600 hover:text-green-700 font-medium px-3 py-2">
+              Đăng Ký
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition duration-300"
+            >
+              Đăng Nhập
+            </button>
+          </>
           <Link
             to="/upload-job"
             className="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-900 transition duration-300 whitespace-nowrap"
