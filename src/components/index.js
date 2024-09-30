@@ -10,6 +10,8 @@ import Loading from "./Loading";
 import CompanyCard from "./CompanyCard";
 import JobTypes from "./JobTypes";
 import DropdownWithCheckbox from "./DropdownWithCheckbox"
+import Login from "./Login"
+
 export {
   Navbar,
   Footer,
@@ -22,5 +24,6 @@ export {
   Loading,
   CompanyCard,
   JobTypes,
-  DropdownWithCheckbox
+  DropdownWithCheckbox,
+  Login
 };

@@ -27,7 +27,6 @@ const Navbar = () => {
           </div>
         </div>
         <div className="hidden lg:flex items-center space-x-2">
-          {user?.token ? (
             <>
               <Link to="/user-profile" className="text-green-600 hover:text-green-700 font-medium px-3 py-2">
                 Đăng Ký
@@ -36,22 +35,9 @@ const Navbar = () => {
                 onClick={handleLogout}
                 className="bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition duration-300"
               >
-                Đăng xuất
-              </button>
+                Đăng Nhập
+                </button>
             </>
-          ) : (
-            <>
-              <Link to="/user-auth" className="text-green-600 hover:text-green-700 font-medium px-3 py-2">
-                Đăng nhập
-              </Link>
-              <Link
-                to="/user-auth"
-                className="bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition duration-300"
-              >
-                Đăng ký
-              </Link>
-            </>
-          )}
           <Link
             to="/upload-job"
             className="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-900 transition duration-300 whitespace-nowrap"
