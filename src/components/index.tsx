@@ -12,6 +12,7 @@ import JobTypes from "./JobTypes";
 import DropdownWithCheckbox from "./DropdownWithCheckbox";
 import Login from "./Login";
 import FilterDropdown from "./FilterDropdown"; 
+import CheckboxDropdown from "./CheckboxDropdown"; 
 
 export {
   Navbar,
@@ -28,4 +29,5 @@ export {
   DropdownWithCheckbox,
   Login,
   FilterDropdown,
+  CheckboxDropdown
 };
