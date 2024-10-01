@@ -2,13 +2,13 @@ import MyComponent from './pages/MyComponent';
 import { ToastContainer } from 'react-toastify';
 import { Route, Routes } from 'react-router-dom';
 import Messenger from './pages/Messenger';
-import Chat from './pages/Chat';
+import ChatRoom from './pages/ChatRoom';
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path='/' element={<Chat />} />
+        <Route path='/' element={<ChatRoom />} />
       </Routes>
       <ToastContainer
         position="top-center"
