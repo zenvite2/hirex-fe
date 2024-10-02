@@ -2,12 +2,31 @@ import { GoLocation } from "react-icons/go";
 import moment from "moment";
 import { Link } from "react-router-dom";
 
-const JobCard = ({ job }) => {
+// Định nghĩa kiểu cho job
+interface Job {
+  id: number;
+  jobTitle: string;
+  location: string;
+  detail: { desc: string }[]; // Mảng chứa mô tả công việc
+  company: {
+    profileUrl: string;
+    name: string;
+  };
+  jobType: string;
+  createdAt: Date; // Ngày tạo (có thể là string nếu bạn sử dụng định dạng ISO)
+}
+
+// Định nghĩa kiểu props cho JobCard
+interface JobCardProps {
+  job: Job;
+}
+
+const JobCard: React.FC<JobCardProps> = ({ job }) => {
   return (
     <Link to={`/job-detail/${job?.id}`}>
       <div
         className='w-full md:w-[16rem] 2xl:w-[18rem] h-[16rem] md:h-[18rem] bg-white flex flex-col justify-between shadow-lg 
-                rounded-md px-3 py-5 '
+                rounded-md px-3 py-5'
       >
         <div className='flex gap-3'>
           <img
@@ -16,7 +35,7 @@ const JobCard = ({ job }) => {
             className='w-14 h-14'
           />
 
-          <div className=''>
+          <div>
             <p className='text-lg font-semibold truncate'>{job?.jobTitle}</p>
             <span className='flex gap-2 items-center'>
               <GoLocation className='text-slate-900 text-sm' />

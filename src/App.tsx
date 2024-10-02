@@ -1,14 +1,15 @@
 import { Outlet, Navigate, Route, Routes, useLocation } from "react-router-dom";
-import { Footer, Navbar } from "./components";
+import { Footer, Navbar, Login } from "./components";
 import {
   About,
   AuthPage,
   Companies,
-  CompanyProfile,
+  // CompanyProfile,
   FindJobs,
   JobDetail,
   UploadJob,
   UserProfile,
+  EmployerLanding
 } from "./pages";
 import { useSelector } from "react-redux";
 import { RootState } from "./redux/store";
@@ -38,7 +39,7 @@ function App() {
             element={<Navigate to='/find-jobs' replace={true} />}
           />
           <Route path='/find-jobs' element={<FindJobs />} />
-          <Route path='/companies' element={<Companies />} />
+          {/* <Route path='/companies' element={<Companies />} /> */}
           <Route
             path={
               user?.accountType === "seeker"
@@ -48,17 +49,19 @@ function App() {
             element={<UserProfile />}
           />
 
-          <Route path={"/company-profile"} element={<CompanyProfile />} />
+          {/* <Route path={"/company-profile"} element={<CompanyProfile />} />
           <Route path={"/company-profile/:id"} element={<CompanyProfile />} />
-          <Route path={"/upload-job"} element={<UploadJob />} />
+          <Route path={"/upload-job"} element={<UploadJob />} /> */}
           <Route path={"/job-detail/:id"} element={<JobDetail />} />
+          <Route path="/login" element={<Login />} /> 
         </Route>
 
+        <Route path='/employer' element={<EmployerLanding />} />
         <Route path='/about-us' element={<About />} />
         <Route path='/user-auth' element={<AuthPage />} />
       </Routes>
       </div>
-      {user && <Footer />}
+      {/* {user/>} */}
     </main>
   );
 }

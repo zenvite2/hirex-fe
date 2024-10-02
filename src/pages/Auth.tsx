@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, Navigate } from "react-router-dom";
 import { Office } from "../assets";
-import { SignUp } from "../components";
+// import { SignUp } from "../components";
 import { RootState } from "../redux/store";
 
 const Auth = () => {
@@ -19,7 +19,7 @@ const Auth = () => {
   return (
     <div className='w-full '>
       <img src={Office} alt='Office' className='object-contain ' />
-      <SignUp open={open} setOpen={setOpen} />
+      {/* <SignUp open={open} setOpen={setOpen} /> */}
     </div>
   );
 };

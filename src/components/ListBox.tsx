@@ -1,10 +1,16 @@
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { BsCheck2, BsChevronExpand } from "react-icons/bs";
 
+// Định nghĩa kiểu cho props
+interface ListBoxProps {
+  sort: string; // Kiểu cho sort
+  setSort: (value: string) => void; // Hàm để cập nhật sort
+}
+
 const options = ["Newest", "Oldest", "A-Z", "Z-A"];
 
-const ListBox = ({ sort, setSort }) => {
+const ListBox: React.FC<ListBoxProps> = ({ sort, setSort }) => {
   return (
     <div className='w-[8rem] md:w-[10rem]'>
       <Listbox value={sort} onChange={setSort}>
@@ -15,12 +21,8 @@ const ListBox = ({ sort, setSort }) => {
             }
           >
             <span className='block truncate'>{sort}</span>
-
             <span className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2'>
-              <BsChevronExpand
-                className='h-5 w-5 text-gray-500'
-                aria-hidden='true'
-              />
+              <BsChevronExpand className='h-5 w-5 text-gray-500' aria-hidden='true' />
             </span>
           </Listbox.Button>
 
