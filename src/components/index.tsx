@@ -9,10 +9,10 @@ import JobCard from "./JobCard";
 import Loading from "./Loading";
 import CompanyCard from "./CompanyCard";
 import JobTypes from "./JobTypes";
-import DropdownWithCheckbox from "./DropdownWithCheckbox";
 import Login from "./Login";
 import FilterDropdown from "./FilterDropdown"; 
 import CheckboxDropdown from "./CheckboxDropdown"; 
+import ReusableModal from "./ReusableModal"; 
 
 export {
   Navbar,
@@ -26,8 +26,8 @@ export {
   Loading,
   CompanyCard,
   JobTypes,
-  DropdownWithCheckbox,
   Login,
   FilterDropdown,
-  CheckboxDropdown
+  CheckboxDropdown,
+  ReusableModal
 };

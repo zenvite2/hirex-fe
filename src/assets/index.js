@@ -12,6 +12,7 @@ import JobImg from "./job.jpg";
 import Facebook from "./facebook.png";
 import CodeWave from "./codewave.png";
 import Logo from "./gethirex_logo.png";
+import Job from "./job.jpeg";
 
 export {
   CodeWave,
@@ -27,5 +28,6 @@ export {
   Youtube,
   Office,
   JobImg,
-  Logo
+  Logo,
+  Job
 };

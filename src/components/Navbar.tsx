@@ -1,21 +1,21 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
+import { Link, useLocation } from "react-router-dom";
 import { Logo } from "../assets";
+import ReusableModal from "./ReusableModal";
 
-// Định nghĩa kiểu cho state user
-interface UserState {
-  user: {
-    token?: string; // Token có thể không có nếu chưa đăng nhập
-  };
-}
-
-// Định nghĩa kiểu cho props
 const Navbar: React.FC = () => {
-  const { user } = useSelector((state: { user: UserState }) => state.user);
-  const dispatch = useDispatch();
-  const [isOpen, setIsOpen] = useState<boolean>(false); // Định kiểu cho state isOpen
+  const location = useLocation();
+  const isEmployerPage = location.pathname.startsWith('/employer');
+  
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const isLinkActive = (path: string) => location.pathname === path;
+
+  const getLinkClassName = (path: string) => {
+    const baseClasses = "text-gray-700 hover:text-green-600 hover:font-semibold transition duration-300";
+    const activeClasses = "text-green-600 font-semibold border-b-2 border-green-600";
+    return `${baseClasses} ${isLinkActive(path) ? activeClasses : ''}`;
+  };
 
   const handleLogout = () => {
     // Implement logout logic here
@@ -28,17 +28,37 @@ const Navbar: React.FC = () => {
           <Link to="/" className="flex-shrink-0">
             <img src={Logo} alt="TopCV Logo" className="h-8 w-auto" />
           </Link>
-          <div className="hidden lg:flex space-x-6 ml-10">
-            <Link to="/find-jobs" className="text-gray-700 hover:text-green-600">Việc làm</Link>
-            <Link to="/user-profile" className="text-gray-700 hover:text-green-600">Hồ sơ & CV</Link>
-            <Link to="/companies" className="text-gray-700 hover:text-green-600">Công ty</Link>
-          </div>
+          {!isEmployerPage ? (
+            <div className="hidden lg:flex space-x-6 ml-10">
+              <Link to="/find-jobs" className={getLinkClassName('/find-jobs')}>
+                Việc làm
+              </Link>
+              <Link to="/user-profile" className={getLinkClassName('/user-profile')}>
+                Hồ sơ & CV
+              </Link>
+              <Link to="/companies" className={getLinkClassName('/companies')}>
+                Công ty
+              </Link>
+            </div>
+          ) : (
+            <div className="hidden lg:flex space-x-6 ml-10">
+              <Link 
+                to="/employer" 
+                className={`${getLinkClassName('/employer')} ${location.pathname.startsWith('/employer') ? 'text-green-600 font-semibold border-b-2 border-green-600' : ''}`}
+              >
+                Đăng việc làm
+              </Link>
+            </div>
+          )}
         </div>
         <div className="hidden lg:flex items-center space-x-2">
           <>
-            <Link to="/user-profile" className="text-green-600 hover:text-green-700 font-medium px-3 py-2">
+            <button
+              onClick={() => setModalOpen(true)}
+              className="text-green-600 hover:text-green-700 font-medium px-3 py-2"
+            >
               Đăng Ký
-            </Link>
+            </button>
             <button
               onClick={handleLogout}
               className="bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition duration-300"
@@ -47,40 +67,38 @@ const Navbar: React.FC = () => {
             </button>
           </>
           <Link
-            to="/upload-job"
+            to={isEmployerPage ? "/" : "/employer"}
             className="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-900 transition duration-300 whitespace-nowrap"
           >
-            Nhà tuyển dụng
+            {isEmployerPage ? "Tìm việc" : "Nhà tuyển dụng"}
           </Link>
         </div>
-        <div className="lg:hidden">
-          <button onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <AiOutlineClose size={24} /> : <AiOutlineMenu size={24} />}
-          </button>
-        </div>
       </div>
-      {/* Mobile menu */}
-      {isOpen && (
-        <div className="lg:hidden bg-white px-4 py-2">
-          <Link to="/find-jobs" className="block py-2 text-gray-700">Việc làm</Link>
-          <Link to="/user-profile" className="block py-2 text-gray-700">Hồ sơ & CV</Link>
-          <Link to="/companies" className="block py-2 text-gray-700">Công ty</Link>
-          <Link to="/tools" className="block py-2 text-gray-700">Công cụ</Link>
-          <Link to="/career-guide" className="block py-2 text-gray-700">Cẩm nang nghề nghiệp</Link>
-          {user?.token ? (
-            <>
-              <Link to="/user-profile" className="block py-2 text-green-600">Hồ sơ</Link>
-              <button onClick={handleLogout} className="block w-full text-left py-2 text-red-600">Đăng xuất</button>
-            </>
-          ) : (
-            <>
-              <Link to="/user-auth" className="block py-2 text-green-600">Đăng nhập</Link>
-              <Link to="/user-auth" className="block py-2 text-green-600">Đăng ký</Link>
-            </>
-          )}
-          <Link to="/upload-job" className="block py-2 text-gray-700">Đăng tuyển & tìm hồ sơ</Link>
-        </div>
-      )}
+
+      {/* Sử dụng modal tái sử dụng */}
+      <ReusableModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        title="Chọn loại tài khoản"
+        footer={(
+          <>
+            <button
+              className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-300 w-full"
+              onClick={() => setModalOpen(false)} // Logic cho "Người tìm việc"
+            >
+              Người tìm việc
+            </button>
+            <button
+              className="bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-900 transition duration-300 w-full"
+              onClick={() => setModalOpen(false)} // Logic cho "Nhà tuyển dụng"
+            >
+              Nhà tuyển dụng
+            </button>
+          </>
+        )}
+      >
+        <p>Bạn muốn đăng ký với tư cách là:</p>
+      </ReusableModal>
     </nav>
   );
 };

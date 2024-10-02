@@ -9,6 +9,7 @@ import {
   JobDetail,
   UploadJob,
   UserProfile,
+  EmployerLanding
 } from "./pages";
 import { useSelector } from "react-redux";
 import { RootState } from "./redux/store";
@@ -55,6 +56,7 @@ function App() {
           <Route path="/login" element={<Login />} /> 
         </Route>
 
+        <Route path='/employer' element={<EmployerLanding />} />
         <Route path='/about-us' element={<About />} />
         <Route path='/user-auth' element={<AuthPage />} />
       </Routes>
