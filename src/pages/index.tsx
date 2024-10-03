@@ -7,15 +7,24 @@ import UploadJob from "./UploadJob";
 import About from "./About";
 import JobDetail from "./JobDetail";
 import EmployerLanding from "./EmployerLanding";
+import Dashboard from "./Dashboard";
+import CompanyInfo from "./CompanyInfo";
+import JobPosts from "./JobPosts";
+import ApplicantsList from "./ApplicantsList";
+import InfoPage from "./InfoPage";
 
 export {
   FindJobs,
   AuthPage,
   Companies,
   UserProfile,
-  // CompanyProfile,
   UploadJob,
   About,
   JobDetail,
-  EmployerLanding
+  EmployerLanding,
+  Dashboard,
+  CompanyInfo,
+  JobPosts,
+  ApplicantsList,
+  InfoPage,
 };

@@ -13,6 +13,7 @@ import Login from "./Login";
 import FilterDropdown from "./FilterDropdown"; 
 import CheckboxDropdown from "./CheckboxDropdown"; 
 import ReusableModal from "./ReusableModal"; 
+import Sidebar from "./Sidebar"; 
 
 export {
   Navbar,
@@ -29,5 +30,6 @@ export {
   Login,
   FilterDropdown,
   CheckboxDropdown,
-  ReusableModal
+  ReusableModal,
+  Sidebar
 };

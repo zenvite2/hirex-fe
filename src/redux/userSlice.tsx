@@ -1,7 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { users } from "../utils/data";
-import { useDispatch } from "react-redux"; // Import useDispatch from react-redux
-
 interface UserState {
   user: {
     id: number;
