@@ -1,9 +1,9 @@
 import React from "react";
 import { AiOutlineSearch, AiOutlineCloseCircle } from "react-icons/ai";
 import { CiLocationOn } from "react-icons/ci";
-import CustomButton from "./CustomButton";
-import { popularSearch } from "../utils/data";
-import { HeroImage } from "../assets";
+import CustomButton from "../common/CustomButton";
+import { popularSearch } from "../../utils/data";
+import { HeroImage } from "../../assets";
 
 interface SearchInputProps {
   placeholder: string;

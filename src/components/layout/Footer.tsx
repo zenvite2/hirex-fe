@@ -1,4 +1,4 @@
-import { footerLinks } from "../utils/data";
+import { footerLinks } from "../../utils/data";
 import { Link } from "react-router-dom";
 
 // Define types for footer links

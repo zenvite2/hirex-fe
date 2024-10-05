@@ -1,5 +1,5 @@
 import React from "react";
-import { JobImg } from "../assets";
+import { JobImg } from "../../assets";
 
 const About = () => {
   return (

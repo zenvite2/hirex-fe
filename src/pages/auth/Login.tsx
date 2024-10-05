@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setUserCredentials } from '../redux/userSlice'; // Adjust the path as needed
+import { setUserCredentials } from '../../redux/userSlice'; // Adjust the path as needed
 import axios from 'axios'; // Or use fetch instead
 
 const GoogleIcon = () => (

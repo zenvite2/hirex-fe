@@ -1,5 +1,5 @@
 import { Outlet, Navigate, Route, Routes, useLocation } from "react-router-dom";
-import { Navbar, Login, Sidebar, RegisterEmployee, RegisterEmployer} from "./components";
+import { Navbar, Sidebar} from "./components";
 import {
   About,
   FindJobs,
@@ -10,7 +10,9 @@ import {
   JobPosts,
   ApplicantsList,
   CompanyInfo,
-
+  Login,
+  RegisterEmployee,
+  RegisterEmployer
 } from "./pages";
 
 function SidebarLayout() {

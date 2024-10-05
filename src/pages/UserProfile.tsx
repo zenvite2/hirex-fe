@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { HiLocationMarker } from "react-icons/hi";
 import { AiOutlineMail } from "react-icons/ai";
 import { FiPhoneCall } from "react-icons/fi";
-import UserForm from "../components/UserForm"; 
+import UserForm from "../components/common/UserForm"; 
 
 const UserProfile: React.FC = () => {
   const { user } = useSelector((state: any) => state.user); // Adjust state type as necessary

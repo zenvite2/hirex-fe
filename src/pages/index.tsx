@@ -1,17 +1,17 @@
-import FindJobs from "./FindJobs";
-import Companies from "./Companies";
+import FindJobs from "./employee/FindJobs";
+import Companies from "./employee/Companies";
 import UserProfile from "./UserProfile";
-// import CompanyProfile from "./CompanyProfile";
-import UploadJob from "./UploadJob";
-import About from "./About";
-import JobDetail from "./JobDetail";
-import EmployerLanding from "./EmployerLanding";
-import Dashboard from "./Dashboard";
-import CompanyInfo from "./CompanyInfo";
-import JobPosts from "./JobPosts";
-import ApplicantsList from "./ApplicantsList";
-import InfoPage from "./InfoPage";
-
+import UploadJob from "./employer/UploadJob";
+import About from "./employee/About";
+import JobDetail from "./employee/JobDetail";
+import EmployerLanding from "./employer/EmployerLanding";
+import Dashboard from "./employer/Dashboard";
+import CompanyInfo from "./employer/CompanyInfo";
+import JobPosts from "./employer/JobPosts";
+import ApplicantsList from "./employer/ApplicantsList";
+import Login from "./auth/Login";
+import RegisterEmployee from "./auth/RegisterEmployee";
+import RegisterEmployer from "./auth/RegisterEmployer";
 export {
   FindJobs,
   Companies,
@@ -24,5 +24,7 @@ export {
   CompanyInfo,
   JobPosts,
   ApplicantsList,
-  InfoPage,
+  Login,
+  RegisterEmployer,
+  RegisterEmployee
 };
