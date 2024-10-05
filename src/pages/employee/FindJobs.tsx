@@ -4,7 +4,7 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import { FaIndustry, FaLevelUpAlt, FaBriefcase, FaDollarSign, FaGraduationCap, FaCalendarAlt } from "react-icons/fa";
 import { jobs } from "../utils/data";
 import { CustomButton, JobCard } from "../components";
-import CheckboxDropdown from "../components/CheckboxDropdown";
+import CheckboxDropdown from "../components/common/CheckboxDropdown";
 
 interface Option {
   value: string;

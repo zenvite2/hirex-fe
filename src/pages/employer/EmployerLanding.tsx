@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Job } from "../assets";
+import { Job } from "../../assets";
 
 const EmployerLanding = () => {
   return (
