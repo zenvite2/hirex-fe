@@ -1,8 +1,7 @@
 import { Outlet, Navigate, Route, Routes, useLocation } from "react-router-dom";
-import { Navbar, Login, Sidebar } from "./components";
+import { Navbar, Login, Sidebar, RegisterEmployee, RegisterEmployer} from "./components";
 import {
   About,
-  AuthPage,
   FindJobs,
   JobDetail,
   UserProfile,
@@ -10,24 +9,10 @@ import {
   Dashboard,
   JobPosts,
   ApplicantsList,
-  CompanyInfo
+  CompanyInfo,
+
 } from "./pages";
-import { useSelector } from "react-redux";
-import { RootState } from "./redux/store";
 
-// Layout cho các route yêu cầu xác thực
-function AuthenticatedLayout() {
-  const location = useLocation();
-  const { user } = useSelector((state: RootState) => state.user);
-
-  return user?.token ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/user-auth" state={{ from: location }} replace />
-  );
-}
-
-// Layout cho các route có Sidebar (chỉ hiển thị Sidebar ở những route cụ thể)
 function SidebarLayout() {
   const location = useLocation();
   const showSidebar = ["/dashboard", "/company-info", "/job-posts", "/applicants", "/info-page"].includes(location.pathname); // Hiển thị Sidebar ở những route này
@@ -48,24 +33,23 @@ function SidebarLayout() {
 }
 
 function App() {
-  const { user } = useSelector((state: RootState) => state.user);
+  const location = useLocation();
+
+  // Không hiển thị Navbar trên trang login và register-employee
+  const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer";
 
   return (
     <main className="bg-[#f7fdfd]">
-      <Navbar />
-      <div className="pt-[80px]">
+      {/* Chỉ hiển thị Navbar nếu không phải trang login hoặc register-employee */}
+      {!hideNavbarOnLogin && <Navbar />}
+      <div className={hideNavbarOnLogin ? "" : "pt-[80px]"}>
         <Routes>
           {/* Routes với xác thực */}
-          <Route element={<AuthenticatedLayout />}>
-            <Route path="/" element={<Navigate to="/find-jobs" replace={true} />} />
-            <Route path="/find-jobs" element={<FindJobs />} />
-            <Route
-              path={user?.accountType === "seeker" ? "/user-profile" : "/user-profile/:id"}
-              element={<UserProfile />}
-            />
-            <Route path="/job-detail/:id" element={<JobDetail />} />
-            <Route path="/login" element={<Login />} />
-          </Route>
+          <Route path="/" element={<Navigate to="/find-jobs" replace={true} />} />
+          <Route path="/find-jobs" element={<FindJobs />} />
+          <Route path="/user-profile" element={<UserProfile />}/>
+          <Route path="/job-detail/:id" element={<JobDetail />} />
+          <Route path="/login" element={<Login />} />
 
           {/* Routes có Sidebar */}
           <Route element={<SidebarLayout />}>
@@ -77,9 +61,10 @@ function App() {
           </Route>
 
           {/* Các route khác */}
+          <Route path="/register-employee" element={<RegisterEmployee />} />
+          <Route path="/register-employer" element={<RegisterEmployer />} />
           <Route path="/employer" element={<EmployerLanding />} />
           <Route path="/about-us" element={<About />} />
-          <Route path="/user-auth" element={<AuthPage />} />
         </Routes>
       </div>
     </main>

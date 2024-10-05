@@ -1,12 +1,11 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import userSlice from "./userSlice";
+import userReducer from "./userSlice";
+// Import thêm các reducers khác nếu có
 
-// Khai báo kiểu RootState để sử dụng trong toàn bộ ứng dụng
 const rootReducer = combineReducers({
-  user: userSlice,
+  user: userReducer,
+  // Thêm các reducers khác vào đây
 });
 
-export { rootReducer };
-
-// Định nghĩa kiểu RootState để sử dụng cho useSelector
 export type RootState = ReturnType<typeof rootReducer>;
+export default rootReducer;

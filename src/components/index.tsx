@@ -14,13 +14,15 @@ import FilterDropdown from "./FilterDropdown";
 import CheckboxDropdown from "./CheckboxDropdown"; 
 import ReusableModal from "./ReusableModal"; 
 import Sidebar from "./Sidebar"; 
+import RegisterEmployee from "./RegisterEmployee"; 
+import RegisterEmployer from "./RegisterEmployer"; 
 
 export {
   Navbar,
   Footer,
   CustomButton,
   TextInput,
-  // SignUp,
+  RegisterEmployee,
   Header,
   ListBox,
   JobCard,
@@ -31,5 +33,6 @@ export {
   FilterDropdown,
   CheckboxDropdown,
   ReusableModal,
-  Sidebar
+  Sidebar,
+  RegisterEmployer
 };

@@ -1,42 +1,44 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { users } from "../utils/data";
+
 interface UserState {
-  user: {
-    id: number;
-    name: string;
-    accountType: string;
-    token?: string;
-  } | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+  userId: number | null;
+  isAuthenticated: boolean;
 }
 
 const initialState: UserState = {
-  user: JSON.parse(window?.localStorage.getItem("userInfo") || "null") ?? users[1],
+  accessToken: null,
+  refreshToken: null,
+  userId: null,
+  isAuthenticated: false,
 };
 
 const userSlice = createSlice({
-  name: "userInfo",
+  name: "user",
   initialState,
   reducers: {
-    login(state, action: PayloadAction<{ user: UserState["user"] }>) {
-      state.user = action.payload.user;
+    setUserCredentials: (state, action: PayloadAction<TokenResponse>) => {
+      state.accessToken = action.payload.accessToken;
+      state.refreshToken = action.payload.refreshToken;
+      state.userId = action.payload.userId;
+      state.isAuthenticated = true;
     },
-    logout(state) {
-      state.user = null;
-      window?.localStorage.removeItem("userInfo");
+    logout: (state) => {
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.userId = null;
+      state.isAuthenticated = false;
     },
   },
 });
 
+export const { setUserCredentials, logout } = userSlice.actions;
 export default userSlice.reducer;
 
-export function Login(user: UserState["user"]) {
-  return (dispatch: any) => {
-    dispatch(userSlice.actions.login({ user }));
-  };
-}
-
-export function Logout() {
-  return (dispatch: any) => {
-    dispatch(userSlice.actions.logout());
-  };
+// Định nghĩa kiểu cho TokenResponse
+export interface TokenResponse {
+  accessToken: string;
+  refreshToken: string;
+  userId: number;
 }

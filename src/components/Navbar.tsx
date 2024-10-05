@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Logo } from "../assets";
+import { Link, useLocation, useNavigate } from "react-router-dom"; 
 import ReusableModal from "./ReusableModal";
+import { Logo } from "../assets";
 
 const Navbar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate(); 
   const isEmployerPage = location.pathname.startsWith('/employer');
   
   const [isModalOpen, setModalOpen] = useState(false);
@@ -17,8 +18,18 @@ const Navbar: React.FC = () => {
     return `${baseClasses} ${isLinkActive(path) ? activeClasses : ''}`;
   };
 
-  const handleLogout = () => {
-    // Implement logout logic here
+  const handleLoginRedirect = () => {
+    navigate("/login"); 
+  };
+
+  const handleRegisterEmployee = () => {
+    setModalOpen(false);
+    navigate("/register-employee");
+  };
+
+  const handleRegisterEmployer = () => {
+    setModalOpen(false);
+    navigate("/register-employer");
   };
 
   return (
@@ -60,7 +71,7 @@ const Navbar: React.FC = () => {
               Đăng Ký
             </button>
             <button
-              onClick={handleLogout}
+              onClick={handleLoginRedirect} 
               className="bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition duration-300"
             >
               Đăng Nhập
@@ -84,13 +95,13 @@ const Navbar: React.FC = () => {
           <>
             <button
               className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-300 w-full"
-              onClick={() => setModalOpen(false)} // Logic cho "Người tìm việc"
+              onClick={handleRegisterEmployee} 
             >
               Người tìm việc
             </button>
             <button
               className="bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-900 transition duration-300 w-full"
-              onClick={() => setModalOpen(false)} // Logic cho "Nhà tuyển dụng"
+              onClick={handleRegisterEmployer}               
             >
               Nhà tuyển dụng
             </button>
