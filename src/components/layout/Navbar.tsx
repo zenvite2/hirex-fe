@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom"; 
-import ReusableModal from "./ReusableModal";
-import { Logo } from "../assets";
+import ReusableModal from "../common/ReusableModal";
+import { Logo } from "../../assets";
 
 const Navbar: React.FC = () => {
   const location = useLocation();

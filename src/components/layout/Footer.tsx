@@ -1,17 +1,6 @@
 import { footerLinks } from "../../utils/data";
 import { Link } from "react-router-dom";
 
-// Define types for footer links
-interface FooterLink {
-  id: string;
-  title: string;
-  links: string[];
-}
-
-// Define the props for the Footer component
-interface FooterProps {
-  footerLinks: FooterLink[];
-}
 
 const Footer = () => {
   return (
