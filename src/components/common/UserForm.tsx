@@ -2,9 +2,6 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { HiLocationMarker } from "react-icons/hi";
-import { AiOutlineMail } from "react-icons/ai";
-import { FiPhoneCall } from "react-icons/fi";
 import { CustomButton, TextInput } from "..";
 
 interface User {

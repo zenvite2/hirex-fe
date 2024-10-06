@@ -50,7 +50,7 @@ function App() {
           <Route path="/" element={<Navigate to="/find-jobs" replace={true} />} />
           <Route path="/find-jobs" element={<FindJobs />} />
           <Route path="/user-profile" element={<UserProfile />}/>
-          <Route path="/job-detail/:id" element={<JobDetail />} />
+          {/* <Route path="/job-detail/:id" element={<JobDetail />} /> */}
           <Route path="/login" element={<Login />} />
 
           {/* Routes có Sidebar */}
