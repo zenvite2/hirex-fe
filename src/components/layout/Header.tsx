@@ -1,130 +1,66 @@
-import React from "react";
-import { AiOutlineSearch, AiOutlineCloseCircle } from "react-icons/ai";
-import { CiLocationOn } from "react-icons/ci";
-import CustomButton from "../common/CustomButton";
-import { popularSearch } from "../../utils/data";
-import { HeroImage } from "../../assets";
-
-interface SearchInputProps {
-  placeholder: string;
-  icon: JSX.Element;
-  value: string;
-  setValue: (value: string) => void;
-  styles?: string;
-}
-
-const SearchInput: React.FC<SearchInputProps> = ({
-  placeholder,
-  icon,
-  value,
-  setValue,
-  styles,
-}) => {
-  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setValue(e.target.value);
-  // };
-  const handleChange = (e: any) => {
-    setValue(e.target.value);
-  };
-  
-  const clearInput = () => setValue("");
-
-  return (
-    <div className={`flex w-full md:w-1/3 items-center ${styles}`}>
-      {icon}
-
-      <input
-        value={value}
-        onChange={handleChange}
-        type='text'
-        className='w-full md:w-64 p-2 outline-none bg-transparent text-base'
-        placeholder={placeholder}
-      />
-
-      <AiOutlineCloseCircle
-        className='hidden md:flex text-gray-600 text-xl cursor-pointer'
-        onClick={clearInput}
-      />
-    </div>
-  );
-};
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import { FileText, Heart, Send, Bell, User } from 'lucide-react';
 
 interface HeaderProps {
-  title: string;
-  type?: boolean;
-  handleClick: () => void;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  location: string;
-  setLocation: (location: string) => void;
+  activeTab?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({
-  title,
-  type,
-  handleClick,
-  searchQuery,
-  setSearchQuery,
-  location,
-  setLocation,
-}) => {
+const Header: React.FC<HeaderProps> = ({ activeTab }) => {
   return (
-    <div className='bg-[#f7fdfd]'>
-      <div
-        className={`container mx-auto px-5 ${
-          type ? "h-[500px]" : "h-[350px]"
-        } flex items-center relative`}
-      >
-        <div className='w-full z-10'>
-          <div className='mb-8'>
-            <p className='text-slate-700 font-bold text-4xl'>{title}</p>
-          </div>
-
-          <div className='w-full flex items-center justify-around bg-white px-2 md:px-5 py-2.5 md:py-6 shadow-2xl rounded-full'>
-            <SearchInput
-              placeholder='Job Title or Keywords'
-              icon={<AiOutlineSearch className='text-gray-600 text-xl' />}
-              value={searchQuery}
-              setValue={setSearchQuery}
-            />
-            <SearchInput
-              placeholder='Add Country or City'
-              icon={<CiLocationOn className='text-gray-600 text-xl' />}
-              value={location}
-              setValue={setLocation}
-              styles={"hidden md:flex"}
-            />
-
-            <div>
-              <CustomButton
-                onClick={handleClick}
-                title='Search'
-                containerStyles={
-                  "text-white py-2 md:py-3 px-3 md:px-10 focus:outline-none bg-purple-600 rounded-full md:rounded-md text-sm md:text-base"
-                }
-              />
-            </div>
-          </div>
-
-          {type && (
-            <div className='w-full lg:1/2 flex flex-wrap gap-3 md:gap-6 py-10 md:py-14'>
-              {popularSearch.map((search, index) => (
-                <span
-                  key={index}
-                  className='bg-[#1d4fd826] text-[#1d4ed8] py-1 px-2 rounded-full text-sm md:text-base'
-                >
-                  {search}
-                </span>
-              ))}
-            </div>
-          )}
+    <header className="bg-gray-100 py-2 shadow-sm">
+      <div className="container mx-auto flex justify-between items-center px-4">
+        <div className="flex space-x-6">
+          <NavLink 
+            to="/my-careerlink"
+            className={`flex items-center space-x-2 text-gray-600 hover:text-blue-600`}
+          >
+            <FileText size={20} />
+            <span>My CareerLink</span>
+          </NavLink>
+          
+          <NavLink 
+            to="/ho-so"
+            className={`flex items-center space-x-2 ${activeTab === 'ho-so' ? 'text-blue-600' : 'text-gray-600'} hover:text-blue-600`}
+          >
+            <FileText size={20} />
+            <span>Hồ sơ xin việc (0)</span>
+          </NavLink>
+          
+          <NavLink 
+            to="/viec-da-luu"
+            className={`flex items-center space-x-2 text-gray-600 hover:text-blue-600`}
+          >
+            <Heart size={20} />
+            <span>Việc đã lưu (0)</span>
+          </NavLink>
+          
+          <NavLink 
+            to="/viec-da-ung-tuyen"
+            className={`flex items-center space-x-2 text-gray-600 hover:text-blue-600`}
+          >
+            <Send size={20} />
+            <span>Việc đã ứng tuyển (0)</span>
+          </NavLink>
+          
+          <NavLink 
+            to="/thong-bao"
+            className={`flex items-center space-x-2 text-gray-600 hover:text-blue-600`}
+          >
+            <Bell size={20} />
+            <span>Thông báo việc làm (0)</span>
+          </NavLink>
         </div>
-
-        <div className='w-1/3 h-full absolute top-24 md:-top-2 lg:-top-14 right-16 2xl:right-[18rem]'>
-          <img src={HeroImage} className='object-contain' />
-        </div>
+        
+        <NavLink 
+          to="/tai-khoan"
+          className="flex items-center space-x-2 text-gray-600 hover:text-blue-600"
+        >
+          <User size={20} />
+          <span>Tài khoản</span>
+        </NavLink>
       </div>
-    </div>
+    </header>
   );
 };
 

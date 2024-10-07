@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { setUserCredentials } from '../../redux/userSlice'; // Adjust the path as needed
-import axios from 'axios'; // Or use fetch instead
+import { useAuth } from '../../hooks/useAuth'; 
+import { useNavigate } from 'react-router-dom';
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
@@ -16,25 +15,14 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const dispatch = useDispatch(); // For dispatching Redux actions
 
+  const { login, loading, error } = useAuth(); 
+  const navigate = useNavigate(); 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await axios.post('http://localhost:8080/auth/access', {
-        email,
-        password,
-      });
-      const { accessToken, refreshToken, userId } = response.data.data;
-
-      // Dispatch the credentials to the Redux store
-      dispatch(setUserCredentials({ accessToken, refreshToken, userId }));
-      
-      console.log('Sign in successful!', accessToken, refreshToken, userId);
-      // Redirect or do further actions here after login
-    } catch (error) {
-      console.error('Login failed:', error);
-      // Handle login failure (e.g., display error message)
+    const success = await login({ email, password });
+    if (success) {
+      navigate('/dashboard'); 
     }
   };
 
@@ -89,10 +77,12 @@ const LoginPage = () => {
             <button
               type="submit"
               className="w-full rounded-md bg-emerald-500 p-2 text-white hover:bg-emerald-600"
+              disabled={loading} // Disable the button when loading
             >
-              Đăng nhập
+              {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </button>
           </form>
+          {error && <p className="mt-4 text-center text-red-600">{error}</p>}
           <div className="mt-4 text-center">
             <span className="text-sm text-gray-500">or</span>
           </div>
