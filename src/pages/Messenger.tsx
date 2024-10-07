@@ -22,12 +22,30 @@ import { startLoading, stopLoading } from '../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
+import CustomModal from '../components/CustomModal';
+import VideoCallRequest from './VideoCallRequest';
+import { useLocation } from 'react-router-dom';
 
-enum Status {
-    JOIN = 'JOIN',
-    LEAVE = 'LEAVE',
-    MESSAGE = 'MESSAGE',
-}
+const VIDEO_CALL_RESPONSE = {
+    ACCEPT: 'ACCEPT',
+    REFUSE: 'REFUSE'
+} as const;
+
+const Status = {
+    JOIN: 'JOIN',
+    LEAVE: 'LEAVE',
+    MESSAGE: 'MESSAGE',
+    VIDEO_CALL_REQUEST: 'VIDEO_CALL_REQUEST',
+    VIDEO_CALL_RESPONSE: VIDEO_CALL_RESPONSE
+} as const;
+
+type StatusType =
+    | typeof Status.JOIN
+    | typeof Status.LEAVE
+    | typeof Status.MESSAGE
+    | typeof Status.VIDEO_CALL_REQUEST
+    | typeof Status.VIDEO_CALL_RESPONSE.ACCEPT
+    | typeof Status.VIDEO_CALL_RESPONSE.REFUSE;
 
 interface User {
     id: string;
@@ -38,16 +56,17 @@ interface User {
 
 interface ChatMessage extends MessageModel {
     receiver: string;
-    status: Status;
+    status: StatusType;
 }
 
 let stompClient: Client | null = null;
-let isConnected = false;
+let isConnected: Boolean = false;
 
 const Messenger: React.FC = () => {
-    const currentUser = 'viet';
+    const { currentUser } = useLocation().state;
+    const [toCaller, setToCaller] = useState(null);
     const users: User[] = [
-        { id: '1', name: 'viet', avatar: 'https://via.placeholder.com/40', lastMessage: 'Hello!' },
+        { id: '1', name: '321', avatar: 'https://via.placeholder.com/40', lastMessage: 'Goi tao di!' },
         { id: '2', name: 'Anna', avatar: 'https://via.placeholder.com/40', lastMessage: 'How are you?' },
         { id: '3', name: 'Sam', avatar: 'https://via.placeholder.com/40', lastMessage: 'Goodbye!' },
     ];
@@ -55,6 +74,7 @@ const Messenger: React.FC = () => {
     const [currentChatFriend, setCurrentChatFriend] = useState<User | null>(users[0]);
     const [messages, setMessages] = useState<MessageModel[]>([]);
     const [messageInputValue, setMessageInputValue] = useState<string>("");
+    const [showCallRequestModal, setShowCallRequestModal] = useState(false);
 
     useEffect(() => {
         dispatch(startLoading());
@@ -63,12 +83,12 @@ const Messenger: React.FC = () => {
 
     const connect = () => {
         if (isConnected) {
-            stompClient.connect({}, onConnected, (e) => { dispatch(stopLoading()); console.log('Error:', e) });
+            stompClient.connect({}, onConnected, (e) => { dispatch(stopLoading()); console.log('Error when connecting ws:', e) });
         } else {
-            const Sock = new SockJS('http://localhost:8888/ws');
+            const Sock = new SockJS('https://192.168.1.123:8888/ws');
             stompClient = over(Sock);
             isConnected = true;
-            stompClient.connect({}, onConnected, (e) => { dispatch(stopLoading()); console.log('Error:', e) });
+            stompClient.connect({}, onConnected, (e) => { dispatch(stopLoading()); console.log('Error when connecting ws:', e) });
         }
     };
 
@@ -91,6 +111,10 @@ const Messenger: React.FC = () => {
     const onReceive = (payload: MessageStompjs) => {
         const payloadData: ChatMessage = { ...JSON.parse(payload.body), position: 'normal', direction: 'incoming' };
         setMessages(prevMessages => [...prevMessages, payloadData]);
+        if (payloadData.status == Status.VIDEO_CALL_REQUEST) {
+            setShowCallRequestModal(true);
+            setToCaller(payloadData.sender);
+        }
     };
 
     const handleSendMessage = () => {
@@ -114,6 +138,35 @@ const Messenger: React.FC = () => {
         }
     };
 
+    const handleVideoCall = () => {
+        const windowFeatures = `menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes,width=${window.screen.width},height=${window.screen.height}`;
+        const url = new URL("https://192.168.1.123:8888/video-call");
+        url.searchParams.set("fromUser", currentUser);
+        url.searchParams.set("toUser", currentChatFriend.name);
+        url.searchParams.set("isCallee", '0');
+        window.open(url.toString(), "Video Call", windowFeatures);
+
+        const chatMessage: ChatMessage = {
+            sender: currentUser,
+            receiver: currentChatFriend.name,
+            message: 'da yeu cau video call',
+            sentTime: Date.now().toLocaleString(),
+            status: Status.VIDEO_CALL_REQUEST,
+            direction: 'outgoing',
+            position: 'normal'
+        };
+        stompClient.send("/app/private-message", {}, JSON.stringify(chatMessage));
+    };
+
+    const handleRefuseCall = () => {
+        const acceptPayload = {
+            fromUser: currentUser,
+            toUser: toCaller,
+            status: 'REFUSE',
+        };
+        stompClient.send("/app/accept", {}, JSON.stringify(acceptPayload));
+    }
+
     return (
         <div style={{ position: "relative", height: "100%", width: "100%", flex: 1 }}>
             <MainContainer responsive>
@@ -126,7 +179,10 @@ const Messenger: React.FC = () => {
                                 lastSenderName={user.name}
                                 info={user.lastMessage}
                                 active={currentChatFriend?.id === user.id}
-                                onClick={() => setCurrentChatFriend(user)}
+                                onClick={() => {
+                                    setCurrentChatFriend(user);
+                                    setToCaller(user.name);
+                                }}
                             >
                                 <Avatar src={user.avatar} name={user.name} />
                             </Conversation>
@@ -140,7 +196,7 @@ const Messenger: React.FC = () => {
                             <Avatar src={currentChatFriend.avatar} name={currentChatFriend.name} />
                             <ConversationHeader.Content userName={currentChatFriend.name} info="Online" />
                             <ConversationHeader.Actions>
-                                <VideoCallButton />
+                                <VideoCallButton onClick={handleVideoCall} />
                             </ConversationHeader.Actions>
                         </ConversationHeader>
                     )}
@@ -162,13 +218,16 @@ const Messenger: React.FC = () => {
                     </MessageList>
 
                     <MessageInput
-                        placeholder={`Type message to ${currentChatFriend?.name || "anonymous"}...`}
+                        placeholder={`you are: ${currentUser} Type message to ${currentChatFriend?.name || "anonymous"}...`}
                         value={messageInputValue}
                         onChange={val => setMessageInputValue(val)}
                         onSend={handleSendMessage}
                     />
                 </ChatContainer>
             </MainContainer>
+            {showCallRequestModal && <CustomModal isOpen={showCallRequestModal} onClose={() => setShowCallRequestModal(false)} width='large' height='large'>
+                <VideoCallRequest fromUser={toCaller} toUser={currentUser} setShowCallRequestModal={setShowCallRequestModal} handleRefuseCall={handleRefuseCall} />
+            </CustomModal>}
         </div>
     );
 };
