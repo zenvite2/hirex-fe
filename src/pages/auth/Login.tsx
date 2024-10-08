@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { setUserCredentials } from '../../redux/userSlice'; // Adjust the path as needed
-import axios from 'axios'; // Or use fetch instead
+import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
@@ -16,25 +15,18 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const dispatch = useDispatch(); // For dispatching Redux actions
+
+  const { login, isLoading, error } = useAuth();
+  const navigate = useNavigate();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8080/auth/access', {
-        email,
-        password,
-      });
-      const { accessToken, refreshToken, userId } = response.data.data;
-
-      // Dispatch the credentials to the Redux store
-      dispatch(setUserCredentials({ accessToken, refreshToken, userId }));
-      
-      console.log('Sign in successful!', accessToken, refreshToken, userId);
-      // Redirect or do further actions here after login
-    } catch (error) {
-      console.error('Login failed:', error);
-      // Handle login failure (e.g., display error message)
+      await login({ email, password });
+      // Đăng nhập thành công, navigate sẽ được xử lý trong useAuth hook
+    } catch (err) {
+      // Xử lý lỗi nếu cần (mặc dù useAuth hook đã xử lý lỗi)
+      console.error('Đăng nhập thất bại:', err);
     }
   };
 
@@ -42,7 +34,7 @@ const LoginPage = () => {
     <div className="flex h-screen bg-emerald-200">
       <div className="m-auto flex w-3/4 max-w-4xl overflow-hidden rounded-xl bg-white shadow-xl">
         <div className="relative w-1/2 bg-gradient-to-br from-emerald-400 to-blue-900 p-8 text-white">
-          {/* Left side content */}
+          {/* Có thể thêm nội dung cho phần này nếu cần */}
         </div>
         <div className="w-1/2 p-8">
           <h2 className="mb-6 text-3xl font-bold">Đăng nhập</h2>
@@ -89,16 +81,18 @@ const LoginPage = () => {
             <button
               type="submit"
               className="w-full rounded-md bg-emerald-500 p-2 text-white hover:bg-emerald-600"
+              disabled={isLoading}
             >
-              Đăng nhập
+              {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </button>
           </form>
+          {error && <p className="mt-4 text-center text-red-600">{error}</p>}
           <div className="mt-4 text-center">
-            <span className="text-sm text-gray-500">or</span>
+            <span className="text-sm text-gray-500">hoặc</span>
           </div>
           <button className="mt-4 flex w-full items-center justify-center rounded-md border border-gray-300 bg-white p-2 text-gray-700 hover:bg-gray-50">
             <GoogleIcon />
-            <span className="ml-2">Continue with Google</span>
+            <span className="ml-2">Tiếp tục với Google</span>
           </button>
         </div>
       </div>

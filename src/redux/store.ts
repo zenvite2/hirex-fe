@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { thunk } from 'redux-thunk';
 import loadingSlice from './slice/loadingSlice';
+import authSlice from './slice/authSlice';
 
 const store = configureStore({
     reducer: {
-        loadingSlice
+        loadingSlice,
+        auth: authSlice,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(thunk),
