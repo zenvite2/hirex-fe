@@ -1,38 +1,31 @@
-import { useDispatch } from 'react-redux';
-import { setUserCredentials } from '../redux/userSlice'; 
-import { LoginCredentials } from '../services/authService'; 
-import authService from '../services/authService'; 
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import authService from '../services/authService';
+import { setAuth } from '../redux/slice/authSlice';
 
-interface AuthHook {
-  login: (data: LoginCredentials) => Promise<boolean>; // login returns a Promise<boolean>
-  loading: boolean;
-  error: string | null;
-}
-
-export const useAuth = (): AuthHook => {
+export const useAuth = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const login = async ({ email, password }: LoginCredentials): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
+  const login = async (credentials) => {
+    setIsLoading(true);
+    setError('');
     try {
-      const response = await authService.login({ email, password }); // Use authService to login
-      const { accessToken, refreshToken, userId } = response.data; // Adjust this according to your API response structure
+      const response = await authService.login(credentials);
+      
+      const { accessToken, refreshToken, userId, role } = response.data;
+      dispatch(setAuth({ accessToken, refreshToken, userId, role }));
 
-      // Dispatch the credentials to Redux
-      dispatch(setUserCredentials({ accessToken, refreshToken, userId }));
-
-      setLoading(false);
-      return true; // Return true on successful login
+      navigate(role === 'user' ? '/find-jobs' : '/employer');
     } catch (err) {
-      setLoading(false);
-      setError('Login failed. Please check your credentials.');
-      return false; // Return false on failure
+      setError('Đăng nhập thất bại. Vui lòng thử lại.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return { login, loading, error }; // Explicitly return login, loading, and error
+  return { login, isLoading, error };
 };

@@ -6,7 +6,7 @@ import { FiPhoneCall } from "react-icons/fi";
 import UserForm from "../components/common/UserForm"; 
 
 const UserProfile: React.FC = () => {
-  const { user } = useSelector((state: any) => state.user); // Adjust state type as necessary
+  const { user } = useSelector((state: any) => state.user); 
   const [open, setOpen] = useState(false);
   const userInfo = user;
 
