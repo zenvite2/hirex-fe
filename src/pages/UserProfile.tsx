@@ -7,7 +7,7 @@ import UserForm from "../components/common/UserForm";
 import { RootState } from "../redux/store";
 
 const UserProfile: React.FC = () => {
-  const { userId } = useSelector((state: RootState) => state.userReducer);
+  const { role } = useSelector((state: RootState) => state.authReducer);
   const [open, setOpen] = useState(false);
 
   // Mock user data for demonstration purposes
