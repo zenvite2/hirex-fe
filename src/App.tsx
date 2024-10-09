@@ -1,5 +1,5 @@
 import { Outlet, Navigate, Route, Routes, useLocation } from "react-router-dom";
-import { Navbar, Sidebar} from "./components";
+import { Navbar, Sidebar } from "./components";
 import {
     About,
     FindJobs,
@@ -12,11 +12,11 @@ import {
     CompanyInfo,
     Login,
     RegisterEmployee,
-    RegisterEmployer
+    RegisterEmployer,
+    Messenger
 } from "./pages";
 import { ToastContainer } from 'react-toastify';
 import Loading from './components/Loading';
-import Messenger from './pages/Messenger';
 
 function SidebarLayout() {
     const location = useLocation();
@@ -53,17 +53,17 @@ function App() {
                         {/* Routes với xác thực */}
                         <Route path="/" element={<Navigate to="/find-jobs" replace={true} />} />
                         <Route path="/find-jobs" element={<FindJobs />} />
-                        <Route path="/user-profile" element={<UserProfile />}/>
+                        <Route path="/user-profile" element={<UserProfile />} />
                         {/* <Route path="/job-detail/:id" element={<JobDetail />} /> */}
                         <Route path="/login" element={<Login />} />
 
                         {/* Routes có Sidebar */}
                         <Route element={<SidebarLayout />}>
                             <Route path="/dashboard" element={<Dashboard />} />
-                            <Route path="/company-info"  element={<CompanyInfo />} />
-                            <Route path="/job-posts" element={<JobPosts />}  />
+                            <Route path="/company-info" element={<CompanyInfo />} />
+                            <Route path="/job-posts" element={<JobPosts />} />
                             <Route path="/applicants" element={<ApplicantsList />} />
-                            <Route path="/info-page"  element={<CompanyInfo />} />
+                            <Route path="/info-page" element={<CompanyInfo />} />
                         </Route>
 
                         {/* Các route khác */}

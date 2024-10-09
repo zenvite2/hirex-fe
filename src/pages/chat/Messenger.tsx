@@ -18,11 +18,11 @@ import {
 } from "@chatscope/chat-ui-kit-react";
 import { Client, Message as MessageStompjs, over } from 'stompjs';
 import SockJS from 'sockjs-client';
-import { startLoading, stopLoading } from '../redux/slice/loadingSlice';
+import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
-import CustomModal from '../components/CustomModal';
+import { RootState } from '../../redux/store';
+import CustomModal from '../../components/CustomModal';
 import VideoCallRequest from './VideoCallRequest';
 import { useLocation } from 'react-router-dom';
 

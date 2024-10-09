@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setUserCredentials } from '../../redux/userSlice'; // Adjust the path as needed
-import axios from 'axios'; // Or use fetch instead
+import { setUserCredentials } from '../../redux/slice/userSlice';
+import axios from 'axios';
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
@@ -29,7 +29,7 @@ const LoginPage = () => {
 
       // Dispatch the credentials to the Redux store
       dispatch(setUserCredentials({ accessToken, refreshToken, userId }));
-      
+
       console.log('Sign in successful!', accessToken, refreshToken, userId);
       // Redirect or do further actions here after login
     } catch (error) {

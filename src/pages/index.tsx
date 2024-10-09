@@ -12,6 +12,8 @@ import ApplicantsList from "./employer/ApplicantsList";
 import Login from "./auth/Login";
 import RegisterEmployee from "./auth/RegisterEmployee";
 import RegisterEmployer from "./auth/RegisterEmployer";
+import Messenger from './chat/Messenger';
+import VideoCallRequest from './chat/VideoCallRequest';
 export {
   FindJobs,
   Companies,
@@ -26,5 +28,7 @@ export {
   ApplicantsList,
   Login,
   RegisterEmployer,
-  RegisterEmployee
+  RegisterEmployee,
+  Messenger,
+  VideoCallRequest
 };

@@ -10,17 +10,16 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": false, // Optionally change to true for stricter type checking
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": false, // Use with caution
-    "module": "esnext",
+    "noFallthroughCasesInSwitch": false,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "noImplicitAny": false, // Consider changing to true if you want to enforce types
-    "strictNullChecks": false // Consider changing to true for better null safety
+    "noImplicitAny": false,
+    "strictNullChecks": false
   },
   "include": [
     "src"

@@ -4,7 +4,7 @@ import { HashLoader } from 'react-spinners';
 import { RootState } from '../redux/store';
 
 const Loading: React.FC = () => {
-    const { isLoading } = useSelector((state: RootState) => state.loadingSlice);
+    const { isLoading } = useSelector((state: RootState) => state.loadingReducer);
 
     if (!isLoading) return null;
 

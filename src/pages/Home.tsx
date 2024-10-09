@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import CustomModal from '../components/CustomModal';
-import Messenger from './Messenger';
+import Messenger from './chat/Messenger';
 import { useNavigate } from 'react-router-dom';
 
 function Home() {

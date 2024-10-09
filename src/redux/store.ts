@@ -1,10 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { thunk } from 'redux-thunk';
-import loadingSlice from './slice/loadingSlice';
+import loadingReducer from './slice/loadingSlice';
+import userReducer from './slice/userSlice';
 
 const store = configureStore({
     reducer: {
-        loadingSlice
+        loadingReducer, userReducer
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(thunk),
