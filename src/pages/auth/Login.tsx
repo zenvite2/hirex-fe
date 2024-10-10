@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { AppDispatch, RootState } from '../../redux/store';
+import { login } from '../../services/authApi';
+import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
+import { toast } from 'react-toastify';
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
@@ -14,24 +17,25 @@ const GoogleIcon = () => (
 );
 
 const LoginPage = () => {
+  const { isLoading } = useSelector((state: RootState) => state.loadingReducer);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-
-  const { login, isLoading, error } = useAuth();
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await login({ email, password });
-      // Đăng nhập thành công, navigate sẽ được xử lý trong useAuth hook
-    } catch (err) {
-      // Xử lý lỗi nếu cần (mặc dù useAuth hook đã xử lý lỗi)
-      console.error('Đăng nhập thất bại:', err);
+    dispatch(startLoading());
+    const result = await dispatch(login({ email, password }))
+    dispatch(stopLoading());
+    if (result.payload.response.success == true) {
+      navigate('/dashboard');
     }
-  };
-
+    else {
+      toast.error("login failed.")
+    }
+  }
   return (
     <div className="flex h-screen bg-emerald-200">
       <div className="m-auto flex w-3/4 max-w-4xl overflow-hidden rounded-xl bg-white shadow-xl">
@@ -88,7 +92,6 @@ const LoginPage = () => {
               {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </button>
           </form>
-          {error && <p className="mt-4 text-center text-red-600">{error}</p>}
           <div className="mt-4 text-center">
             <span className="text-sm text-gray-500">hoặc</span>
           </div>

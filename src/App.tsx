@@ -1,5 +1,5 @@
 import { Outlet, Navigate, Route, Routes, useLocation } from "react-router-dom";
-import { Navbar, Sidebar , Header} from "./components";
+import { Navbar, Sidebar, Header } from "./components";
 import {
     About,
     FindJobs,
@@ -17,6 +17,7 @@ import {
 } from "./pages";
 import { ToastContainer } from 'react-toastify';
 import Loading from './components/Loading';
+import LoginPage from "./pages/auth/Login";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -55,7 +56,7 @@ function App() {
                         <Route path="/find-jobs" element={<FindJobs />} />
                         <Route path="/user-profile" element={<UserProfile />} />
                         {/* <Route path="/job-detail/:id" element={<JobDetail />} /> */}
-                        <Route path="/login" element={<Login />} />
+                        <Route path="/login" element={<LoginPage />} />
 
                         {/* Routes có Sidebar */}
                         <Route element={<SidebarLayout />}>

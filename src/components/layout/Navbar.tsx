@@ -4,7 +4,8 @@ import ReusableModal from "../common/ReusableModal";
 import { Logo } from "../../assets";
 import { ChevronDown, FileText, Heart, Send, Bell, LogOut, Settings, HelpCircle } from "lucide-react";
 import { useSelector, useDispatch } from 'react-redux';
-import { clearAuth } from '../../redux/slice/authSlice';
+import { logout } from '../../redux/slice/authSlice';
+import { RootState } from "../../redux/store";
 interface NavbarProps { }
 
 const Navbar: React.FC<NavbarProps> = () => {
@@ -13,8 +14,8 @@ const Navbar: React.FC<NavbarProps> = () => {
   const isEmployerPage = location.pathname.startsWith('/employer');
 
   const [isModalOpen, setModalOpen] = useState(false);
-  const { accessToken, role } = useSelector((state: any) => state.auth);
-  const isLoggedIn = !!accessToken;
+  const { token, role } = useSelector((state: RootState) => state.authReducer);
+  const isLoggedIn = !!token;
   const dispatch = useDispatch();
 
 
@@ -41,7 +42,7 @@ const Navbar: React.FC<NavbarProps> = () => {
   };
 
   const handleLogout = () => {
-    dispatch(clearAuth());
+    dispatch(logout());
     navigate("/");
   };
 
@@ -139,8 +140,8 @@ const Navbar: React.FC<NavbarProps> = () => {
               <Link
                 to="/employer"
                 className={`${getLinkClassName('/employer')} ${location.pathname.startsWith('/employer')
-                    ? 'text-[#0069DB] font-semibold border-b-2 border-[#0069DB]'
-                    : ''
+                  ? 'text-[#0069DB] font-semibold border-b-2 border-[#0069DB]'
+                  : ''
                   }`}
               >
                 Đăng việc làm
