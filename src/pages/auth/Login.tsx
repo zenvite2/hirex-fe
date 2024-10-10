@@ -31,7 +31,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex h-screen bg-emerald-200">
+    <div className="flex h-screen bg-white">
       <div className="m-auto flex w-3/4 max-w-4xl overflow-hidden rounded-xl bg-white shadow-xl">
         <div className="relative w-1/2 bg-gradient-to-br from-emerald-400 to-blue-900 p-8 text-white">
           {/* Có thể thêm nội dung cho phần này nếu cần */}
@@ -80,7 +80,7 @@ const LoginPage = () => {
             </div>
             <button
               type="submit"
-              className="w-full rounded-md bg-emerald-500 p-2 text-white hover:bg-emerald-600"
+              className="w-full rounded-md bg-blue-500 p-2 text-white hover:bg-blue-600"
               disabled={isLoading}
             >
               {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
