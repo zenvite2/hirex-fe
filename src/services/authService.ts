@@ -1,7 +1,11 @@
 class AuthenticationService {
 
-  getToken() {
-    return sessionStorage.getItem('token');
+  getAccessToken() {
+    return sessionStorage.getItem('accessToken');
+  }
+
+  getRefreshAccessToken() {
+    return sessionStorage.getItem('accessToken');
   }
 
   getRole() {
@@ -13,14 +17,16 @@ class AuthenticationService {
     return sessionStorage.getItem('username');
   }
 
-  saveCredentail(credential, account) {
-    sessionStorage.setItem("token", credential.token);
+  saveCredential(credential: { accessToken: string, refreshToken: string, role: string, username: string }) {
+    sessionStorage.setItem("accessToken", credential.accessToken);
+    sessionStorage.setItem("refreshToken", credential.refreshToken);
     sessionStorage.setItem("role", JSON.stringify(credential.role));
-    sessionStorage.setItem('username', account.username);
+    sessionStorage.setItem('username', JSON.stringify(credential.username));
   }
 
   clearCredential() {
-    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('accessToken');
+    sessionStorage.removeItem('refreshToken');
     sessionStorage.removeItem('role');
     sessionStorage.removeItem('username');
   }

@@ -10,7 +10,7 @@ interface AuthState {
 }
 
 let initialState: AuthState = {
-  isLoggedIn: authService.getToken() !== null,
+  isLoggedIn: authService.getAccessToken() !== null,
   role: authService.getRole() || 'GUEST',
   username: authService.getUsername() || null,
   token: null
@@ -30,8 +30,8 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(login.fulfilled, (state, action) => {
-        if (action.payload.response.data.success == true) {
-          // authService.saveCredentail(action.payload.data, action.payload.account);
+        if (action.payload.response.success == true) {
+          authService.saveCredential(action.payload.response.data);
           state.isLoggedIn = true;
           state.role = authService.getRole();
           state.username = authService.getUsername();

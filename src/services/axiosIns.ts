@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders, InternalAxiosRequestConfig } from 'axios';
+import authService from './authService';
 
 interface ApiConfig extends InternalAxiosRequestConfig {
     includeToken?: boolean
@@ -18,13 +19,13 @@ axiosIns.interceptors.request.use(
         const headers = config.headers as AxiosRequestHeaders;
 
         if (config.includeToken) {
-            const token = sessionStorage.getItem('token');
+            const token = authService.getAccessToken();
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
-            }
+            } else console.error('No token saved.');
         }
 
-        let logMessage = 'REQUEST:\n';
+        let logMessage = '=====REQUEST=====:\n';
         logMessage += `    url: ${config.url}\n`;
         logMessage += `    headers: ${JSON.stringify(config.headers, null, 2)}\n`;
         logMessage += `    payload: ${config.data ? JSON.stringify(config.data, null, 2) : '{}'}\n`;
@@ -41,12 +42,10 @@ axiosIns.interceptors.request.use(
 
 axiosIns.interceptors.response.use(
     (response) => {
-        let logMessage = 'RESPONSE:\n';
-        logMessage += `    statusCode: ${response.status}\n`;
-        logMessage += `    data: ${JSON.stringify(response.data, null, 2)}\n`;
-
+        let logMessage = '=====RESPONSE=====:\n';
+        logMessage += `statusCode: ${response.status}\n`;
+        logMessage += `data: ${JSON.stringify(response.data, null, 2)}\n`;
         console.log(logMessage);
-
         return response;
     },
     (error) => {

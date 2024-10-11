@@ -18,7 +18,7 @@ const GoogleIcon = () => (
 
 const LoginPage = () => {
   const { isLoading } = useSelector((state: RootState) => state.loadingReducer);
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const dispatch: AppDispatch = useDispatch();
@@ -27,7 +27,7 @@ const LoginPage = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(startLoading());
-    const result = await dispatch(login({ email, password }))
+    const result = await dispatch(login({ username, password }))
     dispatch(stopLoading());
     if (result.payload.response.success == true) {
       navigate('/dashboard');
@@ -36,6 +36,7 @@ const LoginPage = () => {
       toast.error("login failed.")
     }
   }
+
   return (
     <div className="flex h-screen bg-emerald-200">
       <div className="m-auto flex w-3/4 max-w-4xl overflow-hidden rounded-xl bg-white shadow-xl">
@@ -46,16 +47,16 @@ const LoginPage = () => {
           <h2 className="mb-6 text-3xl font-bold">Đăng nhập</h2>
           <form onSubmit={handleSignIn}>
             <div className="mb-4">
-              <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
-                Email
+              <label htmlFor="username" className="mb-1 block text-sm font-medium text-gray-700">
+                Username
               </label>
               <input
-                type="email"
-                id="email"
+                type="text"
+                id="username"
                 className="w-full rounded-md border border-gray-300 p-2"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>
