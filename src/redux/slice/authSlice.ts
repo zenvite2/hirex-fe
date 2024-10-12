@@ -5,15 +5,15 @@ import authService from "../../services/authService";
 interface AuthState {
   isLoggedIn: boolean;
   role: string;
-  username: string | null;
-  token: string;
+  username: string;
+  userId: number;
 }
 
 let initialState: AuthState = {
   isLoggedIn: authService.getAccessToken() !== null,
   role: authService.getRole() || 'GUEST',
   username: authService.getUsername() || null,
-  token: null
+  userId: authService.getUserId() || null,
 };
 
 const authSlice = createSlice({
@@ -30,11 +30,12 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(login.fulfilled, (state, action) => {
-        if (action.payload.response.success == true) {
+        if (action.payload.response?.['success'] == true) {
           authService.saveCredential(action.payload.response.data);
           state.isLoggedIn = true;
           state.role = authService.getRole();
           state.username = authService.getUsername();
+          state.userId = authService.getUserId();
         }
       })
       .addCase(login.rejected, (state) => {

@@ -3,21 +3,20 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import ReusableModal from "../common/ReusableModal";
 import { Logo } from "../../assets";
 import { ChevronDown, FileText, Heart, Send, Bell, LogOut, Settings, HelpCircle } from "lucide-react";
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { logout } from '../../redux/slice/authSlice';
 import { RootState } from "../../redux/store";
+import { openMessenger } from "../../redux/slice/loadingSlice";
+import useAppDispatch from "../../hooks/useAppDispatch";
 interface NavbarProps { }
 
 const Navbar: React.FC<NavbarProps> = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isEmployerPage = location.pathname.startsWith('/employer');
-
   const [isModalOpen, setModalOpen] = useState(false);
-  const { token, role } = useSelector((state: RootState) => state.authReducer);
-  const isLoggedIn = !!token;
-  const dispatch = useDispatch();
-
+  const { isLoggedIn, role, username } = useSelector((state: RootState) => state.authReducer);
+  const dispatch = useAppDispatch();
 
   const isLinkActive = (path: string) => location.pathname === path;
 
@@ -134,6 +133,9 @@ const Navbar: React.FC<NavbarProps> = () => {
               <Link to="/companies" className={getLinkClassName('/companies')}>
                 Công ty
               </Link>
+              <div onClick={() => dispatch(openMessenger())}>
+                Tin nhan
+              </div>
             </div>
           ) : (
             <div className="hidden lg:flex space-x-6 ml-10">
@@ -155,7 +157,7 @@ const Navbar: React.FC<NavbarProps> = () => {
             <div className="relative group">
               <button className="flex items-center space-x-2 text-gray-700 hover:text-[#0069DB] transition duration-300 border rounded-full px-2 py-1 hover:border-[#0069DB]">
                 <img src={Logo} alt="User Avatar" className="w-8 h-8 rounded-full" />
-                <span className="font-medium">Quân Nguyễn</span>
+                <span className="font-medium">{username || 'Login'}</span>
                 <ChevronDown size={16} />
               </button>
               {role === 'user' ? renderUserDropdown() : renderAdminDropdown()}

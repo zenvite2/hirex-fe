@@ -6,6 +6,7 @@ import { AppDispatch, RootState } from '../../redux/store';
 import { login } from '../../services/authApi';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
+import useAppDispatch from '../../hooks/useAppDispatch';
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
@@ -21,7 +22,7 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const dispatch: AppDispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -29,11 +30,11 @@ const LoginPage = () => {
     dispatch(startLoading());
     const result = await dispatch(login({ username, password }))
     dispatch(stopLoading());
-    if (result.payload.response.success == true) {
+    if (result?.payload?.response?.success == true) {
       navigate('/dashboard');
     }
     else {
-      toast.error("login failed.")
+      toast.error(result?.payload?.response?.message || 'Something went wrong.');
     }
   }
 

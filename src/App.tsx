@@ -18,6 +18,11 @@ import {
 import { ToastContainer } from 'react-toastify';
 import Loading from './components/Loading';
 import LoginPage from "./pages/auth/Login";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "./redux/store";
+import CustomModal from "./components/CustomModal";
+import { closeMessenger } from "./redux/slice/loadingSlice";
+import useAppDispatch from "./hooks/useAppDispatch";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -40,8 +45,9 @@ function SidebarLayout() {
 
 function App() {
     const location = useLocation();
-
-    // Không hiển thị Navbar trên trang login và register-employee
+    const { showMessenger } = useSelector((state: RootState) => state.loadingReducer);
+    const dispatch = useAppDispatch();
+    // Không hiển thị Navbar trên trang login và register-employee  
     const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer";
 
     return (
@@ -85,6 +91,8 @@ function App() {
                 draggable
                 theme="light"
             />
+            {showMessenger && <CustomModal isOpen={showMessenger} width='large' height='large' onClose={() => { dispatch(closeMessenger()); }} children={<Messenger />} />}
+            { }
             <Loading />
         </>
     );

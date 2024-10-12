@@ -14,94 +14,111 @@ import {
     VideoCallButton,
     TypingIndicator,
     MessageModel,
-    MessageType,
 } from "@chatscope/chat-ui-kit-react";
 import { Client, Message as MessageStompjs, over } from 'stompjs';
 import SockJS from 'sockjs-client';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import CustomModal from '../../components/CustomModal';
 import VideoCallRequest from './VideoCallRequest';
-import { useLocation } from 'react-router-dom';
+import { updateConversations } from '../../redux/slice/messageSlice';
+import { getConversations } from '../../services/messageApi';
+import useAppDispatch from '../../hooks/useAppDispatch';
 
 const VIDEO_CALL_RESPONSE = {
-    ACCEPT: 'ACCEPT',
-    REFUSE: 'REFUSE'
+    ACCEPT: 'VIDEO_CALL_RESPONSE_ACCEPT',
+    REFUSE: 'VIDEO_CALL_RESPONSE_REFUSE'
 } as const;
 
-const Status = {
+export const Status = {
     JOIN: 'JOIN',
-    LEAVE: 'LEAVE',
     MESSAGE: 'MESSAGE',
     VIDEO_CALL_REQUEST: 'VIDEO_CALL_REQUEST',
     VIDEO_CALL_RESPONSE: VIDEO_CALL_RESPONSE
 } as const;
 
-type StatusType =
+export type StatusType =
     | typeof Status.JOIN
-    | typeof Status.LEAVE
     | typeof Status.MESSAGE
     | typeof Status.VIDEO_CALL_REQUEST
     | typeof Status.VIDEO_CALL_RESPONSE.ACCEPT
     | typeof Status.VIDEO_CALL_RESPONSE.REFUSE;
 
-interface User {
-    id: string;
-    name: string;
-    avatar: string;
-    lastMessage: string;
-}
-
-interface ChatMessage extends MessageModel {
+export interface ChatMessage extends MessageModel {
     receiver: string;
     status: StatusType;
+}
+
+export interface Conversation {
+    id: number,
+    name: string,
+    avtUrl: string,
+    last10Messages: ChatMessage[]
 }
 
 let stompClient: Client | null = null;
 let isConnected: Boolean = false;
 
 const Messenger: React.FC = () => {
-    const { currentUser } = useLocation().state;
-    const [toCaller, setToCaller] = useState(null);
-    const users: User[] = [
-        { id: '1', name: '321', avatar: 'https://via.placeholder.com/40', lastMessage: 'Goi tao di!' },
-        { id: '2', name: 'Anna', avatar: 'https://via.placeholder.com/40', lastMessage: 'How are you?' },
-        { id: '3', name: 'Sam', avatar: 'https://via.placeholder.com/40', lastMessage: 'Goodbye!' },
-    ];
-    const dispatch = useDispatch();
-    const [currentChatFriend, setCurrentChatFriend] = useState<User | null>(users[0]);
-    const [messages, setMessages] = useState<MessageModel[]>([]);
-    const [messageInputValue, setMessageInputValue] = useState<string>("");
-    const [showCallRequestModal, setShowCallRequestModal] = useState(false);
+    const { userId, username } = useSelector((state: RootState) => state.authReducer);
+    const { lstConvers } = useSelector((state: RootState) => state.messageReducer);
+    const dispatch = useAppDispatch();
+    const [toCaller, setToCaller] = useState<string>(null);
+    const [currentConvers, setCurrentConversation] = useState<Conversation | null>(lstConvers[0] ?? null);
+    const [lstCurrentMsg, setLstCurrentMsg] = useState<ChatMessage[]>([]);
+    const [msgInput, setMsgInput] = useState<string>("");
+    const [showCallRqModal, setShowCallRqModal] = useState(false);
 
     useEffect(() => {
-        dispatch(startLoading());
-        connect();
+        if (!isConnected) {
+            dispatch(startLoading());
+            connect();
+        }
     }, []);
 
+    useEffect(() => {
+        isConnected && userId != null && dispatch(getConversations({ userId }));
+    }, [userId]);
+
+    const fetchConversations = useCallback(() => {
+        setLstCurrentMsg((lstConvers.length > 0 && currentConvers) ? lstConvers.find(item => item.id == currentConvers?.id)?.last10Messages ?? [] : []);
+    }, [lstConvers, currentConvers]);
+
+    useEffect(() => {
+        isConnected && fetchConversations();
+    }, [lstConvers, currentConvers]);
+
+    useEffect(() => {
+        if (lstConvers.length > 0 && currentConvers == null) {
+            setCurrentConversation(prev => prev ?? lstConvers[0]);
+        }
+    }, [lstConvers]);
+
     const connect = () => {
-        if (isConnected) {
-            stompClient.connect({}, onConnected, (e) => { dispatch(stopLoading()); console.log('Error when connecting ws:', e) });
-        } else {
-            const Sock = new SockJS('https://192.168.1.123:8888/ws');
-            stompClient = over(Sock);
+        if (!isConnected) {
+            const sock = new SockJS('https://192.168.1.123:8888/ws');
+            stompClient = over(sock);
             isConnected = true;
-            stompClient.connect({}, onConnected, (e) => { dispatch(stopLoading()); console.log('Error when connecting ws:', e) });
+            stompClient.connect({}, onConnected, (e) => { dispatch(stopLoading()); toast.error('Cannot connect to server.\nPlease reload the page and try again.'); });
+
+            sock.onerror = () => {
+                toast.error('Something wrong happened.');
+            }
         }
     };
 
     const onConnected = () => {
         dispatch(stopLoading());
-        stompClient.subscribe('/user/' + currentUser + '/private', onReceive);
+        stompClient.subscribe('/user/' + userId + '/private', onReceive);
         const chatMessage: ChatMessage = {
-            sender: currentUser,
-            message: `${currentUser} connected to server.`,
-            sentTime: Date.now().toLocaleString(),
+            sender: userId + '',
+            message: `${userId} connected to server.`,
+            sentTime: new Date().toISOString(),
             receiver: '...',
             status: Status.JOIN,
-            type: 'text',
+            type: 'custom',
             direction: 'outgoing',
             position: 'normal'
         };
@@ -110,47 +127,60 @@ const Messenger: React.FC = () => {
 
     const onReceive = (payload: MessageStompjs) => {
         const payloadData: ChatMessage = { ...JSON.parse(payload.body), position: 'normal', direction: 'incoming' };
-        setMessages(prevMessages => [...prevMessages, payloadData]);
+        updateReduxConversations(payloadData);
         if (payloadData.status == Status.VIDEO_CALL_REQUEST) {
-            setShowCallRequestModal(true);
+            setShowCallRqModal(true);
             setToCaller(payloadData.sender);
         }
     };
 
+    const updateReduxConversations = (chatMessage: ChatMessage) => {
+        const updatedConversations = lstConvers.map(item =>
+            item.id === currentConvers?.id
+                ? { ...item, last10Messages: [...item.last10Messages, chatMessage] }
+                : item
+        );
+        dispatch(updateConversations(updatedConversations));
+    }
+
     const handleSendMessage = () => {
         if (stompClient) {
-            if (messageInputValue.trim() && currentChatFriend) {
+            if (msgInput.trim() && currentConvers) {
                 const chatMessage: ChatMessage = {
-                    sender: currentUser,
-                    receiver: currentChatFriend.name,
-                    message: messageInputValue.trim(),
-                    sentTime: Date.now().toLocaleString(),
+                    sender: String(userId),
+                    receiver: String(currentConvers?.id),
+                    message: msgInput.trim(),
+                    sentTime: new Date().toISOString(),
                     status: Status.MESSAGE,
                     direction: 'outgoing',
-                    position: 'normal'
+                    position: 'normal',
+                    type: 'text',
                 };
+
+                updateReduxConversations(chatMessage);
                 stompClient.send("/app/private-message", {}, JSON.stringify(chatMessage));
-                setMessageInputValue("");
+                setMsgInput("");
             }
+
         }
         else {
-            toast.error("You are disconnected from server. Please reload the page and try again.");
+            toast.error("Cannot connect to server. Please reload the page and try again.");
         }
     };
 
     const handleVideoCall = () => {
         const windowFeatures = `menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes,width=${window.screen.width},height=${window.screen.height}`;
         const url = new URL("https://192.168.1.123:8888/video-call");
-        url.searchParams.set("fromUser", currentUser);
-        url.searchParams.set("toUser", currentChatFriend.name);
+        url.searchParams.set("fromUser", userId + '');
+        url.searchParams.set("toUser", currentConvers?.id + '');
         url.searchParams.set("isCallee", '0');
         window.open(url.toString(), "Video Call", windowFeatures);
 
         const chatMessage: ChatMessage = {
-            sender: currentUser,
-            receiver: currentChatFriend.name,
+            sender: userId + '',
+            receiver: currentConvers?.id + '',
             message: 'da yeu cau video call',
-            sentTime: Date.now().toLocaleString(),
+            sentTime: new Date().toISOString(),
             status: Status.VIDEO_CALL_REQUEST,
             direction: 'outgoing',
             position: 'normal'
@@ -160,9 +190,9 @@ const Messenger: React.FC = () => {
 
     const handleRefuseCall = () => {
         const acceptPayload = {
-            fromUser: currentUser,
+            fromUser: userId,
             toUser: toCaller,
-            status: 'REFUSE',
+            status: 'VIDEO_CALL_REQUEST_REFUSE',
         };
         stompClient.send("/app/accept", {}, JSON.stringify(acceptPayload));
     }
@@ -172,29 +202,29 @@ const Messenger: React.FC = () => {
             <MainContainer responsive>
                 <Sidebar position="left">
                     <ConversationList>
-                        {users.map(user => (
+                        {lstConvers?.length > 0 && lstConvers.map(conversation => (
                             <Conversation
-                                key={user.id}
-                                name={user.name}
-                                lastSenderName={user.name}
-                                info={user.lastMessage}
-                                active={currentChatFriend?.id === user.id}
+                                key={conversation.id}
+                                name={conversation.name}
+                                lastSenderName={conversation.name}
+                                info={conversation.last10Messages[conversation.last10Messages.length - 1]?.message ?? ''}
+                                active={currentConvers?.id === conversation.id}
                                 onClick={() => {
-                                    setCurrentChatFriend(user);
-                                    setToCaller(user.name);
+                                    setCurrentConversation(conversation);
+                                    setToCaller(conversation.id + '');
                                 }}
                             >
-                                <Avatar src={user.avatar} name={user.name} />
+                                <Avatar src={conversation.avtUrl} name={conversation.name} />
                             </Conversation>
                         ))}
                     </ConversationList>
                 </Sidebar>
 
                 <ChatContainer>
-                    {currentChatFriend && (
+                    {currentConvers && (
                         <ConversationHeader>
-                            <Avatar src={currentChatFriend.avatar} name={currentChatFriend.name} />
-                            <ConversationHeader.Content userName={currentChatFriend.name} info="Online" />
+                            <Avatar src={currentConvers?.avtUrl} name={currentConvers?.name} />
+                            <ConversationHeader.Content userName={currentConvers?.name} info="Online" />
                             <ConversationHeader.Actions>
                                 <VideoCallButton onClick={handleVideoCall} />
                             </ConversationHeader.Actions>
@@ -202,31 +232,31 @@ const Messenger: React.FC = () => {
                     )}
 
                     <MessageList>
-                        {messages.map((msg: MessageModel, index) => (
+                        {lstCurrentMsg.map((msg: ChatMessage, index) => (
                             <Message
                                 key={index}
                                 model={{
                                     message: msg.message,
-                                    sentTime: new Date(msg.sentTime).toLocaleTimeString(),
+                                    sentTime: new Date(msg.sentTime).toISOString(),
                                     sender: msg.sender,
-                                    direction: msg.sender === currentUser ? 'outgoing' : 'incoming',
+                                    direction: msg.sender === userId + '' ? 'outgoing' : 'incoming',
                                     position: 'single',
                                 }}
                             />
                         ))}
-                        {/* <TypingIndicator content={`${currentChatFriend?.name} is typing...`} /> */}
+                        {/* <TypingIndicator content={`${currentConvers?.name} is typing...`} /> */}
                     </MessageList>
 
                     <MessageInput
-                        placeholder={`you are: ${currentUser} Type message to ${currentChatFriend?.name || "anonymous"}...`}
-                        value={messageInputValue}
-                        onChange={val => setMessageInputValue(val)}
+                        placeholder={`Type message to ${currentConvers?.name || "anonymous"}...`}
+                        value={msgInput}
+                        onChange={val => setMsgInput(val)}
                         onSend={handleSendMessage}
                     />
                 </ChatContainer>
             </MainContainer>
-            {showCallRequestModal && <CustomModal isOpen={showCallRequestModal} onClose={() => setShowCallRequestModal(false)} width='large' height='large'>
-                <VideoCallRequest fromUser={toCaller} toUser={currentUser} setShowCallRequestModal={setShowCallRequestModal} handleRefuseCall={handleRefuseCall} />
+            {showCallRqModal && <CustomModal isOpen={showCallRqModal} onClose={() => setShowCallRqModal(false)} width='large' height='large'>
+                <VideoCallRequest fromUser={toCaller} toUser={userId + ''} setShowCallRequestModal={setShowCallRqModal} handleRefuseCall={handleRefuseCall} />
             </CustomModal>}
         </div>
     );
