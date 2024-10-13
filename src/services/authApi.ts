@@ -8,7 +8,7 @@ export const login = createAsyncThunk<any, { username: string, password: string 
     async (payload) => {
         return axiosIns.post('/auth/login', payload)
             .then(response => { return { response: response.data } })
-            .catch(error => error);
+            .catch(error => { toast.error(error.response.data) });
     }
 );
 

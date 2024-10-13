@@ -9,10 +9,10 @@ const Loading: React.FC = () => {
     if (!isLoading) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center">
+        <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-60 z-9999">
             <HashLoader
                 size={80}
-                color="green"
+                color="#1591ea"
                 aria-label="Loading Spinner"
                 data-testid="loader"
             />

@@ -1,8 +1,9 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { CustomButton, TextInput } from "..";
+import useAppDispatch from "../../hooks/useAppDispatch";
 
 interface User {
   firstName: string;
@@ -28,7 +29,7 @@ const UserForm: React.FC<UserFormProps> = ({ open, setOpen }) => {
     mode: "onChange",
     defaultValues: { ...user?.user },
   });
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [uploadCv, setUploadCv] = useState<File | null>(null);
 
