@@ -14,6 +14,8 @@ import RegisterEmployee from "./auth/RegisterEmployee";
 import RegisterEmployer from "./auth/RegisterEmployer";
 import Messenger from './chat/Messenger';
 import VideoCallRequest from './chat/VideoCallRequest';
+import ResumePage from "./employee/ResumePage";
+
 export {
   FindJobs,
   Companies,
@@ -30,5 +32,6 @@ export {
   RegisterEmployer,
   RegisterEmployee,
   Messenger,
-  VideoCallRequest
+  VideoCallRequest,
+  ResumePage
 };

@@ -14,11 +14,12 @@ const Navbar: React.FC<NavbarProps> = () => {
   const isEmployerPage = location.pathname.startsWith('/employer');
 
   const [isModalOpen, setModalOpen] = useState(false);
-  const { token, role } = useSelector((state: RootState) => state.authReducer);
+  const token = sessionStorage.getItem('token');
+  const role = sessionStorage.getItem('role');  
   const isLoggedIn = !!token;
   const dispatch = useDispatch();
 
-
+  console.log(role)
   const isLinkActive = (path: string) => location.pathname === path;
 
   const getLinkClassName = (path: string) => {
@@ -128,7 +129,7 @@ const Navbar: React.FC<NavbarProps> = () => {
               <Link to="/find-jobs" className={getLinkClassName('/find-jobs')}>
                 Việc làm
               </Link>
-              <Link to="/companies" className={getLinkClassName('/user-profile')}>
+              <Link to="/resume" className={getLinkClassName('/resume')}>
                 Hồ sơ & CV
               </Link>
               <Link to="/companies" className={getLinkClassName('/companies')}>
