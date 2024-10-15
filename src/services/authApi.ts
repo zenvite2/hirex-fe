@@ -12,11 +12,20 @@ export const login = createAsyncThunk<any, { username: string, password: string 
     }
 );
 
-export const register = createAsyncThunk<any, any>(
-    'authReducers/register',
+export const registerEmployee = createAsyncThunk<any, any>(
+    'authReducers/registerEmployee',
     async (info) => {
-        return axiosIns.post('/auth/register/user', info)
-            .then(response => { toast.success(response.data) })
+        return axiosIns.post('/employee/create', info)
+            .then(response => {return {response: response.data} })
+            .catch(error => toast.error(error.response.data));
+    }
+);
+
+export const registerEmployer = createAsyncThunk<any, any>(
+    'authReducers/registerEmployer',
+    async (info) => {
+        return axiosIns.post('/employer/create', info)
+            .then(response => {return {response: response.data} })
             .catch(error => toast.error(error.response.data));
     }
 );

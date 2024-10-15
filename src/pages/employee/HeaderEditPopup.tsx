@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 
 const HeaderEditPopup = ({ isOpen, onClose, onSave, headerData }) => {
-  const [editedData, setEditedData] = React.useState(headerData);
+  const [editedData, setEditedData] = useState(headerData);
 
   useEffect(() => {
     if (isOpen) {
@@ -27,142 +28,101 @@ const HeaderEditPopup = ({ isOpen, onClose, onSave, headerData }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl"> {/* Changed max-w-md to max-w-3xl */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Thông tin cá nhân</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-xl">
-            &times;
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-lg font-semibold">Thông tin cá nhân</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <X size={20} />
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4"> {/* Added grid layout for two columns */}
+        <form onSubmit={handleSubmit}>
+          <div className="p-4 grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="resumeTitle" className="block text-sm font-medium text-gray-700">Tiêu đề hồ sơ *</label>
-              <input
-                type="text"
-                id="resumeTitle"
-                name="resumeTitle"
-                value={editedData.resumeTitle}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-              />
-            </div>
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Họ và tên *</label>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Họ và tên *</label>
               <input
                 type="text"
                 id="name"
                 name="name"
+                className="block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
                 value={editedData.name}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                required
               />
             </div>
             <div>
-              <label htmlFor="nationality" className="block text-sm font-medium text-gray-700">Quốc tịch *</label>
-              <select
-                id="nationality"
-                name="nationality"
-                value={editedData.nationality}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-              >
-                <option value="Việt kiều">Việt kiều</option>
-                {/* Add other nationality options here */}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700">Ngày sinh *</label>
+              <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 mb-1">Ngày sinh *</label>
               <input
                 type="date"
                 id="birthDate"
                 name="birthDate"
+                className="block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
                 value={editedData.birthDate}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                required
               />
             </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Ảnh đại diện</label>
-            <div className="mt-1 flex items-center">
-              <img src="/placeholder-image.jpg" alt="Profile" className="w-12 h-12 object-cover rounded-full" />
-              <button type="button" className="ml-4 px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">
-                Chọn ảnh
-              </button>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4"> {/* Added grid layout for two columns */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Tình trạng hôn nhân *</label>
-              <div className="flex space-x-4">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="maritalStatus"
-                    value="single"
-                    checked={editedData.maritalStatus === 'single'}
-                    onChange={handleChange}
-                    className="form-radio text-blue-600"
-                  />
-                  <span className="ml-2">Độc thân</span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="maritalStatus"
-                    value="married"
-                    checked={editedData.maritalStatus === 'married'}
-                    onChange={handleChange}
-                    className="form-radio text-blue-600"
-                  />
-                  <span className="ml-2">Đã kết hôn</span>
-                </label>
-              </div>
+              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Địa chỉ *</label>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                className="block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                value={editedData.address}
+                onChange={handleChange}
+                required
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Giới tính *</label>
-              <div className="flex space-x-4">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                className="block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                value={editedData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Giới tính *</label>
+              <div className="mt-1 space-x-4">
                 <label className="inline-flex items-center">
                   <input
                     type="radio"
+                    className="form-radio border-2 border-gray-300"
                     name="gender"
-                    value="male"
-                    checked={editedData.gender === 'male'}
+                    value="Nam"
+                    checked={editedData.gender === "Nam"}
                     onChange={handleChange}
-                    className="form-radio text-blue-600"
                   />
                   <span className="ml-2">Nam</span>
                 </label>
                 <label className="inline-flex items-center">
                   <input
                     type="radio"
+                    className="form-radio border-2 border-gray-300"
                     name="gender"
-                    value="female"
-                    checked={editedData.gender === 'female'}
+                    value="Nữ"
+                    checked={editedData.gender === "Nữ"}
                     onChange={handleChange}
-                    className="form-radio text-blue-600"
                   />
                   <span className="ml-2">Nữ</span>
                 </label>
               </div>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Ảnh đại diện</label>
+              <div className="mt-1">
+                <img src="/api/placeholder/100/100" alt="Placeholder" className="w-24 h-24 object-cover rounded border-2 border-gray-300" />
+              </div>
+            </div>
           </div>
-          <div className="flex justify-end space-x-2 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Hủy
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Cập nhật
-            </button>
+          <div className="flex justify-end space-x-2 p-4 border-t">
+            <button type="button" onClick={onClose} className="px-4 py-2 border-2 rounded-md text-gray-600 hover:bg-gray-50">Hủy</button>
+            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 border-2 border-blue-500">Cập nhật</button>
           </div>
         </form>
       </div>

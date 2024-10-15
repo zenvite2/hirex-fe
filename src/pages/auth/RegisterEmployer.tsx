@@ -1,217 +1,107 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useRegistrationForm } from './useRegistrationForm';
+import { FormInput } from '../../components/registration/FormInput';
+import { LocationSelector } from '../../components/registration/LocationSelector';
+import { registerEmployer } from '../../services/authApi';
+import useAppDispatch from '../../hooks/useAppDispatch';
+import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
+import { toast } from 'react-toastify';
 
-const RegistrationForm = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    fullName: '',
-    gender: '',
-    phone: '',
-    company: '',
-    workLocation: '',
-    district: '',
-  });
-  const [termsAccepted, setTermsAccepted] = useState(false);
+const RegistrationForm: React.FC = () => {
+  const dispatch = useAppDispatch();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({ ...prevData, [name]: value }));
-  };
+  const {
+    formData,
+    handleInputChange,
+    cities,
+    districts,
+    handleSelectCity,
+    handleSelectDistrict,
+    fetchCities,
+    fetchDistricts,
+  } = useRegistrationForm();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    
+    const submissionData = {
+      username: formData.username,
+      email: formData.email,
+      password: formData.password,
+      fullName: formData.fullName,
+      gender: formData.gender,
+      phone: formData.phone,
+      company: formData.company,
+      workLocation: formData.workLocation,
+      district: formData.district
+    };
+
+    dispatch(startLoading());
+    const result = await dispatch(registerEmployer(submissionData));
+    dispatch(stopLoading());
+
+    if (result?.payload?.response?.success == true) {
+      toast.success('Đăng ký thành công');
+    } else {
+      toast.error(result?.payload?.response?.message || 'Đăng ký thất bại');
+    }
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <div className="w-full max-w-2xl m-auto bg-white rounded-lg shadow-md p-8">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email đăng nhập *
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-              placeholder="Email"
-              required
-            />
-          </div>
+    <div className="flex min-h-screen bg-gray-50">
+      <div className="w-full max-w-xl m-auto bg-white rounded-lg shadow-md p-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <FormInput name="username" label="Username" value={formData.username} onChange={handleInputChange} />
+          <FormInput name="email" label="Email đăng nhập" type="email" value={formData.email} onChange={handleInputChange} />
+          <FormInput name="password" label="Mật khẩu" type="password" value={formData.password} onChange={handleInputChange} />
+          <FormInput name="confirmPassword" label="Xác nhận mật khẩu" type="password" value={formData.confirmPassword} onChange={handleInputChange} />
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Mật khẩu *
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-              placeholder="Mật khẩu ( từ 6 đến 25 ký tự )"
-              required
-              minLength={6}
-              maxLength={25}
-            />
-          </div>
+          <h3 className="text-base font-medium text-gray-900">Thông tin nhà tuyển dụng</h3>
 
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-              Nhập lại mật khẩu *
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-              placeholder="Nhập lại mật khẩu"
-              required
-            />
-          </div>
-
-          <h3 className="text-lg font-medium text-gray-900">Thông tin nhà tuyển dụng</h3>
-
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
+            <FormInput name="fullName" label="Họ và tên" value={formData.fullName} onChange={handleInputChange} />
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                Họ và tên *
-              </label>
-              <input
-                type="text"
-                id="fullName"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleInputChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-                placeholder="Họ và tên"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Giới tính *</label>
-              <div className="mt-2 space-x-4">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="Nam"
-                    checked={formData.gender === 'Nam'}
-                    onChange={handleInputChange}
-                    className="form-radio text-green-600"
-                  />
-                  <span className="ml-2">Nam</span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="Nữ"
-                    checked={formData.gender === 'Nữ'}
-                    onChange={handleInputChange}
-                    className="form-radio text-green-600"
-                  />
-                  <span className="ml-2">Nữ</span>
-                </label>
+              <label className="block text-xs font-medium text-gray-700">Giới tính *</label>
+              <div className="mt-1 space-x-4">
+                {['Nam', 'Nữ'].map((gender) => (
+                  <label key={gender} className="inline-flex items-center">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value={gender}
+                      checked={formData.gender === gender}
+                      onChange={handleInputChange}
+                      className="form-radio text-green-600"
+                    />
+                    <span className="ml-2 text-sm">{gender}</span>
+                  </label>
+                ))}
               </div>
             </div>
           </div>
 
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-              Số điện thoại cá nhân *
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleInputChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-              placeholder="Số điện thoại cá nhân"
-              required
-            />
-          </div>
+          <FormInput name="phone" label="Số điện thoại cá nhân" type="tel" value={formData.phone} onChange={handleInputChange} />
+          <FormInput name="company" label="Công ty" value={formData.company} onChange={handleInputChange} />
 
-          <div>
-            <label htmlFor="company" className="block text-sm font-medium text-gray-700">
-              Công ty *
-            </label>
-            <input
-              type="text"
-              id="company"
-              name="company"
-              value={formData.company}
-              onChange={handleInputChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-              placeholder="Tên công ty"
-              required
+          <div className="grid grid-cols-2 gap-3">
+            <LocationSelector
+              label="Địa điểm làm việc"
+              placeholder="Chọn tỉnh/thành phố"
+              locations={cities}
+              value={cities.find(city => city.id === formData.workLocation)?.name || ''}
+              onChange={handleSelectCity}
+              onSearch={fetchCities}
             />
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="workLocation" className="block text-sm font-medium text-gray-700">
-                Địa điểm làm việc *
-              </label>
-              <select
-                id="workLocation"
-                name="workLocation"
-                value={formData.workLocation}
-                onChange={handleInputChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-                required
-              >
-                <option value="">Chọn tỉnh/thành phố</option>
-                {/* Add options here */}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="district" className="block text-sm font-medium text-gray-700">
-                Quận/huyện
-              </label>
-              <select
-                id="district"
-                name="district"
-                value={formData.district}
-                onChange={handleInputChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-              >
-                <option value="">Chọn quận/huyện</option>
-                {/* Add options here */}
-              </select>
-            </div>
-          </div>
-
-          <div className="flex items-center">
-            <input
-              id="terms"
-              name="terms"
-              type="checkbox"
-              checked={termsAccepted}
-              onChange={() => setTermsAccepted(!termsAccepted)}
-              className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-              required
+            <LocationSelector
+              label="Quận/huyện"
+              placeholder="Chọn quận/huyện"
+              locations={districts}
+              value={districts.find(district => district.id === formData.district)?.name || ''}
+              onChange={handleSelectDistrict}
+              onSearch={(name) => fetchDistricts(name, formData.workLocation)}
+              disabled={!formData.workLocation}
             />
-            <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
-              Tôi đã đọc và đồng ý với{' '}
-              <a href="#" className="text-green-600 hover:text-green-500">
-                Điều khoản dịch vụ
-              </a>{' '}
-              và{' '}
-              <a href="#" className="text-green-600 hover:text-green-500">
-                Chính sách bảo mật
-              </a>{' '}
-              của TopCV.
-            </label>
           </div>
 
           <div>
@@ -219,17 +109,10 @@ const RegistrationForm = () => {
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
-              Hoàn tất
+              Đăng ký
             </button>
           </div>
         </form>
-
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Đã có tài khoản?{' '}
-          <a href="#" className="font-medium text-green-600 hover:text-green-500">
-            Đăng nhập ngay
-          </a>
-        </p>
       </div>
     </div>
   );

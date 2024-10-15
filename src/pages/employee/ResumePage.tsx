@@ -73,12 +73,10 @@ const ResumePage: React.FC = () => {
   const [isHeaderEditPopupOpen, setIsHeaderEditPopupOpen] = useState(false);
   const [headerData, setHeaderData] = useState({
     name: "Quân Nguyễn",
-    title: "gg",
     gender: "Nam",
     birthDate: "15/01/1970",
-    maritalStatus: "Độc thân",
-    nationality: "Việt kiều",
-    avatarUrl: "/api/placeholder/150/150" // Placeholder for avatar
+    address: 'Hà nội',
+    email:'quanbanthu@gmail.com'
   });
 
   const handleSaveHeaderData = (newData) => {
@@ -148,12 +146,11 @@ const ResumePage: React.FC = () => {
                 <Pencil size={20} />
               </button>
             </div>
-            <p className="text-xl text-gray-600 mb-4">{headerData.title}</p>
             <div className="grid grid-cols-2 gap-4">
               <p><span className="font-semibold">Giới tính:</span> {headerData.gender}</p>
               <p><span className="font-semibold">Ngày sinh:</span> {headerData.birthDate}</p>
-              <p><span className="font-semibold">Tình trạng hôn nhân:</span> {headerData.maritalStatus}</p>
-              <p><span className="font-semibold">Quốc tịch:</span> {headerData.nationality}</p>
+              <p><span className="font-semibold">Địa chỉ:</span> {headerData.address}</p>
+              <p><span className="font-semibold">Email:</span> {headerData.email}</p>
             </div>
           </div>
         </header>
@@ -241,45 +238,6 @@ const ResumePage: React.FC = () => {
         </section>
 
         <Divider />
-
-        {/* Certification section */}
-        {/* <section className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold">Certifications</h2>
-            <button
-              onClick={() => {
-                setEditingCertification(null);
-                setIsCertificationPopupOpen(true);
-              }}
-              className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
-            >
-              <Plus size={20} />
-            </button>
-          </div>
-          {certifications.map((cert) => (
-            <div key={cert.id} className="mb-4 p-4 bg-gray-50 rounded-lg">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-semibold text-lg">{cert.name}</p>
-                  <p className="text-gray-600">Issued by: {cert.issuedBy}</p>
-                  <p className="text-sm text-gray-500">Issue Date: {cert.issueDate}</p>
-                  {cert.expirationDate && <p className="text-sm text-gray-500">Expiration Date: {cert.expirationDate}</p>}
-                </div>
-                <button
-                  onClick={() => {
-                    setEditingCertification(cert);
-                    setIsCertificationPopupOpen(true);
-                  }}
-                  className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
-                >
-                  <Pencil size={16} />
-                </button>
-              </div>
-            </div>
-          ))}
-        </section>
-
-        <Divider /> */}
 
         {/* Skills section */}
         <section className="mb-8">

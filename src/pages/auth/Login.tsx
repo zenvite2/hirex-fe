@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../../redux/store';
 import { login } from '../../services/authApi';
@@ -31,7 +30,11 @@ const LoginPage = () => {
     const result = await dispatch(login({ username, password }))
     dispatch(stopLoading());
     if (result?.payload?.response?.success == true) {
-      navigate('/dashboard');
+      if(result?.payload?.response?.data.role == 'EMPLOYEE'){
+        navigate('/find-jobs');
+      }else{
+        navigate('/employer');
+      }
     }
     else {
       toast.error(result?.payload?.response?.message || 'Something went wrong.');

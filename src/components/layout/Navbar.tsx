@@ -127,7 +127,7 @@ const Navbar: React.FC<NavbarProps> = () => {
               <Link to="/find-jobs" className={getLinkClassName('/find-jobs')}>
                 Việc làm
               </Link>
-              <Link to="/companies" className={getLinkClassName('/user-profile')}>
+              <Link to="/resume" className={getLinkClassName('/resume')}>
                 Hồ sơ & CV
               </Link>
               <Link to="/companies" className={getLinkClassName('/companies')}>
@@ -160,7 +160,7 @@ const Navbar: React.FC<NavbarProps> = () => {
                 <span className="font-medium">{username || 'Login'}</span>
                 <ChevronDown size={16} />
               </button>
-              {role === 'user' ? renderUserDropdown() : renderAdminDropdown()}
+              {role === 'EMPLOYEE' ? renderUserDropdown() : renderAdminDropdown()}
             </div>
           ) : (
             <>

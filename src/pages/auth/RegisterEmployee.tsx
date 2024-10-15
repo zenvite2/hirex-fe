@@ -1,47 +1,60 @@
 import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import useAppDispatch from '../../hooks/useAppDispatch';
+import { registerEmployee } from '../../services/authApi';
+import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
+import { toast } from 'react-toastify';
+import { Link } from "react-router-dom";
 
 const RegistrationForm = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const dispatch = useAppDispatch();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({ ...prevData, [name]: value }));
-  };
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [retryPassword, setRetryPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRetryPassword, setShowRetryPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add your registration logic here
-    console.log('Form submitted:', formData);
+    if (password !== retryPassword) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+    dispatch(startLoading());
+    const result = await dispatch(registerEmployee({ username, email, password, retryPassword }));
+    dispatch(stopLoading());
+
+    if (result?.payload?.response?.success == true) {
+      toast.success('Đăng ký thành công');
+    } else {
+      toast.error(result?.payload?.response?.message || 'Đăng ký thất bại');
+    }
+
   };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       <div className="w-full max-w-md m-auto bg-white rounded-lg shadow-md p-8">
-        <h2 className="text-2xl font-semibold text-center text-green-600 mb-6">
-          Chào mừng bạn đến với TopCV
+        <h2 className="text-2xl font-semibold text-center text-blue-600 mb-6">
+          Chào mừng bạn đến với HireX
         </h2>
-        <p className="text-center text-gray-600 mb-6">
-          Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý tưởng
-        </p>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
-              Họ và tên
+            <label htmlFor="username" className="block text-gray-700 text-sm font-bold mb-2">
+              Username
             </label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
+              id="username"
+              name="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
-              placeholder="Nhập họ tên"
+              placeholder="username"
               required
             />
           </div>
@@ -53,57 +66,69 @@ const RegistrationForm = () => {
               type="email"
               id="email"
               name="email"
-              value={formData.email}
-              onChange={handleInputChange}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
               placeholder="Nhập email"
               required
             />
           </div>
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
               Mật khẩu
             </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
-              placeholder="Nhập mật khẩu"
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label htmlFor="confirmPassword" className="block text-gray-700 text-sm font-bold mb-2">
-              Xác nhận mật khẩu
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
-              placeholder="Nhập lại mật khẩu"
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label className="flex items-center">
+            <div className="relative">
               <input
-                type="checkbox"
-                checked={termsAccepted}
-                onChange={() => setTermsAccepted(!termsAccepted)}
-                className="mr-2"
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
+                placeholder="Nhập mật khẩu"
                 required
               />
-              <span className="text-sm text-gray-600">
-                Tôi đã đọc và đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của TopCV
-              </span>
-            </label>
+              <div
+                className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <FontAwesomeIcon
+                  icon={showPassword ? faEye : faEyeSlash}
+                  className="text-gray-600"
+                />
+              </div>
+            </div>
           </div>
+          <div className="mb-6 relative">
+            <label htmlFor="retryPassword" className="block text-gray-700 text-sm font-bold mb-2">
+              Xác nhận mật khẩu
+            </label>
+            <div className="relative">
+              <input
+                type={showRetryPassword ? "text" : "password"}
+                id="retryPassword"
+                name="retryPassword"
+                value={retryPassword}
+                onChange={(e) => setRetryPassword(e.target.value)}
+                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
+                placeholder="Nhập lại mật khẩu"
+                required
+              />
+              <div
+                className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                onClick={() => setShowRetryPassword(!showRetryPassword)}
+              >
+                <FontAwesomeIcon
+                  icon={showRetryPassword ? faEye : faEyeSlash}
+                  className="text-gray-600"
+                />
+              </div>
+            </div>
+            {passwordError && (
+              <p className="text-red-500 text-sm mt-2">{passwordError}</p>
+            )}
+          </div>
+
           <button
             type="submit"
             className="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:shadow-outline"
@@ -113,9 +138,11 @@ const RegistrationForm = () => {
         </form>
         <p className="text-center text-sm text-gray-600 mt-4">
           Bạn đã có tài khoản?{' '}
-          <a href="#" className="text-green-500 hover:text-green-600">
-            Đăng nhập ngay
-          </a>
+          <Link to="/login">
+            <a className="text-green-500 hover:text-green-600">
+              Đăng nhập ngay
+            </a>
+          </Link>
         </p>
       </div>
     </div>
