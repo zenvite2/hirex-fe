@@ -1,23 +1,14 @@
-import React, { useState } from 'react';
-import { Pencil, Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import ExperiencePopup from './ExperiencePopup';
 import EducationPopup from './EducationPopup';
-import CertificationPopup from './CertificationPopup';
 import SkillPopup from './SkillPopup';
 import HeaderEditPopup from './HeaderEditPopup';
-import { Logo } from "../../assets";
-
-interface ResumeData {
-  name: string;
-  gender: string;
-  birthDate: string;
-  maritalStatus: string;
-  nationality: string;
-  address: string;
-  email: string;
-  totalExperience: string;
-  about: string;
-}
+import useAppDispatch from '../../hooks/useAppDispatch';
+import { getEmployees } from '../../services/employeeApi';
+import { RiAccountBoxFill } from "react-icons/ri";
+import { educationDelete, educationGetAll } from '../../services/educationApi';
+import { toast } from 'react-toastify';
 
 interface Experience {
   id?: number;
@@ -30,20 +21,12 @@ interface Experience {
 
 interface Education {
   id?: number;
-  school: string;
-  degree: string;
+  level: string;
+  nameSchool: string;
+  expertise: string;
   startDate: string;
   endDate: string;
   description: string;
-  major: string;
-}
-
-interface Certification {
-  id?: number;
-  name: string;
-  issuedBy: string;
-  issueDate: string;
-  expirationDate?: string;
 }
 
 interface Skill {
@@ -52,34 +35,45 @@ interface Skill {
   level: string;
 }
 
+interface HeaderData {
+  fullName: string;
+  gender: string;
+  dateOfBirth: string;
+  address: string;
+  email: string;
+  phoneNumber: string;
+  avatarUrl?: string;
+}
+
 const ResumePage: React.FC = () => {
-  const [resumeData, setResumeData] = useState<ResumeData | null>(null);
-  const [experiences, setExperiences] = useState<Experience[]>([]);
+
+  const dispatch = useAppDispatch();
   const [educations, setEducations] = useState<Education[]>([]);
-  const [certifications, setCertifications] = useState<Certification[]>([]);
+  const [isEducationPopupOpen, setIsEducationPopupOpen] = useState(false);
+  const [editingEducation, setEditingEducation] = useState<Education | null>(null);
+
+  const [experiences, setExperiences] = useState<Experience[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
 
   const [isExperiencePopupOpen, setIsExperiencePopupOpen] = useState(false);
-  const [isEducationPopupOpen, setIsEducationPopupOpen] = useState(false);
-  const [isCertificationPopupOpen, setIsCertificationPopupOpen] = useState(false);
   const [isSkillPopupOpen, setIsSkillPopupOpen] = useState(false);
 
   const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
-  const [editingEducation, setEditingEducation] = useState<Education | null>(null);
-  const [editingCertification, setEditingCertification] = useState<Certification | null>(null);
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
 
   const Divider = () => <hr className="my-8 border-t border-gray-300" />;
   const [isHeaderEditPopupOpen, setIsHeaderEditPopupOpen] = useState(false);
-  const [headerData, setHeaderData] = useState({
-    name: "Quân Nguyễn",
-    gender: "Nam",
-    birthDate: "15/01/1970",
-    address: 'Hà nội',
-    email:'quanbanthu@gmail.com'
+  const [headerData, setHeaderData] = useState<HeaderData>({
+    fullName: '',
+    gender: '',
+    dateOfBirth: '',
+    address: '',
+    email: '',
+    phoneNumber: '',
+    avatarUrl: '',
   });
 
-  const handleSaveHeaderData = (newData) => {
+  const handleSaveHeaderData = (newData: HeaderData) => {
     setHeaderData(newData);
     setIsHeaderEditPopupOpen(false);
   };
@@ -94,26 +88,6 @@ const ResumePage: React.FC = () => {
     setIsExperiencePopupOpen(false);
   };
 
-  const handleSaveEducation = (education: Education) => {
-    if (education.id) {
-      setEducations(educations.map(e => e.id === education.id ? education : e));
-    } else {
-      setEducations([...educations, { ...education, id: Date.now() }]);
-    }
-    setEditingEducation(null);
-    setIsEducationPopupOpen(false);
-  };
-
-  const handleSaveCertification = (certification: Certification) => {
-    if (certification.id) {
-      setCertifications(certifications.map(c => c.id === certification.id ? certification : c));
-    } else {
-      setCertifications([...certifications, { ...certification, id: Date.now() }]);
-    }
-    setEditingCertification(null);
-    setIsCertificationPopupOpen(false);
-  };
-
   const handleSaveSkill = (skill: Skill) => {
     if (skill.id) {
       setSkills(skills.map(s => s.id === skill.id ? skill : s));
@@ -124,6 +98,76 @@ const ResumePage: React.FC = () => {
     setIsSkillPopupOpen(false);
   };
 
+  const fetchEducations = async () => {
+    try {
+      const result = await dispatch(educationGetAll());
+      if (educationGetAll.fulfilled.match(result)) {
+        const educationsData = result.payload.response.data.map((item: any) => ({
+          id: item.id,
+          nameSchool: item.universityName,
+          expertise: item.expertise,
+          startDate: item.startDate || '',
+          endDate: item.endDate || '',
+          description: item.description,
+          level: item.level // Assuming the API now returns the level
+        }));
+        setEducations(educationsData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch educations:', error);
+      toast.error('Failed to fetch educations. Please try again.');
+    }
+  };
+
+  const handleSaveEducation = async (education: Education) => {
+    await fetchEducations();
+    setEditingEducation(null);
+    setIsEducationPopupOpen(false);
+  };
+
+  const handleDeleteEducation = async (id: number) => {
+    try {
+      const action = await dispatch(educationDelete(id));
+      if (educationDelete.fulfilled.match(action)) {
+        await fetchEducations(); // Fetch the updated list after deletion
+        toast.success('Education deleted successfully');
+      }
+    } catch (error) {
+      console.error('Failed to delete education:', error);
+      toast.error('Failed to delete education. Please try again.');
+    }
+
+  };
+  useEffect(() => {
+    fetchEducations();
+  }, [dispatch]);
+
+
+  useEffect(() => {
+    const fetchEmployeeData = async () => {
+      try {
+        const action = await dispatch(getEmployees());
+        if (getEmployees.fulfilled.match(action)) {
+          const employeeData = action.payload.response.data;
+          const [day, month, year] = employeeData.dateOfBirth.split('/');
+          const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          setHeaderData({
+            fullName: employeeData.fullName,
+            gender: employeeData.gender,
+            dateOfBirth: formattedDate, // Đã được chuyển đổi sang yyyy-mm-dd
+            address: employeeData.address,
+            email: employeeData.email,
+            phoneNumber: employeeData.phoneNumber,
+            avatarUrl: employeeData.avatar,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch employee data:', error);
+      }
+    };
+
+    fetchEmployeeData();
+  }, [dispatch]);
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">
@@ -131,14 +175,20 @@ const ResumePage: React.FC = () => {
 
         {/* Header section */}
         <header className="mb-8 flex items-start">
-          <img
-            src={Logo}
-            alt="Profile"
-            className="w-32 h-32 rounded-full mr-8 object-cover"
-          />
+          {headerData.avatarUrl ? (
+            <img
+              src={headerData.avatarUrl}
+              alt="Profile"
+              className="w-24 h-24 mr-8 bg-gray-200 flex items-center justify-center rounded-md"
+            />
+          ) : (
+            <div className="w-24 h-24  mr-8 bg-gray-200 flex items-center justify-center rounded-md">
+              <RiAccountBoxFill className="w-16 h-16 text-gray-400" />
+            </div>
+          )}
           <div className="flex-grow">
             <div className="flex justify-between items-center mb-4">
-              <h1 className="text-3xl font-bold">{headerData.name}</h1>
+              <h1 className="text-3xl font-bold">{headerData.fullName}</h1>
               <button
                 onClick={() => setIsHeaderEditPopupOpen(true)}
                 className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
@@ -148,9 +198,10 @@ const ResumePage: React.FC = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <p><span className="font-semibold">Giới tính:</span> {headerData.gender}</p>
-              <p><span className="font-semibold">Ngày sinh:</span> {headerData.birthDate}</p>
+              <p><span className="font-semibold">Ngày sinh:</span> {new Date(headerData.dateOfBirth).toLocaleDateString('vi-VN')}</p>
               <p><span className="font-semibold">Địa chỉ:</span> {headerData.address}</p>
               <p><span className="font-semibold">Email:</span> {headerData.email}</p>
+              <p><span className="font-semibold">Số điện thoại:</span> {headerData.phoneNumber}</p>
             </div>
           </div>
         </header>
@@ -176,25 +227,32 @@ const ResumePage: React.FC = () => {
               <div key={edu.id} className="mb-4 p-4 bg-gray-50 rounded-lg">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-semibold text-lg">{edu.school}</p>
-                    <p className="text-gray-600">{edu.degree}</p>
+                    <p className="text-gray-600">{edu.expertise}</p>
+                    <p className="font-semibold text-lg">{edu.nameSchool}</p>
                     <p className="text-sm text-gray-500">{edu.startDate} - {edu.endDate}</p>
                   </div>
-                  <button
-                    onClick={() => {
-                      setEditingEducation(edu);
-                      setIsEducationPopupOpen(true);
-                    }}
-                    className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
-                  >
-                    <Pencil size={16} />
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingEducation(edu);
+                        setIsEducationPopupOpen(true);
+                      }}
+                      className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteEducation(edu.id!)}
+                      className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
-                <p className="mt-2 text-gray-700">{edu.description}</p>
               </div>
             ))
           ) : (
-            <p className="text-gray-500"></p>
+            <p className="text-gray-500">Chưa có thông tin học vấn</p>
           )}
         </section>
 
@@ -287,12 +345,6 @@ const ResumePage: React.FC = () => {
           onSave={handleSaveEducation}
           education={editingEducation}
         />
-        <CertificationPopup
-          isOpen={isCertificationPopupOpen}
-          onClose={() => setIsCertificationPopupOpen(false)}
-          onSave={handleSaveCertification}
-          certification={editingCertification}
-        />
         <SkillPopup
           isOpen={isSkillPopupOpen}
           onClose={() => setIsSkillPopupOpen(false)}
@@ -303,7 +355,7 @@ const ResumePage: React.FC = () => {
           isOpen={isHeaderEditPopupOpen}
           onClose={() => setIsHeaderEditPopupOpen(false)}
           onSave={handleSaveHeaderData}
-          headerData={headerData}
+          headerData={{ ...headerData, avatarUrl: headerData.avatarUrl }}
         />
       </div>
     </div>
