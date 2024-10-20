@@ -185,7 +185,7 @@ const Navbar: React.FC<NavbarProps> = () => {
               handleLogout();     // Log out the user
               // After logging out, navigate to the appropriate page
               setTimeout(() => {
-                navigate(isEmployerPage ? "/" : "/employer");
+                navigate(isEmployerPage ? "/find-jobs" : "/employer");
               }, 0);  // Use a slight delay to ensure logout finishes before navigation
             }}
             className="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-900 transition duration-300 whitespace-nowrap"

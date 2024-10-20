@@ -35,3 +35,43 @@ export const districtList = createAsyncThunk<any,{ name?: string; cityIds?: numb
         return rejectWithValue(error.response?.data);
     }
 });
+
+export const salaryList = createAsyncThunk<any>(
+    'salary/list',
+    async () => {
+        return axiosIns.get('/auto-fill/salary', {
+          includeToken: true
+        }).then(response => { return { response: response.data }})      
+          .catch(error => toast.error(error.response?.data))
+    }
+);
+
+export const jobTypeList = createAsyncThunk<any>(
+    'job-type/list',
+    async () => {
+        return axiosIns.get('/auto-fill/job-type', {
+          includeToken: true
+        }).then(response => { return { response: response.data }})      
+          .catch(error => toast.error(error.response?.data))
+    }
+);
+
+export const experienceList = createAsyncThunk<any>(
+    'experience/list',
+    async () => {
+        return axiosIns.get('/auto-fill/year-experience', {
+          includeToken: true
+        }).then(response => { return { response: response.data }})      
+          .catch(error => toast.error(error.response?.data))
+    }
+);
+
+export const positionList = createAsyncThunk<any>(
+    'experience/list',
+    async () => {
+        return axiosIns.get('/auto-fill/position', {
+          includeToken: true
+        }).then(response => { return { response: response.data }})      
+          .catch(error => toast.error(error.response?.data))
+    }
+);

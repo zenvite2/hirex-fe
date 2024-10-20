@@ -4,25 +4,28 @@ import ExperiencePopup from './ExperiencePopup';
 import EducationPopup from './EducationPopup';
 import SkillPopup from './SkillPopup';
 import HeaderEditPopup from './HeaderEditPopup';
+import CareerGoalPopup from './CareerGoalPopup';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { getEmployees } from '../../services/employeeApi';
 import { RiAccountBoxFill } from "react-icons/ri";
 import { educationDelete, educationGetAll } from '../../services/educationApi';
+import { experienceDelete, experienceGetAll } from '../../services/experienceApi';
 import { toast } from 'react-toastify';
 
 interface Experience {
   id?: number;
-  company: string;
+  companyName: string;
   position: string;
   startDate: string;
   endDate: string;
   description: string;
+  yearExperience: number;
 }
 
 interface Education {
   id?: number;
   level: string;
-  nameSchool: string;
+  universityName: string;
   expertise: string;
   startDate: string;
   endDate: string;
@@ -45,6 +48,12 @@ interface HeaderData {
   avatarUrl?: string;
 }
 
+interface CareerGoalData {
+  id?: number;
+  position: string;
+  description: string;
+}
+
 const ResumePage: React.FC = () => {
 
   const dispatch = useAppDispatch();
@@ -53,15 +62,15 @@ const ResumePage: React.FC = () => {
   const [editingEducation, setEditingEducation] = useState<Education | null>(null);
 
   const [experiences, setExperiences] = useState<Experience[]>([]);
-  const [skills, setSkills] = useState<Skill[]>([]);
-
   const [isExperiencePopupOpen, setIsExperiencePopupOpen] = useState(false);
-  const [isSkillPopupOpen, setIsSkillPopupOpen] = useState(false);
-
   const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
+
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [isSkillPopupOpen, setIsSkillPopupOpen] = useState(false);
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
 
   const Divider = () => <hr className="my-8 border-t border-gray-300" />;
+
   const [isHeaderEditPopupOpen, setIsHeaderEditPopupOpen] = useState(false);
   const [headerData, setHeaderData] = useState<HeaderData>({
     fullName: '',
@@ -73,19 +82,20 @@ const ResumePage: React.FC = () => {
     avatarUrl: '',
   });
 
+  const [isCareerGoalEditPopupOpen, setIsCareerGoalEditPopupOpen] = useState(false);
+  const [CareerGoalData, setCareerGoalData] = useState<CareerGoalData>({
+    position: '',
+    description: ''
+  });
+
   const handleSaveHeaderData = (newData: HeaderData) => {
     setHeaderData(newData);
     setIsHeaderEditPopupOpen(false);
   };
 
-  const handleSaveExperience = (experience: Experience) => {
-    if (experience.id) {
-      setExperiences(experiences.map(e => e.id === experience.id ? experience : e));
-    } else {
-      setExperiences([...experiences, { ...experience, id: Date.now() }]);
-    }
-    setEditingExperience(null);
-    setIsExperiencePopupOpen(false);
+  const handleSaveCareerGoalData = (newData: CareerGoalData) => {
+    setCareerGoalData(newData);
+    setIsCareerGoalEditPopupOpen(false);
   };
 
   const handleSaveSkill = (skill: Skill) => {
@@ -104,7 +114,7 @@ const ResumePage: React.FC = () => {
       if (educationGetAll.fulfilled.match(result)) {
         const educationsData = result.payload.response.data.map((item: any) => ({
           id: item.id,
-          nameSchool: item.universityName,
+          universityName: item.universityName,
           expertise: item.expertise,
           startDate: item.startDate || '',
           endDate: item.endDate || '',
@@ -142,6 +152,49 @@ const ResumePage: React.FC = () => {
     fetchEducations();
   }, [dispatch]);
 
+  const fetchExperiens = async () => {
+    try {
+      const result = await dispatch(experienceGetAll());
+      if (experienceGetAll.fulfilled.match(result)) {
+        const experiencesData = result.payload.response.data.map((item: any) => ({
+          id: item.id,
+          companyName: item.companyName,
+          position: item.position,
+          startDate: item.startDate || '',
+          endDate: item.endDate || '',
+          description: item.description,
+          yearExperience: item.yearExperience // Assuming the API now returns the level
+        }));
+        setExperiences(experiencesData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch experiences:', error);
+      toast.error('Failed to fetch experiences. Please try again.');
+    }
+  };
+
+  const handleSaveExperience = async (experience: Experience) => {
+    await fetchExperiens();
+    setEditingExperience(null);
+    setIsExperiencePopupOpen(false);
+  };
+
+  const handleDeleteExperience = async (id: number) => {
+    try {
+      const action = await dispatch(experienceDelete(id));
+      if (experienceDelete.fulfilled.match(action)) {
+        await fetchEducations(); // Fetch the updated list after deletion
+        toast.success('Experience deleted successfully');
+      }
+    } catch (error) {
+      console.error('Failed to delete experience:', error);
+      toast.error('Failed to delete experience. Please try again.');
+    }
+
+  };
+  useEffect(() => {
+    fetchExperiens();
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchEmployeeData = async () => {
@@ -228,7 +281,7 @@ const ResumePage: React.FC = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-gray-600">{edu.expertise}</p>
-                    <p className="font-semibold text-lg">{edu.nameSchool}</p>
+                    <p className="font-semibold text-lg">{edu.universityName}</p>
                     <p className="text-sm text-gray-500">{edu.startDate} - {edu.endDate}</p>
                   </div>
                   <div className="flex gap-2">
@@ -276,21 +329,28 @@ const ResumePage: React.FC = () => {
             <div key={exp.id} className="mb-4 p-4 bg-gray-50 rounded-lg">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="font-semibold text-lg">{exp.company}</p>
+                  <p className="font-semibold text-lg">{exp.companyName}</p>
                   <p className="text-gray-600">{exp.position}</p>
                   <p className="text-sm text-gray-500">{exp.startDate} - {exp.endDate}</p>
                 </div>
-                <button
-                  onClick={() => {
-                    setEditingExperience(exp);
-                    setIsExperiencePopupOpen(true);
-                  }}
-                  className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
-                >
-                  <Pencil size={16} />
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setEditingExperience(exp);
+                      setIsExperiencePopupOpen(true);
+                    }}
+                    className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteExperience(exp.id!)}
+                    className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
-              <p className="mt-2 text-gray-700">{exp.description}</p>
             </div>
           ))}
         </section>
@@ -332,6 +392,26 @@ const ResumePage: React.FC = () => {
           </div>
         </section>
 
+        <Divider />
+
+        <header className="mb-8 flex items-start">
+          <div className="flex-grow">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-orange-600">Mục tiêu nghề nghiệp</h2>
+              <button
+                onClick={() => setIsCareerGoalEditPopupOpen(true)}
+                className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
+              >
+                <Pencil size={20} />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-4">
+              <p><span className="font-semibold">Vị trí:</span> {headerData.gender}</p>
+              <p><span className="font-semibold">Mô tả:</span> {new Date(headerData.dateOfBirth).toLocaleDateString('vi-VN')}</p>
+            </div>
+          </div>
+        </header>
+
         {/* Popups */}
         <ExperiencePopup
           isOpen={isExperiencePopupOpen}
@@ -357,6 +437,13 @@ const ResumePage: React.FC = () => {
           onSave={handleSaveHeaderData}
           headerData={{ ...headerData, avatarUrl: headerData.avatarUrl }}
         />
+          <CareerGoalPopup
+          isOpen={isCareerGoalEditPopupOpen}
+          onClose={() => setIsCareerGoalEditPopupOpen(false)}
+          onSave={handleSaveCareerGoalData}
+          careergoal={CareerGoalData}
+        />
+
       </div>
     </div>
 

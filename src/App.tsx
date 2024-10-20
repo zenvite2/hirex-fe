@@ -10,11 +10,11 @@ import {
     JobPosts,
     ApplicantsList,
     CompanyInfo,
-    Login,
     RegisterEmployee,
     RegisterEmployer,
     Messenger,
-    ResumePage
+    ResumePage,
+    JobForm
 } from "./pages";
 import { ToastContainer } from 'react-toastify';
 import Loading from './components/Loading';
@@ -27,7 +27,7 @@ import useAppDispatch from "./hooks/useAppDispatch";
 
 function SidebarLayout() {
     const location = useLocation();
-    const showSidebar = ["/dashboard", "/company-info", "/job-posts", "/applicants", "/info-page"].includes(location.pathname); // Hiển thị Sidebar ở những route này
+    const showSidebar = ["/dashboard", "/company-info", "/job-posts", "/applicants", "/info-page", "/apply-job"].includes(location.pathname); // Hiển thị Sidebar ở những route này
 
     return (
         <div className="flex min-h-screen">
@@ -72,6 +72,7 @@ function App() {
                             <Route path="/job-posts" element={<JobPosts />} />
                             <Route path="/applicants" element={<ApplicantsList />} />
                             <Route path="/info-page" element={<CompanyInfo />} />
+                            <Route path="/apply-job" element={<JobForm />} />
                         </Route>
 
                         {/* Các route khác */}

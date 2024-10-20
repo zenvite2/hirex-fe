@@ -23,7 +23,7 @@ interface JobCardProps {
 
 const JobCard: React.FC<JobCardProps> = ({ job }) => {
   return (
-    <Link to={`/job-detail/${job?.id}`}>
+    // <Link to={`/job-detail/${job?.id}`}>
       <div
         className='w-full md:w-[16rem] 2xl:w-[18rem] h-[16rem] md:h-[18rem] bg-white flex flex-col justify-between shadow-lg 
                 rounded-md px-3 py-5'
@@ -59,7 +59,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
           </span>
         </div>
       </div>
-    </Link>
+    // </Link>
   );
 };
 

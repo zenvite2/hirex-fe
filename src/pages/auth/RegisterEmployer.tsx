@@ -28,6 +28,7 @@ const RegistrationForm: React.FC = () => {
       username: formData.username,
       email: formData.email,
       password: formData.password,
+      retryPassword: formData.confirmPassword,
       fullName: formData.fullName,
       gender: formData.gender,
       phone: formData.phone,

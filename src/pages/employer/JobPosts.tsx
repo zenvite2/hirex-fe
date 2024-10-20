@@ -65,7 +65,7 @@ const JobListings = () => {
             <tr key={index} className="border-b">
               <td className="py-2">
                 <div className="font-bold">{job.title}</div>
-                <div className="text-gray-500">📍 {job.location}</div>
+                <div className="text-gray-500">{job.location}</div>
               </td>
               <td className="py-2">
                 <div>{job.createdAt}</div>

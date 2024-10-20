@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 interface Education {
   id?: number;
   level: string;
-  nameSchool: string;
+  universityName: string;
   expertise: string;
   startDate: string;
   endDate: string;
@@ -52,7 +52,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
 
   const [formData, setFormData] = useState<Education>({
     level: '',
-    nameSchool: '',
+    universityName: '',
     expertise: '',
     startDate: '',
     endDate: '',
@@ -67,7 +67,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
     } else {
       setFormData({
         level: '',
-        nameSchool: '',
+        universityName: '',
         expertise: '',
         startDate: '',
         endDate: '',
@@ -84,8 +84,8 @@ const EducationForm: React.FC<EducationFormProps> = ({
     if (!formData.level) {
       newErrors.level = 'Vui lòng chọn trình độ học vấn';
     }
-    if (!formData.nameSchool.trim()) {
-      newErrors.nameSchool = 'Vui lòng nhập tên trường';
+    if (!formData.universityName.trim()) {
+      newErrors.universityName = 'Vui lòng nhập tên trường';
     }
     if (!formData.expertise.trim()) {
       newErrors.expertise = 'Vui lòng nhập chuyên môn';
@@ -126,7 +126,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
 
     try {
       const educationData: EducationRequestData = {
-        universityName: formData.nameSchool,
+        universityName: formData.universityName,
         level: formData.level,
         expertise: formData.expertise,
         startDate: formData.startDate,
@@ -159,7 +159,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
         const updatedEducation: Education = {
           id: education?.id || result.payload.response.data.id,
           level: formData.level,
-          nameSchool: formData.nameSchool,
+          universityName: formData.universityName,
           expertise: formData.expertise,
           startDate: formData.startDate,
           endDate: formData.endDate,
@@ -230,16 +230,16 @@ const EducationForm: React.FC<EducationFormProps> = ({
             </label>
             <input
               type="text"
-              name="nameSchool"
-              value={formData.nameSchool}
+              name="universityName"
+              value={formData.universityName}
               onChange={handleChange}
               disabled={isSubmitting}
-              className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.nameSchool ? 'border-red-500' : 'border-gray-300'
+              className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.universityName ? 'border-red-500' : 'border-gray-300'
                 }`}
               placeholder="Nhập tên trường"
             />
-            {errors.nameSchool && (
-              <p className="mt-1 text-sm text-red-500">{errors.nameSchool}</p>
+            {errors.universityName && (
+              <p className="mt-1 text-sm text-red-500">{errors.universityName}</p>
             )}
           </div>
 
