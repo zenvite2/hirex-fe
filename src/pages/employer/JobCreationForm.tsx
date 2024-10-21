@@ -1,16 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import useAppDispatch from '../../hooks/useAppDispatch';
+import { experienceList, positionList, jobTypeList } from '../../services/autofillApi';
+import { useLocationSelector } from './useLocationSelector';
+import { LocationSelector } from '../../components/registration/LocationSelector';
+
+interface ExperienceType {
+  id: number;
+  name: string;
+  minYear: number;
+  maxYear: number;
+}
+
+interface PositionType {
+  id: number;
+  name: string;
+}
+
+interface BasicType {
+  id: number;
+  name: string;
+}
 
 interface FormData {
   title: string;
-  province: string;
-  district: string;
-  ward: string;
+  city: number | null;
+  district: number | null;
   address: string;
   description: string;
   industry: string;
-  experience: string;
+  experience: number | string;
   jobType: string;
-  position: string;
+  position: number | string;
   deadline: string;
   salary: string;
   overtime: string;
@@ -18,256 +38,215 @@ interface FormData {
   phone: string;
 }
 
+const initialFormData: FormData = {
+  title: '',
+  city: null,
+  district: null,
+  address: '',
+  description: '',
+  industry: '',
+  experience: '',
+  jobType: '',
+  position: '',
+  deadline: '',
+  salary: '',
+  overtime: '',
+  email: '',
+  phone: ''
+};
+
 const JobCreationForm: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    title: '',
-    province: '',
-    district: '',
-    ward: '',
-    address: '',
-    description: '',
-    industry: '',
-    experience: '',
-    jobType: '',
-    position: '',
-    deadline: '',
-    salary: '',
-    overtime: '',
-    email: '',
-    phone: '',
-  });
+  const dispatch = useAppDispatch();
+  const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [experiences, setExperiences] = useState<ExperienceType[]>([]);
+  const [positions, setPositions] = useState<PositionType[]>([]);
+  const [jobTypes, setJobTypes] = useState<BasicType[]>([]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const {
+    city,
+    district,
+    cities,
+    districts,
+    handleSelectCity,
+    handleSelectDistrict,
+    fetchCities,
+    fetchDistricts
+  } = useLocationSelector();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [experienceResult, positionResult, jobTypeResult] = await Promise.all([
+        dispatch(experienceList()).unwrap(),
+        dispatch(positionList()).unwrap(),
+        dispatch(jobTypeList()).unwrap()
+      ]);
+
+      if (experienceResult.response?.data) {
+        setExperiences(experienceResult.response.data);
+      }
+
+      if (positionResult.response?.data) {
+        setPositions(positionResult.response.data);
+      }
+
+      if (jobTypeResult.response?.data) {
+        setJobTypes(jobTypeResult.response.data);
+      }
+    };
+
+    fetchData();
+  }, [dispatch]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log(formData);
-    // You can add your submission logic here, such as sending data to an API
+    console.log('Form submitted:', { ...formData, city: city?.id, district: district?.id });
   };
+
+  const renderSelectOptions = (fieldName: keyof FormData) => {
+    switch (fieldName) {
+      case 'experience':
+        return experiences.map(exp => (
+          <option key={exp.id} value={exp.id}>
+            {exp.name}
+          </option>
+        ));
+      case 'position':
+        return positions.map(pos => (
+          <option key={pos.id} value={pos.id}>
+            {pos.name}
+          </option>
+        ));
+      case 'jobType':
+        return jobTypes.map(type => (
+          <option key={type.id} value={type.id}>
+            {type.name}
+          </option>
+        ));
+      default:
+        return ([] as string[]).map(option => (
+          <option key={option} value={option}>{option}</option>
+        ));
+    }
+  };
+
+  const renderField = (name: keyof FormData, label: string, type: string = 'text', options?: string[] | ExperienceType[] | PositionType[]) => (
+    <div className="relative space-y-2">
+      <label className="block text-sm font-semibold text-gray-700">
+        {label} <span className="text-red-500">*</span>
+      </label>
+      <div>
+        {type === 'select' ? (
+          <select
+            id={name}
+            name={name}
+            value={formData[name] as string}
+            onChange={handleInputChange}
+            className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+            required
+          >
+            <option value="">Chọn {label}</option>
+            {renderSelectOptions(name)}
+          </select>
+        ) : type === 'textarea' ? (
+          <textarea
+            id={name}
+            name={name}
+            value={formData[name] as string}
+            onChange={handleInputChange}
+            className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+            required
+            rows={4}
+          />
+        ) : (
+          <input
+            type={type}
+            id={name}
+            name={name}
+            value={formData[name] as string}
+            onChange={handleInputChange}
+            className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+            required
+          />
+        )}
+      </div>
+    </div>
+  );
 
   return (
-    <div className="container mx-auto w-3/4 px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Thêm mới job</h1>
-      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        <div className="mb-4">
-          <label htmlFor="title" className="block text-gray-700 text-sm font-bold mb-2">Tiêu đề (*)</label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            required
-          />
-        </div>
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="container mx-auto max-w-5xl px-4">
+        <h1 className="text-3xl font-bold mb-6">Thêm mới job</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 mb-4">
-          <div>
-            <label htmlFor="province" className="block text-gray-700 text-sm font-bold mb-2">Tỉnh / TP (*)</label>
-            <select
-              id="province"
-              name="province"
-              value={formData.province}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            >
-              <option value="">Chọn tỉnh / TP</option>
-              {/* Add province options here */}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="district" className="block text-gray-700 text-sm font-bold mb-2">Quận / huyện (*)</label>
-            <select
-              id="district"
-              name="district"
-              value={formData.district}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            >
-              <option value="">Chọn Quận / huyện</option>
-              {/* Add district options here */}
-            </select>
-          </div>
-        </div>
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            {renderField('title', 'Tiêu đề')}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label htmlFor="address" className="block text-gray-700 text-sm font-bold mb-2">Địa chỉ cụ thể (*)</label>
-            <input
-              type="text"
-              id="address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-2/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <LocationSelector
+                label="Tỉnh / TP"
+                placeholder="Chọn tỉnh thành"
+                locations={cities}
+                value={city?.name || ''}
+                onChange={(selectedCity) => {
+                  handleSelectCity(selectedCity);
+                  setFormData(prev => ({
+                    ...prev,
+                    city: selectedCity?.id || null,
+                    district: null
+                  }));
+                }}
+                onSearch={fetchCities}
+                disabled={false}
+              />
 
-        <div className="mb-4">
-          <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">Mô tả (*)</label>
-          <textarea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            rows={6}
-            required
-          />
-        </div>
+              <LocationSelector
+                label="Quận / Huyện"
+                placeholder="Chọn quận huyện"
+                locations={districts}
+                value={district?.name || ''}
+                onChange={(selectedDistrict) => {
+                  handleSelectDistrict(selectedDistrict);
+                  setFormData(prev => ({
+                    ...prev,
+                    district: selectedDistrict?.id || null
+                  }));
+                }}
+                onSearch={(query) => fetchDistricts(query, city?.id || 0)}
+                disabled={!city}
+              />
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label htmlFor="industry" className="block text-gray-700 text-sm font-bold mb-2">Ngành nghề (*)</label>
-            <select
-              id="industry"
-              name="industry"
-              value={formData.industry}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            >
-              <option value="">Chọn ngành nghề</option>
-              <option value="Bán hàng">Bán hàng</option>
-              {/* Add more industry options */}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="experience" className="block text-gray-700 text-sm font-bold mb-2">Kinh nghiệm làm việc (*)</label>
-            <select
-              id="experience"
-              name="experience"
-              value={formData.experience}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            >
-              <option value="">Chọn kinh nghiệm</option>
-              <option value="2 năm">2 năm</option>
-              {/* Add more experience options */}
-            </select>
-          </div>
-        </div>
+            {renderField('address', 'Địa chỉ cụ thể')}
+            {renderField('description', 'Mô tả', 'textarea')}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label htmlFor="jobType" className="block text-gray-700 text-sm font-bold mb-2">Loại hình làm việc (*)</label>
-            <select
-              id="jobType"
-              name="jobType"
-              value={formData.jobType}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            >
-              <option value="">Chọn loại hình làm việc</option>
-              <option value="Bán thời gian cố định">Bán thời gian cố định</option>
-              {/* Add more job type options */}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="position" className="block text-gray-700 text-sm font-bold mb-2">Cấp bậc (*)</label>
-            <select
-              id="position"
-              name="position"
-              value={formData.position}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            >
-              <option value="">Chọn cấp bậc</option>
-              <option value="Nhân viên">Nhân viên</option>
-              {/* Add more position options */}
-            </select>
-          </div>
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {renderField('industry', 'Ngành nghề', 'select', ['Bán hàng', 'IT', 'Giáo dục', 'Y tế'])}
+              {renderField('experience', 'Kinh nghiệm làm việc', 'select')}
+              {renderField('jobType', 'Loại hình làm việc', 'select', ['Toàn thời gian', 'Bán thời gian', 'Thời vụ'])}
+              {renderField('position', 'Cấp bậc', 'select', ['Nhân viên', 'Trưởng nhóm', 'Quản lý', 'Giám đốc'])}
+              {renderField('deadline', 'Hạn nộp hồ sơ', 'date')}
+              {renderField('salary', 'Mức lương')}
+              {renderField('overtime', 'Làm thêm giờ (OT)', 'select', ['Không', 'Có'])}
+              {renderField('email', 'Email', 'email')}
+              {renderField('phone', 'Số điện thoại', 'tel')}
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label htmlFor="deadline" className="block text-gray-700 text-sm font-bold mb-2">Hạn nộp hồ sơ (*)</label>
-            <input
-              type="date"
-              id="deadline"
-              name="deadline"
-              value={formData.deadline}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="salary" className="block text-gray-700 text-sm font-bold mb-2">Mức lương (*)</label>
-            <input
-              type="text"
-              id="salary"
-              name="salary"
-              value={formData.salary}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
+            <div className="flex justify-end pt-6">
+              <button
+                type="submit"
+                className="px-6 py-3 bg-blue-600 text-white text-base font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              >
+                Lưu
+              </button>
+            </div>
+          </form>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label htmlFor="overtime" className="block text-gray-700 text-sm font-bold mb-2">Làm thêm giờ (OT)</label>
-            <select
-              id="overtime"
-              name="overtime"
-              value={formData.overtime}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            >
-              <option value="Không">Không</option>
-              <option value="Có">Có</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2">Phone</label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center justify-end">
-          <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Lưu
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   );
 };

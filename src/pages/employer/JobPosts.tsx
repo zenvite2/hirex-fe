@@ -1,5 +1,6 @@
 import React from 'react';
 import { Eye, Pencil, Trash } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const JobListings = () => {
   const jobListings = [
@@ -29,11 +30,17 @@ const JobListings = () => {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">Danh sách job</h1>
-        <button className="bg-red-500 text-white px-4 py-2 rounded">Thêm mới job</button>
+        <h1 className="text-xl font-bold">Danh sách công việc</h1>
+        <Link to="/apply-job">
+          <button
+            className="bg-[#0069DB] text-white px-3 py-2 rounded-md hover:bg-[#0050B3] transition duration-300"
+          >
+            Thêm mới
+          </button>
+        </Link>
       </div>
-      
-      <div className="bg-gray-100 p-4 mb-4 flex justify-between">
+
+      {/* <div className="bg-gray-100 p-4 mb-4 flex justify-between">
         <div className="flex items-center">
           <span className="mr-2">🕒</span>
           <span className="font-bold mr-1">10</span>
@@ -49,7 +56,7 @@ const JobListings = () => {
           <span className="font-bold mr-1">3</span>
           Ứng viên
         </div>
-      </div>
+      </div> */}
 
       <table className="w-full">
         <thead>
