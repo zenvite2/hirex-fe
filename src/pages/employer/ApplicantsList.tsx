@@ -1,27 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, ChevronDown, Download, Trash, CheckCircle, XCircle } from 'lucide-react';
+import { applicationLists } from '../../services/applicayionApi';
+import moment from 'moment';
+import useAppDispatch from '../../hooks/useAppDispatch';
 
 const ApplicantsList = () => {
-  const applicants = [
-    {
-      job: 'CỘNG TÁC VIÊN CONTENT MARKETING (THU NHẬP TỪ 4.000.000 - 6.000.000 VNĐ)',
-      name: 'Nguyễn Văn AA',
-      phone: '0928817228',
-      email: 'nguyenvanaaa@gmail.com',
-      location: 'Số 2, Ngõ 54, Phố Vũ Trọng Phụng, Thanh Xuân, Hà Nội',
-      date: '2023-04-16 08:30',
-      status: 'Pass'
-    },
-    {
-      job: 'NHÂN VIÊN TƯ VẤN KHÓA HỌC PARTIME',
-      name: 'Nguyễn Văn AA',
-      phone: '0928817228',
-      email: 'nguyenvanaaa@gmail.com',
-      location: '206 Bạch Mai, Hai Bà Trưng, Hà Nội',
-      date: '2023-04-16 08:14',
-      status: 'Fail'
-    }
-  ];
+  const dispatch = useAppDispatch();
+  const [applications , setAplications] = useState([]);
+
+  useEffect(() => {
+
+    const fetchJobDetail = async () => {
+      try {
+          const result = await dispatch(applicationLists());
+          setAplications(result?.payload?.response?.data);
+      } catch (err) {
+      }
+  };
+  fetchJobDetail(); 
+  }, [dispatch]);
 
   return (
     <div className="p-4">
@@ -34,6 +31,9 @@ const ApplicantsList = () => {
         <div className="relative inline-block mr-2">
           <select className="border p-2 pr-8 appearance-none rounded">
             <option>Chọn trạng thái</option>
+            <option value="PENDING">PENDING</option>
+            <option value="APPROVED">APPROVED</option>
+            <option value="REJECTED">REJECTED</option>
           </select>
           <ChevronDown className="absolute right-2 top-3 w-4 h-4 pointer-events-none" />
         </div>
@@ -48,7 +48,7 @@ const ApplicantsList = () => {
       <table className="w-full">
         <thead>
           <tr className="text-left text-pink-500">
-            <th>Jop</th>
+            <th>Job</th>
             <th>Ứng viên</th>
             <th>Ngày ứng tuyển</th>
             <th>Trạng thái</th>
@@ -56,31 +56,44 @@ const ApplicantsList = () => {
           </tr>
         </thead>
         <tbody>
-          {applicants.map((applicant, index) => (
-            <tr key={index} className="border-b">
+          {applications.map((application) => (
+            <tr key={application.id} className="border-b">
               <td className="py-2">
-                <div className="font-bold">{applicant.job}</div>
-                <div className="text-gray-500">📍 {applicant.location}</div>
-                <div className="text-red-500">Đánh giá</div>
+                <div className="font-bold">{application.jobTitle}</div>
+                <div className="text-gray-500">📍 {application.address}</div>
               </td>
               <td className="py-2">
-                <div>{applicant.name}</div>
-                <div>Phone: {applicant.phone}</div>
-                <div>Email: {applicant.email}</div>
+                <div>{application.fullName || 'Chưa có tên'}</div>
                 <div className="flex items-center">
-                  CV: <Download className="w-4 h-4 ml-1" /> Download
+                  CV: <Download className="w-4 h-4 ml-1 cursor-pointer" /> Download
                 </div>
               </td>
-              <td className="py-2">{applicant.date}</td>
               <td className="py-2">
-                <span className={applicant.status === 'Pass' ? 'text-green-500' : 'text-red-500'}>
-                  {applicant.status}
+                {application.createdAt 
+                  ? moment(application.createdAt).format('YYYY-MM-DD HH:mm')
+                  : 'Chưa có thời gian'}
+              </td>
+              <td className="py-2">
+                <span className={
+                  application.status === 'APPROVED' 
+                    ? 'text-green-500' 
+                    : application.status === 'REJECTED'
+                    ? 'text-red-500'
+                    : 'text-yellow-500'
+                }>
+                  {application.status}
                 </span>
               </td>
               <td className="py-2">
-                <Trash className="inline-block mr-2 text-gray-500" size={18} />
-                <CheckCircle className="inline-block mr-2 text-gray-500" size={18} />
-                <XCircle className="inline-block text-gray-500" size={18} />
+                <Trash className="inline-block mr-2 text-gray-500 cursor-pointer" size={18} />
+                <CheckCircle 
+                  className="inline-block mr-2 text-gray-500 cursor-pointer hover:text-green-500" 
+                  size={18} 
+                />
+                <XCircle 
+                  className="inline-block text-gray-500 cursor-pointer hover:text-red-500" 
+                  size={18} 
+                />
               </td>
             </tr>
           ))}

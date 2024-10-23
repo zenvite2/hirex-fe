@@ -56,7 +56,7 @@ function App() {
             <main className="bg-[#f7fdfd]">
                 {/* Chỉ hiển thị Navbar nếu không phải trang login hoặc register-employee */}
                 {!hideNavbarOnLogin && <Navbar />}
-                <div className={hideNavbarOnLogin ? "" : "pt-[80px]"}>
+                <div className={hideNavbarOnLogin ? "" : "pt-[50px]"}>
                     <Routes>
                         {/* Routes với xác thực */}
                         <Route path="/" element={<Navigate to="/find-jobs" replace={true} />} />

@@ -40,12 +40,10 @@ export const jobGetAll = createAsyncThunk<any>(
 );
 
 // Get job
-export const jobGet = createAsyncThunk<any>(
+export const jobGet = createAsyncThunk<any,any>(
     'job/getJob',
     async (id) => {
-        return axiosIns.get(`/job/${id}`, {
-            includeToken: true
-        })
+        return axiosIns.get(`/job/${id}`)
             .then(response => { return { response: response.data } })
             .catch(error => toast.error(error.response.data));
     }
