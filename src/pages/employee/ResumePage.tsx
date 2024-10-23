@@ -201,18 +201,20 @@ const ResumePage: React.FC = () => {
       try {
         const action = await dispatch(getEmployees());
         if (getEmployees.fulfilled.match(action)) {
-          const employeeData = action.payload.response.data;
-          const [day, month, year] = employeeData.dateOfBirth.split('/');
-          const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-          setHeaderData({
-            fullName: employeeData.fullName,
-            gender: employeeData.gender,
-            dateOfBirth: formattedDate, // Đã được chuyển đổi sang yyyy-mm-dd
-            address: employeeData.address,
-            email: employeeData.email,
-            phoneNumber: employeeData.phoneNumber,
-            avatarUrl: employeeData.avatar,
-          });
+          const employeeData = action.payload.response?.data;
+          if (employeeData) {
+            const [day, month, year] = employeeData.dateOfBirth.split('/');
+            const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            setHeaderData({
+              fullName: employeeData.fullName,
+              gender: employeeData.gender,
+              dateOfBirth: formattedDate, // Đã được chuyển đổi sang yyyy-mm-dd
+              address: employeeData.address,
+              email: employeeData.email,
+              phoneNumber: employeeData.phoneNumber,
+              avatarUrl: employeeData.avatar,
+            });
+          }
         }
       } catch (error) {
         console.error('Failed to fetch employee data:', error);
@@ -437,7 +439,7 @@ const ResumePage: React.FC = () => {
           onSave={handleSaveHeaderData}
           headerData={{ ...headerData, avatarUrl: headerData.avatarUrl }}
         />
-          <CareerGoalPopup
+        <CareerGoalPopup
           isOpen={isCareerGoalEditPopupOpen}
           onClose={() => setIsCareerGoalEditPopupOpen(false)}
           onSave={handleSaveCareerGoalData}
