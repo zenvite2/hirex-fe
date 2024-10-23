@@ -62,7 +62,7 @@ function App() {
                         <Route path="/" element={<Navigate to="/find-jobs" replace={true} />} />
                         <Route path="/find-jobs" element={<FindJobs />} />
                         <Route path="/user-profile" element={<UserProfile />} />
-                        {/* <Route path="/job-detail/:id" element={<JobDetail />} /> */}
+                        <Route path="/job-detail/:id" element={<JobDetail />} />
                         <Route path="/login" element={<LoginPage />} />
 
                         {/* Routes có Sidebar */}
@@ -73,6 +73,8 @@ function App() {
                             <Route path="/applicants" element={<ApplicantsList />} />
                             <Route path="/info-page" element={<CompanyInfo />} />
                             <Route path="/apply-job" element={<JobForm />} />
+                            <Route path="/jobs/edit/:id" element={<JobForm />} />
+
                         </Route>
 
                         {/* Các route khác */}

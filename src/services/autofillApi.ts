@@ -73,3 +73,13 @@ export const positionList = createAsyncThunk<any>(
           .catch(error => toast.error(error.response?.data))
     }
 );
+
+export const techList = createAsyncThunk<any>(
+    'tech/list',
+    async () => {
+        return axiosIns.get('/auto-fill/tech', {
+          includeToken: true
+        }).then(response => { return { response: response.data }})      
+          .catch(error => toast.error(error.response?.data))
+    }
+);
