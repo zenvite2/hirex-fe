@@ -1,14 +1,29 @@
-import React, { useState } from "react";
+import React, {useEffect, useState } from "react";
 import { BsSearch } from "react-icons/bs";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { FaIndustry, FaLevelUpAlt, FaBriefcase, FaDollarSign, FaGraduationCap, FaCalendarAlt } from "react-icons/fa";
 import { jobs } from "../../utils/data";
 import { CustomButton, JobCard } from "../../components";
 import CheckboxDropdown from "../../components/common/CheckboxDropdown";
+import { jobGetWithCompany } from '../../services/jobApi';
+import useAppDispatch from '../../hooks/useAppDispatch';
 
 interface Option {
   value: string;
   label: string;
+}
+
+interface Job {
+  id: number;
+  title: string;
+  location: string;
+  district: string;
+  city: string;
+  deadline: string;
+  createdAt: string;
+  companyName: string;
+  companyLogo: string | null;
+  companyDescription: string | null;
 }
 
 const jobFieldOptions: Option[] = [
@@ -55,6 +70,8 @@ const renderDropdown = (
 );
 
 const FindJobs: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [jobLocation, setJobLocation] = useState<string>("");
   const [selectedJobFields, setSelectedJobFields] = useState<string[]>([]);
@@ -65,6 +82,22 @@ const FindJobs: React.FC = () => {
   const [selectedJobTypes, setSelectedJobTypes] = useState<string[]>([]);
   const [selectedPostingDates, setSelectedPostingDates] = useState<string[]>([]);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const result = await dispatch(jobGetWithCompany()).unwrap();
+        if (result && result.response && result.response.success) {
+          setJobs(result.response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+      } 
+    };
+
+    fetchJobs();
+  }, [dispatch]);
+
 
   return (
     <div className="bg-[#f7fdfd]">

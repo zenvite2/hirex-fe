@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import useAppDispatch from '../../hooks/useAppDispatch';
-import { experienceList, positionList, jobTypeList } from '../../services/autofillApi';
+import { experienceList, positionList, jobTypeList, techList } from '../../services/autofillApi';
+import { jobCreate } from '../../services/jobApi';
 import { useLocationSelector } from './useLocationSelector';
 import { LocationSelector } from '../../components/registration/LocationSelector';
+import { toast } from 'react-toastify';
 
 interface ExperienceType {
   id: number;
@@ -21,18 +23,23 @@ interface BasicType {
   name: string;
 }
 
+interface TechType {
+  id: number;
+  name: string;
+}
+
 interface FormData {
   title: string;
   city: number | null;
   district: number | null;
-  address: string;
+  location: string;
   description: string;
-  industry: string;
-  experience: number | string;
+  industry: number | null;
+  yearExperience: number | null;
   jobType: string;
-  position: number | string;
+  position: number | null;
   deadline: string;
-  salary: string;
+  salary: number | null;
   overtime: string;
   email: string;
   phone: string;
@@ -42,14 +49,14 @@ const initialFormData: FormData = {
   title: '',
   city: null,
   district: null,
-  address: '',
+  location: '',
   description: '',
-  industry: '',
-  experience: '',
+  industry: null,
+  yearExperience: null,
   jobType: '',
-  position: '',
+  position: null,
   deadline: '',
-  salary: '',
+  salary: null,
   overtime: '',
   email: '',
   phone: ''
@@ -61,6 +68,8 @@ const JobCreationForm: React.FC = () => {
   const [experiences, setExperiences] = useState<ExperienceType[]>([]);
   const [positions, setPositions] = useState<PositionType[]>([]);
   const [jobTypes, setJobTypes] = useState<BasicType[]>([]);
+  const [techs, setTechs] = useState<TechType[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     city,
@@ -75,22 +84,28 @@ const JobCreationForm: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [experienceResult, positionResult, jobTypeResult] = await Promise.all([
-        dispatch(experienceList()).unwrap(),
-        dispatch(positionList()).unwrap(),
-        dispatch(jobTypeList()).unwrap()
-      ]);
+      try {
+        const [experienceResult, positionResult, jobTypeResult, techResult] = await Promise.all([
+          dispatch(experienceList()).unwrap(),
+          dispatch(positionList()).unwrap(),
+          dispatch(jobTypeList()).unwrap(),
+          dispatch(techList()).unwrap(),
+        ]);
 
-      if (experienceResult.response?.data) {
-        setExperiences(experienceResult.response.data);
-      }
-
-      if (positionResult.response?.data) {
-        setPositions(positionResult.response.data);
-      }
-
-      if (jobTypeResult.response?.data) {
-        setJobTypes(jobTypeResult.response.data);
+        if (experienceResult.response?.data) {
+          setExperiences(experienceResult.response.data);
+        }
+        if (positionResult.response?.data) {
+          setPositions(positionResult.response.data);
+        }
+        if (jobTypeResult.response?.data) {
+          setJobTypes(jobTypeResult.response.data);
+        }
+        if (techResult.response?.data) {
+          setTechs(techResult.response.data);
+        }
+      } catch (error) {
+        toast.error('Lỗi khi tải dữ liệu. Vui lòng thử lại sau.');
       }
     };
 
@@ -102,14 +117,31 @@ const JobCreationForm: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Form submitted:', { ...formData, city: city?.id, district: district?.id });
+
+    const jobData = {
+      ...formData,
+      city: city?.id,
+      district: district?.id,
+    };
+
+    setIsSubmitting(true);
+    try {
+      const result = await dispatch(jobCreate(jobData));
+      if (result?.payload?.response?.success == true) {
+        toast.success('Tạo job thành công!');
+      }
+    } catch (error: any) {
+      toast.error('Có lỗi xảy ra khi tạo job. Vui lòng thử lại.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderSelectOptions = (fieldName: keyof FormData) => {
     switch (fieldName) {
-      case 'experience':
+      case 'yearExperience':
         return experiences.map(exp => (
           <option key={exp.id} value={exp.id}>
             {exp.name}
@@ -127,17 +159,21 @@ const JobCreationForm: React.FC = () => {
             {type.name}
           </option>
         ));
-      default:
-        return ([] as string[]).map(option => (
-          <option key={option} value={option}>{option}</option>
+      case 'industry':
+        return techs.map(type => (
+          <option key={type.id} value={type.id}>
+            {type.name}
+          </option>
         ));
+      default:
+        return [];
     }
   };
 
-  const renderField = (name: keyof FormData, label: string, type: string = 'text', options?: string[] | ExperienceType[] | PositionType[]) => (
+  const renderField = (name: keyof FormData, label: string, type: string = 'text') => (
     <div className="relative space-y-2">
       <label className="block text-sm font-semibold text-gray-700">
-        {label} <span className="text-red-500">*</span>
+        {label}
       </label>
       <div>
         {type === 'select' ? (
@@ -147,7 +183,6 @@ const JobCreationForm: React.FC = () => {
             value={formData[name] as string}
             onChange={handleInputChange}
             className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-            required
           >
             <option value="">Chọn {label}</option>
             {renderSelectOptions(name)}
@@ -159,7 +194,6 @@ const JobCreationForm: React.FC = () => {
             value={formData[name] as string}
             onChange={handleInputChange}
             className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-            required
             rows={4}
           />
         ) : (
@@ -170,7 +204,6 @@ const JobCreationForm: React.FC = () => {
             value={formData[name] as string}
             onChange={handleInputChange}
             className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-            required
           />
         )}
       </div>
@@ -221,17 +254,17 @@ const JobCreationForm: React.FC = () => {
               />
             </div>
 
-            {renderField('address', 'Địa chỉ cụ thể')}
+            {renderField('location', 'Địa chỉ cụ thể')}
             {renderField('description', 'Mô tả', 'textarea')}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {renderField('industry', 'Ngành nghề', 'select', ['Bán hàng', 'IT', 'Giáo dục', 'Y tế'])}
-              {renderField('experience', 'Kinh nghiệm làm việc', 'select')}
-              {renderField('jobType', 'Loại hình làm việc', 'select', ['Toàn thời gian', 'Bán thời gian', 'Thời vụ'])}
-              {renderField('position', 'Cấp bậc', 'select', ['Nhân viên', 'Trưởng nhóm', 'Quản lý', 'Giám đốc'])}
+              {renderField('industry', 'Công nghệ', 'select')}
+              {renderField('yearExperience', 'Kinh nghiệm làm việc', 'select')}
+              {renderField('jobType', 'Loại hình làm việc', 'select')}
+              {renderField('position', 'Cấp bậc', 'select')}
               {renderField('deadline', 'Hạn nộp hồ sơ', 'date')}
               {renderField('salary', 'Mức lương')}
-              {renderField('overtime', 'Làm thêm giờ (OT)', 'select', ['Không', 'Có'])}
+              {renderField('overtime', 'Làm thêm giờ (OT)', 'select')}
               {renderField('email', 'Email', 'email')}
               {renderField('phone', 'Số điện thoại', 'tel')}
             </div>
@@ -239,9 +272,12 @@ const JobCreationForm: React.FC = () => {
             <div className="flex justify-end pt-6">
               <button
                 type="submit"
-                className="px-6 py-3 bg-blue-600 text-white text-base font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                disabled={isSubmitting}
+                className={`px-6 py-3 bg-blue-600 text-white text-base font-medium rounded-lg 
+                  ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} 
+                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors`}
               >
-                Lưu
+                {isSubmitting ? 'Đang xử lý...' : 'Lưu'}
               </button>
             </div>
           </form>

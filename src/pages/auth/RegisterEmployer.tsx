@@ -31,9 +31,9 @@ const RegistrationForm: React.FC = () => {
       retryPassword: formData.confirmPassword,
       fullName: formData.fullName,
       gender: formData.gender,
-      phone: formData.phone,
-      company: formData.company,
-      workLocation: formData.workLocation,
+      phoneNumber: formData.phone,
+      nameCompany: formData.company,
+      city: formData.workLocation,
       district: formData.district
     };
 

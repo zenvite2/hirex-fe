@@ -1,0 +1,17 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
+import axiosIns from "./axiosIns";
+
+export const updateCompany = createAsyncThunk<any, FormData>(
+    'company/update',
+    async (formData) => {
+        return axiosIns.patch('/company', formData, {
+          includeToken: true, 
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }).then(response => {return { response: response.data }})
+          .catch(error =>  toast.error(error.response?.data?.message))   
+    }
+  );
+  
