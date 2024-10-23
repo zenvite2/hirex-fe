@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import {
     MainContainer,
@@ -14,6 +14,8 @@ import {
     VideoCallButton,
     TypingIndicator,
     MessageModel,
+    MessageType,
+
 } from "@chatscope/chat-ui-kit-react";
 import { Client, Message as MessageStompjs, over } from 'stompjs';
 import SockJS from 'sockjs-client';
@@ -26,6 +28,7 @@ import VideoCallRequest from './VideoCallRequest';
 import { updateConversations } from '../../redux/slice/messageSlice';
 import { getConversations } from '../../services/messageApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
+import { uploadFile } from '../../services/fileUploadApi';
 
 const VIDEO_CALL_RESPONSE = {
     ACCEPT: 'VIDEO_CALL_RESPONSE_ACCEPT',
@@ -49,6 +52,7 @@ export type StatusType =
 export interface ChatMessage extends MessageModel {
     receiver: string;
     status: StatusType;
+    fileUrl?: string;
 }
 
 export interface Conversation {
@@ -70,6 +74,7 @@ const Messenger: React.FC = () => {
     const [lstCurrentMsg, setLstCurrentMsg] = useState<ChatMessage[]>([]);
     const [msgInput, setMsgInput] = useState<string>("");
     const [showCallRqModal, setShowCallRqModal] = useState(false);
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         if (!isConnected) {
@@ -143,9 +148,9 @@ const Messenger: React.FC = () => {
         dispatch(updateConversations(updatedConversations));
     }
 
-    const handleSendMessage = () => {
+    const handleSendMessage = useCallback((type: MessageType, fileUrl?: string) => {
         if (stompClient) {
-            if (msgInput.trim() && currentConvers) {
+            if ((msgInput.trim() || fileUrl) && currentConvers) {
                 const chatMessage: ChatMessage = {
                     sender: String(userId),
                     receiver: String(currentConvers?.id),
@@ -154,19 +159,19 @@ const Messenger: React.FC = () => {
                     status: Status.MESSAGE,
                     direction: 'outgoing',
                     position: 'normal',
-                    type: 'text',
+                    type: type,
+                    fileUrl: fileUrl
                 };
 
                 updateReduxConversations(chatMessage);
                 stompClient.send("/app/private-message", {}, JSON.stringify(chatMessage));
                 setMsgInput("");
             }
-
         }
         else {
             toast.error("Cannot connect to server. Please reload the page and try again.");
         }
-    };
+    }, [msgInput]);
 
     const handleVideoCall = () => {
         const windowFeatures = `menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes,width=${window.screen.width},height=${window.screen.height}`;
@@ -179,11 +184,12 @@ const Messenger: React.FC = () => {
         const chatMessage: ChatMessage = {
             sender: userId + '',
             receiver: currentConvers?.id + '',
-            message: 'da yeu cau video call',
+            message: 'Đã yêu cầu cuộc gọi video.',
             sentTime: new Date().toISOString(),
             status: Status.VIDEO_CALL_REQUEST,
             direction: 'outgoing',
-            position: 'normal'
+            position: 'normal',
+            type: 'text'
         };
         stompClient.send("/app/private-message", {}, JSON.stringify(chatMessage));
     };
@@ -196,6 +202,22 @@ const Messenger: React.FC = () => {
         };
         stompClient.send("/app/accept", {}, JSON.stringify(acceptPayload));
     }
+
+    const handleFileChosen = (event) => {
+        const file: File = event.target.files[0];
+        const fileType: MessageType = file.type.startsWith("image/") ? "image" : "custom";
+        uploadFile(file)
+            .then((url) => {
+                if (url) {
+                    handleSendMessage(fileType, url);
+                }
+            })
+            .catch((error) => {
+                console.error("Error uploading file:", error);
+                toast.error("Something went wrong during file upload");
+            });
+        event.target.value = '';
+    };
 
     return (
         <div style={{ position: "relative", height: "100%", width: "100%", flex: 1 }}>
@@ -236,14 +258,28 @@ const Messenger: React.FC = () => {
                             <Message
                                 key={index}
                                 model={{
-                                    message: msg.message,
+                                    message: msg.type === 'text' ? msg.message : undefined,
                                     sentTime: new Date(msg.sentTime).toISOString(),
                                     sender: msg.sender,
                                     direction: msg.sender === userId + '' ? 'outgoing' : 'incoming',
                                     position: 'single',
+                                    type: msg.type
                                 }}
-                            />
+                            >
+                                {msg.type == 'image' && <Message.ImageContent src={msg.fileUrl} />}
+                                {msg.type === "custom" && (
+                                    <Message.CustomContent>
+                                        <embed
+                                            src={msg.fileUrl}
+                                            width="100%"
+                                            height="400px"
+                                            type="application/pdf"
+                                        />
+                                    </Message.CustomContent>
+                                )}
+                            </Message>
                         ))}
+
                         {/* <TypingIndicator content={`${currentConvers?.name} is typing...`} /> */}
                     </MessageList>
 
@@ -251,13 +287,25 @@ const Messenger: React.FC = () => {
                         placeholder={`Type message to ${currentConvers?.name || "anonymous"}...`}
                         value={msgInput}
                         onChange={val => setMsgInput(val)}
-                        onSend={handleSendMessage}
+                        onSend={() => { handleSendMessage('text') }}
+                        onAttachClick={() => {
+                            if (fileInputRef.current) {
+                                fileInputRef.current.click();
+                            }
+                        }}
                     />
                 </ChatContainer>
             </MainContainer>
             {showCallRqModal && <CustomModal isOpen={showCallRqModal} onClose={() => setShowCallRqModal(false)} width='large' height='large'>
                 <VideoCallRequest fromUser={toCaller} toUser={userId + ''} setShowCallRequestModal={setShowCallRqModal} handleRefuseCall={handleRefuseCall} />
             </CustomModal>}
+            <input
+                type="file"
+                accept="image/*,application/pdf"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileChosen}
+            />
         </div>
     );
 };
