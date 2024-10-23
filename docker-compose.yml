@@ -1,0 +1,8 @@
+services:
+  hirex-fe:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hire-fe:latest
+    ports:
+      - "80:80"

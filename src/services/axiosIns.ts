@@ -13,7 +13,7 @@ interface ApiConfig extends InternalAxiosRequestConfig {
 }
 
 const axiosIns: AxiosInstance = axios.create({
-    baseURL: process.env.BASE_URL || 'http://localhost:8080',
+    baseURL: process.env.REACT_APP_BASE_URL || 'http://localhost:8080',
     timeout: 5000,
     headers: {
         'Content-Type': 'application/json',
@@ -21,7 +21,7 @@ const axiosIns: AxiosInstance = axios.create({
 });
 
 const axiosWsIns: AxiosInstance = axios.create({
-    baseURL: process.env.BASE_WS_URL || 'https://localhost:8888',
+    baseURL: process.env.REACT_APP_BASE_WS_URL || 'https://localhost:8888',
     timeout: 5000,
     headers: {
         'Content-Type': 'application/json',
@@ -43,6 +43,7 @@ const addInterceptors = (instance: AxiosInstance) => {
             }
 
             let logMessage = '========REQUEST========\n';
+            logMessage += `baseUrl: ${config.baseURL}\n`;
             logMessage += `url: ${config.url}\n`;
             logMessage += `headers: ${JSON.stringify(config.headers, null, 2)}\n`;
             logMessage += `payload: ${config.data ? JSON.stringify(config.data, null, 2) : '{}'}\n`;

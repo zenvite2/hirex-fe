@@ -7,7 +7,7 @@ export const login = createAsyncThunk<any, { username: string, password: string 
     'authReducers/login',
     async (payload) => {
         return axiosIns.post('/auth/login', payload)
-            .then(response => { toast.success('Welcome back to Hirex.'); return { response: response.data } })
+            .then(response => { response.data?.success == true && toast.success('Welcome back to Hirex.'); return { response: response.data } })
             .catch(error => { toast.error(error.response.data) });
     }
 );
