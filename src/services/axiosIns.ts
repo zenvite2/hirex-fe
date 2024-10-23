@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestHeaders, InternalAxiosRequestConfig } from 'axios';
 import authService from './authService';
+import { toast } from 'react-toastify';
 
 declare module 'axios' {
     interface AxiosRequestConfig {
@@ -37,16 +38,14 @@ const addInterceptors = (instance: AxiosInstance) => {
                 if (token) {
                     headers['Authorization'] = `Bearer ${token}`;
                 } else {
-                    console.error('No token saved.');
+                    return Promise.reject(new Error('No token saved. Cannot make API request.'));
                 }
             }
 
-            // Log request details
             let logMessage = '========REQUEST========\n';
             logMessage += `url: ${config.url}\n`;
             logMessage += `headers: ${JSON.stringify(config.headers, null, 2)}\n`;
             logMessage += `payload: ${config.data ? JSON.stringify(config.data, null, 2) : '{}'}\n`;
-
             console.log(logMessage);
 
             return config;
@@ -59,17 +58,23 @@ const addInterceptors = (instance: AxiosInstance) => {
 
     instance.interceptors.response.use(
         (response) => {
-            let logMessage = '=========RESPONSE========\n';
+            let logMessage = '==============RESPONSE==============\n';
             logMessage += `statusCode: ${response.status}\n`;
             logMessage += `data: ${JSON.stringify(response.data, null, 2)}\n`;
             console.log(logMessage);
             return response;
         },
         (error) => {
-            let logMessage = '==============RESPONSE ERROR===========:\n';
+            let logMessage = '==============RESPONSE ERROR==============:\n';
             if (error.response) {
                 logMessage += `status code: ${error.response.status}\n`;
                 logMessage += `data: ${JSON.stringify(error.response.data, null, 2)}\n`;
+
+                if (error.response.status === 401) {
+                    window.location.href = '/login';
+                    authService.clearCredential();
+                    toast.error('Your Session is expired.');
+                }
             } else {
                 logMessage += `Error: ${error.message}\n`;
             }
