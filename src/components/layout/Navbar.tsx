@@ -18,9 +18,14 @@ const Navbar: React.FC<NavbarProps> = () => {
   const { isLoggedIn, role, username } = useSelector((state: RootState) => state.authReducer);
   const dispatch = useAppDispatch();
 
-  const isLinkActive = (path: string) => location.pathname === path;
+  const isLinkActive = (path: string | string[]) => {
+    if (Array.isArray(path)) {
+      return path.some(p => location.pathname === p);
+    }
+    return location.pathname === path;
+  };
 
-  const getLinkClassName = (path: string) => {
+  const getLinkClassName = (path: string | string[]) => {
     const baseClasses = "text-gray-700 hover:text-[#0069DB] hover:font-semibold transition duration-300";
     const activeClasses = "text-[#0069DB] font-semibold border-b-2 border-[#0069DB]";
     return `${baseClasses} ${isLinkActive(path) ? activeClasses : ''}`;
@@ -127,7 +132,10 @@ const Navbar: React.FC<NavbarProps> = () => {
               <Link to="/find-jobs" className={getLinkClassName('/find-jobs')}>
                 Việc làm
               </Link>
-              <Link to="/resume" className={getLinkClassName('/resume')}>
+              <Link
+                to={isLoggedIn && role === 'EMPLOYEE' ? '/resume' : '/resume-content'}
+                className={getLinkClassName(['/resume', '/resume-content'])}
+              >
                 Hồ sơ & CV
               </Link>
               <Link to="/companies" className={getLinkClassName('/companies')}>

@@ -54,7 +54,7 @@ export const jobGetWithCompany = createAsyncThunk<any>(
     'job/getJobWithComapany',
     async (id) => {
         return axiosIns.get(`/job/with-company`, {
-            includeToken: true
+            // includeToken: true
         })
             .then(response => { return { response: response.data } })
             .catch(error => toast.error(error.response.data));

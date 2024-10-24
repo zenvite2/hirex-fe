@@ -14,7 +14,8 @@ import {
     RegisterEmployer,
     Messenger,
     ResumePage,
-    JobForm
+    JobForm,
+    ResumeContent
 } from "./pages";
 import { ToastContainer } from 'react-toastify';
 import Loading from './components/Loading';
@@ -84,6 +85,7 @@ function App() {
                         <Route path="/employer" element={<EmployerLanding />} />
                         <Route path="/about-us" element={<About />} />
                         <Route path="/resume" element={<ResumePage />} />
+                        <Route path="/resume-content" element={<ResumeContent />} />
 
                     </Routes>
                 </div>
