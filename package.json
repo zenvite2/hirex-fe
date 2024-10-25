@@ -45,6 +45,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "prod": "NODE_ENV=development env-cmd -f .env.prod -- npm start",
     "build": "react-scripts build",
     "build:dev": "NODE_ENV=development env-cmd -f .env.dev -- npm run build",
     "build:prod": "NODE_ENV=production env-cmd -f .env.prod -- npm run build",
