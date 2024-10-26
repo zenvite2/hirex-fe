@@ -37,9 +37,8 @@ export const districtList = createAsyncThunk<any,{ name?: string; cityIds?: numb
 export const salaryList = createAsyncThunk<any>(
     'salary/list',
     async () => {
-        return axiosIns.get('/auto-fill/salary', {
-          includeToken: true
-        }).then(response => { return { response: response.data }})      
+        return axiosIns.get('/auto-fill/salary')
+          .then(response => { return { response: response.data }})      
           .catch(error => toast.error(error.response?.data))
     }
 );
@@ -77,9 +76,8 @@ export const positionList = createAsyncThunk<any>(
 export const techList = createAsyncThunk<any>(
     'tech/list',
     async () => {
-        return axiosIns.get('/auto-fill/tech', {
-          includeToken: true
-        }).then(response => { return { response: response.data }})      
+        return axiosIns.get('/auto-fill/tech')
+          .then(response => { return { response: response.data }})      
           .catch(error => toast.error(error.response?.data))
     }
 );

@@ -131,7 +131,7 @@ const RegistrationForm = () => {
 
           <button
             type="submit"
-            className="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:shadow-outline"
+            className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:shadow-outline"
           >
             Đăng ký
           </button>
@@ -139,7 +139,7 @@ const RegistrationForm = () => {
         <p className="text-center text-sm text-gray-600 mt-4">
           Bạn đã có tài khoản?{' '}
           <Link to="/login">
-            <a className="text-green-500 hover:text-green-600">
+            <a className="text-blue-500 hover:text-blue-600">
               Đăng nhập ngay
             </a>
           </Link>

@@ -10,11 +10,11 @@ export const useRegistrationForm = () => {
     password: '',
     confirmPassword: '',
     fullName: '',
-    gender: '',
+    gender: 'Nam',
     phone: '',
     company: '',
     workLocation: 0,
-    district: 0,
+    district: 0
   });
   const dispatch = useAppDispatch();
  
@@ -76,6 +76,7 @@ export const useRegistrationForm = () => {
 
   return {
     formData,
+    setFormData,
     handleInputChange,
     handleSubmit,
     cities,

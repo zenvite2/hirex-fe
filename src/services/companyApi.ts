@@ -14,4 +14,12 @@ export const updateCompany = createAsyncThunk<any, FormData>(
           .catch(error =>  toast.error(error.response?.data?.message))   
     }
   );
-  
+
+  export const getListCompany = createAsyncThunk<any>(
+    'company/getList',
+    async () => {
+        return axiosIns.get('/company/all')
+          .then(response => {return { response: response.data }})
+          .catch(error =>  toast.error(error.response?.data?.message))   
+    }
+  );

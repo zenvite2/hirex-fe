@@ -10,6 +10,7 @@ import { getEmployees } from '../../services/employeeApi';
 import { RiAccountBoxFill } from "react-icons/ri";
 import { educationDelete, educationGetAll } from '../../services/educationApi';
 import { experienceDelete, experienceGetAll } from '../../services/experienceApi';
+import { skillGetAll, skillDelete } from '../../services/skillApi';
 import { toast } from 'react-toastify';
 
 interface Experience {
@@ -36,6 +37,7 @@ interface Skill {
   id?: number;
   name: string;
   level: string;
+  description?: string;
 }
 
 interface HeaderData {
@@ -96,16 +98,6 @@ const ResumePage: React.FC = () => {
   const handleSaveCareerGoalData = (newData: CareerGoalData) => {
     setCareerGoalData(newData);
     setIsCareerGoalEditPopupOpen(false);
-  };
-
-  const handleSaveSkill = (skill: Skill) => {
-    if (skill.id) {
-      setSkills(skills.map(s => s.id === skill.id ? skill : s));
-    } else {
-      setSkills([...skills, { ...skill, id: Date.now() }]);
-    }
-    setEditingSkill(null);
-    setIsSkillPopupOpen(false);
   };
 
   const fetchEducations = async () => {
@@ -183,7 +175,7 @@ const ResumePage: React.FC = () => {
     try {
       const action = await dispatch(experienceDelete(id));
       if (experienceDelete.fulfilled.match(action)) {
-        await fetchEducations(); // Fetch the updated list after deletion
+        await fetchEducations();
         toast.success('Experience deleted successfully');
       }
     } catch (error) {
@@ -222,6 +214,46 @@ const ResumePage: React.FC = () => {
     };
 
     fetchEmployeeData();
+  }, [dispatch]);
+
+  const fetchSkills = async () => {
+    try {
+      const result = await dispatch(skillGetAll());
+      if (skillGetAll.fulfilled.match(result)) {
+        const skillsData = result.payload.response.data.map((item: any) => ({
+          id: item.id,
+          name: item.techName,
+          level: item.level,
+          description: item.description
+        }));
+        setSkills(skillsData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch skills:', error);
+      toast.error('Failed to fetch skills. Please try again.');
+    }
+  };
+
+  const handleSaveSkill = async (skill: Skill) => {
+    await fetchSkills();
+    setEditingSkill(null);
+    setIsSkillPopupOpen(false);
+  };
+
+  const handleDeleteSkill = async (id: number) => {
+    try {
+      const action = await dispatch(skillDelete(id));
+      if (action?.payload?.response?.success ===  true) {
+        await fetchSkills(); 
+        toast.success('Skill deleted successfully');
+      }
+    } catch (error) {
+      toast.error('Failed to delete skill. Please try again.');
+    }
+  };
+
+  useEffect(() => {
+    fetchSkills();
   }, [dispatch]);
 
   return (
@@ -373,25 +405,38 @@ const ResumePage: React.FC = () => {
               <Plus size={20} />
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            {skills.map((skill) => (
-              <div key={skill.id} className="p-4 bg-gray-50 rounded-lg flex justify-between items-center">
-                <div>
-                  <p className="font-semibold">{skill.name}</p>
-                  <p className="text-sm text-gray-600">{skill.level}</p>
+          {skills.length > 0 ? (
+              skills.map((skill) => (
+                <div key={skill.id} className="p-4 bg-gray-50 rounded-lg flex justify-between items-center">
+                  <div>
+                    <p className="font-semibold">{skill.name}</p>
+                    <p className="text-sm text-gray-600">{skill.level}</p>
+                    {skill.description && (
+                      <p className="text-sm text-gray-500 mt-1">{skill.description}</p>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingSkill(skill);
+                        setIsSkillPopupOpen(true);
+                      }}
+                      className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteSkill(skill.id!)}
+                      className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={() => {
-                    setEditingSkill(skill);
-                    setIsSkillPopupOpen(true);
-                  }}
-                  className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
-                >
-                  <Pencil size={16} />
-                </button>
-              </div>
-            ))}
-          </div>
+              ))
+          ) : (
+            <p className="text-gray-500">Chưa có thông tin kỹ năng</p>
+          )}
         </section>
 
         <Divider />

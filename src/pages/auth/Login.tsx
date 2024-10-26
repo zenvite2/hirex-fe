@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {  RootState } from '../../redux/store';
+import { RootState } from '../../redux/store';
 import { login } from '../../services/authApi';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
@@ -30,9 +30,9 @@ const LoginPage = () => {
     const result = await dispatch(login({ username, password }))
     dispatch(stopLoading());
     if (result?.payload?.response?.success == true) {
-      if(result?.payload?.response?.data.role == 'EMPLOYEE'){
+      if (result?.payload?.response?.data.role == 'EMPLOYEE') {
         navigate('/find-jobs');
-      }else{
+      } else {
         navigate('/employer');
       }
     }
@@ -42,14 +42,14 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="flex h-screen bg-emerald-200">
-      <div className="m-auto flex w-3/4 max-w-4xl overflow-hidden rounded-xl bg-white shadow-xl">
+    <div className="flex h-screen bg-gray-100">
+      <div className="m-auto flex w-3/4 max-w-4xl overflow-hidden rounded-xl bg-white shadow-2xl">
         <div className="relative w-1/2 bg-gradient-to-br from-emerald-400 to-blue-900 p-8 text-white">
           {/* Left side content */}
         </div>
-        <div className="w-1/2 p-8">
-          <h2 className="mb-6 text-3xl font-bold">Đăng nhập</h2>
-          <form onSubmit={handleSignIn}>
+        <div className="w-1/2 p-8 bg-white shadow-lg">
+          <h2 className="mb-6 text-3xl font-bold text-gray-800">Đăng nhập</h2>
+          <form onSubmit={handleSignIn} className="space-y-4">
             <div className="mb-4">
               <label htmlFor="username" className="mb-1 block text-sm font-medium text-gray-700">
                 Username
@@ -57,7 +57,7 @@ const LoginPage = () => {
               <input
                 type="text"
                 id="username"
-                className="w-full rounded-md border border-gray-300 p-2"
+                className="w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -71,7 +71,7 @@ const LoginPage = () => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
-                className="w-full rounded-md border border-gray-300 p-2"
+                className="w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 placeholder="Mật khẩu"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -82,7 +82,7 @@ const LoginPage = () => {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  className="mr-2"
+                  className="mr-2 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
                   checked={showPassword}
                   onChange={() => setShowPassword(!showPassword)}
                 />
@@ -91,7 +91,7 @@ const LoginPage = () => {
             </div>
             <button
               type="submit"
-              className="w-full rounded-md bg-emerald-500 p-2 text-white hover:bg-emerald-600"
+              className="w-full rounded-md bg-blue-500 p-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               disabled={isLoading}
             >
               {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
@@ -100,7 +100,7 @@ const LoginPage = () => {
           <div className="mt-4 text-center">
             <span className="text-sm text-gray-500">hoặc</span>
           </div>
-          <button className="mt-4 flex w-full items-center justify-center rounded-md border border-gray-300 bg-white p-2 text-gray-700 hover:bg-gray-50">
+          <button className="mt-4 flex w-full items-center justify-center rounded-md border border-gray-300 bg-white p-2 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
             <GoogleIcon />
             <span className="ml-2">Tiếp tục với Google</span>
           </button>

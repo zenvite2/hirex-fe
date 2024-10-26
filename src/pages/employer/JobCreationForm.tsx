@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useAppDispatch from '../../hooks/useAppDispatch';
-import { experienceList, positionList, jobTypeList, techList } from '../../services/autofillApi';
+import { experienceList, positionList, jobTypeList, techList, salaryList } from '../../services/autofillApi';
 import { jobCreate } from '../../services/jobApi';
 import { useLocationSelector } from './useLocationSelector';
 import { LocationSelector } from '../../components/registration/LocationSelector';
@@ -69,6 +69,7 @@ const JobCreationForm: React.FC = () => {
   const [positions, setPositions] = useState<PositionType[]>([]);
   const [jobTypes, setJobTypes] = useState<BasicType[]>([]);
   const [techs, setTechs] = useState<TechType[]>([]);
+  const [salarys, setSalarys] = useState<TechType[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -85,11 +86,12 @@ const JobCreationForm: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [experienceResult, positionResult, jobTypeResult, techResult] = await Promise.all([
+        const [experienceResult, positionResult, jobTypeResult, techResult, salaryResult] = await Promise.all([
           dispatch(experienceList()).unwrap(),
           dispatch(positionList()).unwrap(),
           dispatch(jobTypeList()).unwrap(),
           dispatch(techList()).unwrap(),
+          dispatch(salaryList()).unwrap(),
         ]);
 
         if (experienceResult.response?.data) {
@@ -103,6 +105,9 @@ const JobCreationForm: React.FC = () => {
         }
         if (techResult.response?.data) {
           setTechs(techResult.response.data);
+        }
+        if (salaryResult.response?.data) {
+          setSalarys(salaryResult.response.data);
         }
       } catch (error) {
         toast.error('Lỗi khi tải dữ liệu. Vui lòng thử lại sau.');
@@ -161,6 +166,12 @@ const JobCreationForm: React.FC = () => {
         ));
       case 'industry':
         return techs.map(type => (
+          <option key={type.id} value={type.id}>
+            {type.name}
+          </option>
+        ));
+      case 'salary':
+        return salarys.map(type => (
           <option key={type.id} value={type.id}>
             {type.name}
           </option>
@@ -263,7 +274,7 @@ const JobCreationForm: React.FC = () => {
               {renderField('jobType', 'Loại hình làm việc', 'select')}
               {renderField('position', 'Cấp bậc', 'select')}
               {renderField('deadline', 'Hạn nộp hồ sơ', 'date')}
-              {renderField('salary', 'Mức lương')}
+              {renderField('salary', 'Mức lương', 'select')}
               {renderField('overtime', 'Làm thêm giờ (OT)', 'select')}
               {renderField('email', 'Email', 'email')}
               {renderField('phone', 'Số điện thoại', 'tel')}
