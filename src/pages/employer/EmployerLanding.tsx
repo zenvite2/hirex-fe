@@ -1,8 +1,21 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from "../../redux/store";
 import { Job } from "../../assets";
 
 const EmployerLanding = () => {
+  const navigate = useNavigate();
+  const { isLoggedIn, role } = useSelector((state: RootState) => state.authReducer);
+
+  const handlePostJob = () => {
+    if (isLoggedIn && role === 'EMPLOYER') {
+      navigate('/job-posts');
+    } else {
+      navigate('/login');
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <main className="flex-grow">
@@ -14,13 +27,16 @@ const EmployerLanding = () => {
                 lần tới trở nên tốt hơn.<br />
                 Nhanh chóng.
               </h1>
-              <button className="bg-blue-600 text-white px-6 py-3 rounded-md text-lg font-semibold mt-4 hover:bg-blue-700 transition duration-300">
+              <button 
+                onClick={handlePostJob}
+                className="bg-blue-600 text-white px-6 py-3 rounded-md text-lg font-semibold mt-4 hover:bg-blue-700 transition duration-300"
+              >
                 Đăng việc làm
               </button>
             </div>
             <div className="md:w-1/2">
               <img 
-                 src={Job}
+                src={Job}
                 alt="Tuyển dụng trực tuyến" 
                 className="w-full max-w-md mx-auto"
               />

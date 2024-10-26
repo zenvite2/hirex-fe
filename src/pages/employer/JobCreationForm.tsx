@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { experienceList, positionList, jobTypeList, techList, salaryList } from '../../services/autofillApi';
-import { jobCreate } from '../../services/jobApi';
+import { jobCreate, jobUpdate} from '../../services/jobApi';
 import { useLocationSelector } from './useLocationSelector';
 import { LocationSelector } from '../../components/registration/LocationSelector';
 import { toast } from 'react-toastify';
@@ -63,6 +64,7 @@ const initialFormData: FormData = {
 };
 
 const JobCreationForm: React.FC = () => {
+  const { id } = useParams()
   const dispatch = useAppDispatch();
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [experiences, setExperiences] = useState<ExperienceType[]>([]);
@@ -71,6 +73,7 @@ const JobCreationForm: React.FC = () => {
   const [techs, setTechs] = useState<TechType[]>([]);
   const [salarys, setSalarys] = useState<TechType[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     city,
@@ -80,8 +83,9 @@ const JobCreationForm: React.FC = () => {
     handleSelectCity,
     handleSelectDistrict,
     fetchCities,
-    fetchDistricts
+    fetchDistricts,
   } = useLocationSelector();
+
 
   useEffect(() => {
     const fetchData = async () => {

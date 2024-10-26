@@ -28,8 +28,16 @@ import useAppDispatch from "./hooks/useAppDispatch";
 
 function SidebarLayout() {
     const location = useLocation();
-    const showSidebar = ["/dashboard", "/company-info", "/job-posts", "/applicants", "/info-page", "/apply-job"].includes(location.pathname); // Hiển thị Sidebar ở những route này
-
+    const showSidebar = [
+        "/dashboard",
+        "/company-info", 
+        "/job-posts",
+        "/applicants",
+        "/info-page",
+        "/apply-job"
+    ].includes(location.pathname) || 
+        /^\/jobs\/edit\/\d+$/.test(location.pathname);
+        
     return (
         <div className="flex min-h-screen">
             {/* Sidebar chỉ hiển thị trên các trang có Sidebar */}
@@ -75,7 +83,6 @@ function App() {
                             <Route path="/info-page" element={<CompanyInfo />} />
                             <Route path="/apply-job" element={<JobForm />} />
                             <Route path="/jobs/edit/:id" element={<JobForm />} />
-
                         </Route>
 
                         {/* Các route khác */}
