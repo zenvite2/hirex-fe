@@ -11,6 +11,7 @@ import { RiAccountBoxFill } from "react-icons/ri";
 import { educationDelete, educationGetAll } from '../../services/educationApi';
 import { experienceDelete, experienceGetAll } from '../../services/experienceApi';
 import { skillGetAll, skillDelete } from '../../services/skillApi';
+import { careergoalGet } from '../../services/careergoalApi';
 import { toast } from 'react-toastify';
 
 interface Experience {
@@ -50,10 +51,11 @@ interface HeaderData {
   avatarUrl?: string;
 }
 
-interface CareerGoalData {
+interface CareerGoal {
   id?: number;
   position: string;
-  description: string;
+  salary: number;
+  jobType: number;
 }
 
 const ResumePage: React.FC = () => {
@@ -85,19 +87,11 @@ const ResumePage: React.FC = () => {
   });
 
   const [isCareerGoalEditPopupOpen, setIsCareerGoalEditPopupOpen] = useState(false);
-  const [CareerGoalData, setCareerGoalData] = useState<CareerGoalData>({
-    position: '',
-    description: ''
-  });
+  const [careerGoalData, setCareerGoalData] = useState<CareerGoal | null>(null);
 
   const handleSaveHeaderData = (newData: HeaderData) => {
     setHeaderData(newData);
     setIsHeaderEditPopupOpen(false);
-  };
-
-  const handleSaveCareerGoalData = (newData: CareerGoalData) => {
-    setCareerGoalData(newData);
-    setIsCareerGoalEditPopupOpen(false);
   };
 
   const fetchEducations = async () => {
@@ -243,8 +237,8 @@ const ResumePage: React.FC = () => {
   const handleDeleteSkill = async (id: number) => {
     try {
       const action = await dispatch(skillDelete(id));
-      if (action?.payload?.response?.success ===  true) {
-        await fetchSkills(); 
+      if (action?.payload?.response?.success === true) {
+        await fetchSkills();
         toast.success('Skill deleted successfully');
       }
     } catch (error) {
@@ -255,6 +249,36 @@ const ResumePage: React.FC = () => {
   useEffect(() => {
     fetchSkills();
   }, [dispatch]);
+
+
+  useEffect(() => {
+    fetchCareerGoalData();
+  }, []);
+
+  const fetchCareerGoalData = async () => {
+    try {
+      const result = await dispatch(careergoalGet());
+
+      if (careergoalGet.fulfilled.match(result) && result.payload?.response?.success) {
+        setCareerGoalData(result.payload.response.data);
+      } else {
+        setCareerGoalData(null);
+      }
+    } catch (error) {
+      toast.error('Đã có lỗi xảy ra khi tải thông tin mục tiêu nghề nghiệp');
+    }
+  };
+
+  const handleSaveCareerGoalData = (updatedCareerGoal: CareerGoal) => {
+    setCareerGoalData(updatedCareerGoal);
+  };
+
+  const formatSalary = (salary: number): string => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(salary);
+  };
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">
@@ -406,34 +430,34 @@ const ResumePage: React.FC = () => {
             </button>
           </div>
           {skills.length > 0 ? (
-              skills.map((skill) => (
-                <div key={skill.id} className="p-4 bg-gray-50 rounded-lg flex justify-between items-center">
-                  <div>
-                    <p className="font-semibold">{skill.name}</p>
-                    <p className="text-sm text-gray-600">{skill.level}</p>
-                    {skill.description && (
-                      <p className="text-sm text-gray-500 mt-1">{skill.description}</p>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        setEditingSkill(skill);
-                        setIsSkillPopupOpen(true);
-                      }}
-                      className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteSkill(skill.id!)}
-                      className="text-red-500 hover:text-red-700 transition-colors duration-200"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
+            skills.map((skill) => (
+              <div key={skill.id} className="p-4 bg-gray-50 rounded-lg flex justify-between items-center">
+                <div>
+                  <p className="font-semibold">{skill.name}</p>
+                  <p className="text-sm text-gray-600">{skill.level}</p>
+                  {skill.description && (
+                    <p className="text-sm text-gray-500 mt-1">{skill.description}</p>
+                  )}
                 </div>
-              ))
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setEditingSkill(skill);
+                      setIsSkillPopupOpen(true);
+                    }}
+                    className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteSkill(skill.id!)}
+                    className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            ))
           ) : (
             <p className="text-gray-500">Chưa có thông tin kỹ năng</p>
           )}
@@ -453,8 +477,9 @@ const ResumePage: React.FC = () => {
               </button>
             </div>
             <div className="grid grid-cols-1 gap-4">
-              <p><span className="font-semibold">Vị trí:</span> {headerData.gender}</p>
-              <p><span className="font-semibold">Mô tả:</span> {new Date(headerData.dateOfBirth).toLocaleDateString('vi-VN')}</p>
+              <p><span className="font-semibold">Vị trí mong muốn: </span> {careerGoalData?.position}</p>
+              <p><span className="font-semibold">Mức lương mong muốn: </span> {careerGoalData?.salary ? formatSalary(careerGoalData.salary) : ''}</p>
+              <p><span className="font-semibold">Loại công việc: </span> {careerGoalData?.jobType}</p>
             </div>
           </div>
         </header>
@@ -488,7 +513,7 @@ const ResumePage: React.FC = () => {
           isOpen={isCareerGoalEditPopupOpen}
           onClose={() => setIsCareerGoalEditPopupOpen(false)}
           onSave={handleSaveCareerGoalData}
-          careergoal={CareerGoalData}
+          careergoal={careerGoalData}
         />
 
       </div>

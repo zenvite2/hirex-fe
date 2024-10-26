@@ -26,6 +26,16 @@ export const careergoalUpdate = createAsyncThunk<any, any>(
     }
 );
 
+export const careergoalGet = createAsyncThunk<any>(
+    'career-goal/get',
+    async () => {
+        return axiosIns.get(`/career-goal`, {
+            includeToken: true
+        })
+            .then(response => { return { response: response.data } })
+            .catch(error => toast.error(error.response.data));
+    }
+);
 
 // Delete experience
 export const careergoalDelete = createAsyncThunk<any, number>(
