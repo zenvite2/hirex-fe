@@ -2,12 +2,14 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-COPY .env ./
-COPY .env.prod ./
-COPY package*.json ./
-COPY . .
+COPY package.json ./
 
 RUN npm install
+
+COPY .env ./
+COPY .env.prod ./
+
+COPY . .
 
 RUN npm run build:prod
 

@@ -23,7 +23,7 @@ pipeline {
                 script {
                     echo "Tagging and pushing Docker images to the registry...."
 
-                    sh '''\
+                    sh '''
                         docker tag fe:latest $DOCKER_REPO/fe:latest
                         docker push $DOCKER_REPO/fe:latest
                     '''
@@ -37,9 +37,9 @@ pipeline {
                     echo "Deploying Docker containers to prod server..."
                     sh '''
                         sshpass -p "$HIREX_VPS_PW" ssh -o StrictHostKeyChecking=no "$HIREX_VPS_USER@$HIREX_VPS" bash << 'EOF'
-                            docker compose down && \
+                            docker compose -f /root/hirex/deploy/docker-compose-fe.yml down && \
                             docker compose -f /root/hirex/deploy/docker-compose-fe.yml pull && \
-                            docker compose -f /root/hirex/deploy/docker-compose-fe.yml up -d --remove-orphans
+                            docker compose -f /root/hirex/deploy/docker-compose-fe.yml up -d
                         << EOF
                     '''
                 }
