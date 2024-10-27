@@ -62,6 +62,7 @@ export interface Conversation {
     last10Messages: ChatMessage[]
 }
 
+const wsUrl = process.env.REACT_APP_BASE_WS_URL;
 let stompClient: Client | null = null;
 let isConnected: Boolean = false;
 
@@ -103,7 +104,7 @@ const Messenger: React.FC = () => {
 
     const connect = () => {
         if (!isConnected) {
-            const sock = new SockJS('https://192.168.1.123:8888/ws');
+            const sock = new SockJS(wsUrl + '/ws');
             stompClient = over(sock);
             isConnected = true;
             stompClient.connect({}, onConnected, (e) => { dispatch(stopLoading()); toast.error('Cannot connect to server.\nPlease reload the page and try again.'); });
@@ -175,7 +176,7 @@ const Messenger: React.FC = () => {
 
     const handleVideoCall = () => {
         const windowFeatures = `menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes,width=${window.screen.width},height=${window.screen.height}`;
-        const url = new URL("https://192.168.1.123:8888/video-call");
+        const url = new URL(wsUrl + "/video-call");
         url.searchParams.set("fromUser", userId + '');
         url.searchParams.set("toUser", currentConvers?.id + '');
         url.searchParams.set("isCallee", '0');

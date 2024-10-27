@@ -3,6 +3,8 @@ import CustomModal from '../components/CustomModal';
 import Messenger from './chat/Messenger';
 import { useNavigate } from 'react-router-dom';
 
+const wsUrl = process.env.REACT_APP_BASE_WS_URL;
+
 function Home() {
     const [currentUser, setCurrentUser] = useState('')
     const currentChatFriend = '321'
@@ -27,7 +29,7 @@ function Home() {
             <button
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                 onClick={() => {
-                    window.open("https://192.168.1.123:8888/video-call", "Video Call", windowFeatures)
+                    window.open(wsUrl + "/video-call", "Video Call", windowFeatures)
                 }}
             >
                 Open Modal

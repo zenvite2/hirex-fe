@@ -7,12 +7,14 @@ interface VideoCallRequestProps {
     handleRefuseCall: any;
 }
 
+const wsUrl = process.env.REACT_APP_BASE_WS_URL;
+
 const VideoCallRequest: React.FC<VideoCallRequestProps> = ({ fromUser, toUser, setShowCallRequestModal, handleRefuseCall }) => {
 
     const acceptCallRequest = () => {
         setShowCallRequestModal(false);
         const windowFeatures = `menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes,width=${window.screen.width},height=${window.screen.height}`;
-        const url = new URL("https://192.168.1.123:8888/video-call");
+        const url = new URL(wsUrl + "/video-call");
         url.searchParams.set("fromUser", toUser);
         url.searchParams.set("toUser", fromUser);
         url.searchParams.set("isCallee", '1');
