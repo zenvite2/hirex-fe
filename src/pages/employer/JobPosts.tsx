@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, Pencil, Trash } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate  } from 'react-router-dom';
 import { jobGetAll } from '../../services/jobApi';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
@@ -9,6 +9,7 @@ const JobListings = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -85,18 +86,19 @@ const JobListings = () => {
                   <div className="text-sm text-gray-600 mt-1">{formatDate(job.deadline)}</div>
                 </td>
                 <td className="py-4">
-                  <span className={`px-2 py-1 rounded-full text-sm ${
-                    job.status === 'Đã duyệt' 
+                  <span className={`px-2 py-1 rounded-full text-sm ${job.status === 'Đã duyệt'
                       ? 'bg-green-100 text-green-800'
                       : 'bg-yellow-100 text-yellow-800'
-                  }`}>
+                    }`}>
                     {job.status || 'Chờ duyệt'}
                   </span>
                 </td>
                 <td className="py-4">
                   <div className="flex gap-3">
-                    <button className="hover:text-yellow-600 transition-colors">
-                      <Pencil size={18} />
+                    <button
+                      onClick={() => navigate(`/jobs/edit/${job.id}`)}
+                      className="hover:text-yellow-600 transition-colors"
+                    >                      <Pencil size={18} />
                     </button>
                     <button className="hover:text-red-600 transition-colors">
                       <Trash size={18} />
@@ -108,7 +110,7 @@ const JobListings = () => {
           </tbody>
         </table>
       </div>
-      
+
       {jobs.length === 0 && !loading && (
         <div className="text-center py-8 text-gray-500">
           Chưa có công việc nào được đăng tải
