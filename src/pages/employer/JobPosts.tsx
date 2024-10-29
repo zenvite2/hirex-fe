@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, Pencil, Trash } from 'lucide-react';
-import { Link, useNavigate  } from 'react-router-dom';
-import { jobGetAll } from '../../services/jobApi';
+import { Link, useNavigate } from 'react-router-dom';
+import { jobGetAll, jobDelete } from '../../services/jobApi';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
 
@@ -17,7 +17,6 @@ const JobListings = () => {
       try {
         const result = await dispatch(jobGetAll());
         if (result?.payload?.response?.success == true) {
-          console.log(result.payload.response.data)
           setJobs(result.payload.response.data);
         }
       } catch (error) {
@@ -41,6 +40,16 @@ const JobListings = () => {
       minute: '2-digit',
       second: '2-digit'
     });
+  };
+
+  const handleDelete = async (jobId) => {
+    try {
+      await dispatch(jobDelete(jobId));
+      setJobs(jobs.filter((job) => job.id !== jobId));
+      toast.success('Xóa công việc thành công!');
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi xóa công việc');
+    }
   };
 
   if (loading) {
@@ -87,8 +96,8 @@ const JobListings = () => {
                 </td>
                 <td className="py-4">
                   <span className={`px-2 py-1 rounded-full text-sm ${job.status === 'Đã duyệt'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-yellow-100 text-yellow-800'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-yellow-100 text-yellow-800'
                     }`}>
                     {job.status || 'Chờ duyệt'}
                   </span>
@@ -100,7 +109,9 @@ const JobListings = () => {
                       className="hover:text-yellow-600 transition-colors"
                     >                      <Pencil size={18} />
                     </button>
-                    <button className="hover:text-red-600 transition-colors">
+                    <button
+                      onClick={() => handleDelete(job.id)}
+                      className="hover:text-red-600 transition-colors">
                       <Trash size={18} />
                     </button>
                   </div>

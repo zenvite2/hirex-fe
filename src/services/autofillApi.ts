@@ -81,3 +81,13 @@ export const techList = createAsyncThunk<any>(
           .catch(error => toast.error(error.response?.data))
     }
 );
+
+export const contracTypeList = createAsyncThunk<any>(
+    'job-type/list',
+    async () => {
+        return axiosIns.get('/auto-fill/contract-type', {
+          includeToken: true
+        }).then(response => { return { response: response.data }})      
+          .catch(error => toast.error(error.response?.data))
+    }
+);

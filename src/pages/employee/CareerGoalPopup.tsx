@@ -12,12 +12,6 @@ interface CareerGoal {
     jobType: number;
 }
 
-interface CareerGoalRequestData {
-    position: string;
-    salary: number;
-    jobType: number;
-}
-
 interface CareerGoalPopups {
     isOpen: boolean;
     onClose: () => void;

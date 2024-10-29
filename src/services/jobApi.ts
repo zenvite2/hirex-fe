@@ -26,7 +26,6 @@ export const jobUpdate = createAsyncThunk<any, any>(
     }
 );
 
-
 // Get all job
 export const jobGetAll = createAsyncThunk<any>(
     'job/getAll',
@@ -44,6 +43,16 @@ export const jobGet = createAsyncThunk<any,any>(
     'job/getJob',
     async (id) => {
         return axiosIns.get(`/job/${id}`)
+            .then(response => { return { response: response.data } })
+            .catch(error => toast.error(error.response.data));
+    }
+);
+
+// Get jobWith
+export const jobGetWith = createAsyncThunk<any,any>(
+    'job/getJob',
+    async (id) => {
+        return axiosIns.get(`/job/detail/${id}`)
             .then(response => { return { response: response.data } })
             .catch(error => toast.error(error.response.data));
     }
