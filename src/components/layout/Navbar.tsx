@@ -127,37 +127,38 @@ const Navbar: React.FC<NavbarProps> = () => {
           <Link to="/" className="flex-shrink-0">
             <img src={Logo} alt="TopCV Logo" className="h-8 w-auto" />
           </Link>
-          {!isEmployerPage ? (
-            <div className="hidden lg:flex space-x-6 ml-10">
-              <Link to="/find-jobs" className={getLinkClassName('/find-jobs')}>
-                Việc làm
-              </Link>
-              <Link
-                to={isLoggedIn && role === 'EMPLOYEE' ? '/resume' : '/resume-content'}
-                className={getLinkClassName(['/resume', '/resume-content'])}
-              >
-                Hồ sơ & CV
-              </Link>
-              <Link to="/companies" className={getLinkClassName('/companies')}>
-                Công ty
-              </Link>
-              <div onClick={() => dispatch(openMessenger())}>
-                Tin nhan
-              </div>
-            </div>
-          ) : (
-            <div className="hidden lg:flex space-x-6 ml-10">
-              <Link
-                to="/employer"
-                className={`${getLinkClassName('/employer')} ${location.pathname.startsWith('/employer')
-                  ? 'text-[#0069DB] font-semibold border-b-2 border-[#0069DB]'
-                  : ''
-                  }`}
-              >
-                Đăng việc làm
-              </Link>
-            </div>
-          )}
+          <div className="hidden lg:flex space-x-6 ml-10">
+            {!isEmployerPage && (!isLoggedIn || role === 'EMPLOYEE') ? (
+              <>
+                {/* Hiển thị "Việc làm" và "Hồ sơ & CV" khi chưa đăng nhập hoặc khi vai trò là 'EMPLOYEE' */}
+                <Link to="/find-jobs" className={getLinkClassName('/find-jobs')}>
+                  Việc làm
+                </Link>
+                <Link
+                  to={isLoggedIn && role === 'EMPLOYEE' ? '/resume' : '/resume-content'}
+                  className={getLinkClassName(['/resume', '/resume-content'])}
+                >
+                  Hồ sơ & CV
+                </Link>
+                <div onClick={() => dispatch(openMessenger())}>
+                  Tin nhắn
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Hiển thị "Đăng việc làm" khi vai trò là 'EMPLOYER' */}
+                <Link
+                  to="/employer"
+                  className={`${getLinkClassName('/employer')} ${location.pathname.startsWith('/employer')
+                    ? 'text-[#0069DB] font-semibold border-b-2 border-[#0069DB]'
+                    : ''
+                    }`}
+                >
+                  Đăng việc làm
+                </Link>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="hidden lg:flex items-center space-x-2">
@@ -189,12 +190,11 @@ const Navbar: React.FC<NavbarProps> = () => {
           <Link
             to={isEmployerPage ? "/find-jobs" : "/employer"}
             onClick={(e) => {
-              e.preventDefault(); // Prevent the default link behavior
-              handleLogout();     // Log out the user
-              // After logging out, navigate to the appropriate page
+              e.preventDefault();
+              handleLogout();
               setTimeout(() => {
                 navigate(isEmployerPage ? "/find-jobs" : "/employer");
-              }, 0);  // Use a slight delay to ensure logout finishes before navigation
+              }, 0);
             }}
             className="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-900 transition duration-300 whitespace-nowrap"
           >

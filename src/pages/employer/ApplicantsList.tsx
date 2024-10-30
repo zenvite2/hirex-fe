@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Search, ChevronDown, Download, Trash, CheckCircle, XCircle } from 'lucide-react';
-import { applicationLists } from '../../services/applicayionApi';
+import { applicationLists, applicationUpdate, ApplicationStatus } from '../../services/applicayionApi';
 import moment from 'moment';
 import useAppDispatch from '../../hooks/useAppDispatch';
+import { toast } from 'react-toastify';
 
 const ApplicantsList = () => {
   const dispatch = useAppDispatch();
   const [applications, setApplications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [updatingId, setUpdatingId] = useState(null);
 
   useEffect(() => {
-    // Hàm kiểm tra token trong sessionStorage
     const checkSessionToken = () => {
       const token = sessionStorage.getItem('accessToken');
       return !!token;
@@ -21,7 +22,6 @@ const ApplicantsList = () => {
       setIsLoading(true);
       setError(null);
 
-      // Kiểm tra session token trước khi gọi API
       if (!checkSessionToken()) {
         setIsLoading(false);
         return;
@@ -40,7 +40,28 @@ const ApplicantsList = () => {
     fetchJobDetail();
   }, [dispatch]);
 
-  // Loading state
+  const handleUpdateStatus = async (id: number, status: ApplicationStatus) => {
+    try {
+      setUpdatingId(id);
+      const result = await dispatch(applicationUpdate({
+        id,
+        status
+      }));
+
+      if (result?.payload?.response?.data) {
+        setApplications(applications.map(app =>
+          app.id === id ? { ...app, status } : app
+        ));
+        toast.success(`Cập nhật trạng thái thành ${status}`);
+      }
+    } catch (err) {
+      toast.error('Không thể cập nhật trạng thái');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center p-8">
@@ -49,7 +70,6 @@ const ApplicantsList = () => {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="p-4">
@@ -110,34 +130,62 @@ const ApplicantsList = () => {
                 <td className="py-2">
                   <div>{application.fullName || 'Chưa có tên'}</div>
                   <div className="flex items-center">
-                    CV: <Download className="w-4 h-4 ml-1 cursor-pointer" /> Download
+                    {application.cvPdf ? (
+                      <a
+                        href={application.cvPdf}
+                        download={`CV_${application.fullName || 'unnamed'}.pdf`}
+                        className="flex items-center text-blue-500 hover:text-blue-700"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        CV: <Download className="w-4 h-4 ml-1" /> Download
+                      </a>
+                    ) : (
+                      <span className="text-gray-400">Chưa có CV</span>
+                    )}
                   </div>
                 </td>
                 <td className="py-2">
-                  {application.createdAt 
+                  {application.createdAt
                     ? moment(application.createdAt).format('YYYY-MM-DD HH:mm')
                     : 'Chưa có thời gian'}
                 </td>
                 <td className="py-2">
                   <span className={
-                    application.status === 'APPROVED' 
-                      ? 'text-green-500' 
+                    application.status === 'APPROVED'
+                      ? 'text-green-500'
                       : application.status === 'REJECTED'
-                      ? 'text-red-500'
-                      : 'text-yellow-500'
+                        ? 'text-red-500'
+                        : 'text-yellow-500'
                   }>
                     {application.status}
                   </span>
                 </td>
                 <td className="py-2">
                   <Trash className="inline-block mr-2 text-gray-500 cursor-pointer" size={18} />
-                  <CheckCircle 
-                    className="inline-block mr-2 text-gray-500 cursor-pointer hover:text-green-500" 
-                    size={18} 
+                  <CheckCircle
+                    className={`inline-block mr-2 cursor-pointer ${application.status === ApplicationStatus.ACCEPTED
+                        ? 'text-green-500'
+                        : 'text-gray-500 hover:text-green-500'
+                      } ${updatingId === application.id ? 'opacity-50' : ''}`}
+                    size={18}
+                    onClick={() => {
+                      if (application.status !== ApplicationStatus.ACCEPTED && updatingId !== application.id) {
+                        handleUpdateStatus(application.id, ApplicationStatus.ACCEPTED);
+                      }
+                    }}
                   />
-                  <XCircle 
-                    className="inline-block text-gray-500 cursor-pointer hover:text-red-500" 
-                    size={18} 
+                  <XCircle
+                    className={`inline-block cursor-pointer ${application.status === ApplicationStatus.REJECTED
+                        ? 'text-red-500'
+                        : 'text-gray-500 hover:text-red-500'
+                      } ${updatingId === application.id ? 'opacity-50' : ''}`}
+                    size={18}
+                    onClick={() => {
+                      if (application.status !== ApplicationStatus.REJECTED && updatingId !== application.id) {
+                        handleUpdateStatus(application.id, ApplicationStatus.REJECTED);
+                      }
+                    }}
                   />
                 </td>
               </tr>

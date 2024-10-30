@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { applicationCreate } from '../../services/applicayionApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { toast } from 'react-toastify';
@@ -15,26 +14,36 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, onSubmit, jobI
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState(false);
     const [coverLetter, setCoverLetter] = useState('');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     if (!isOpen) return null;
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setSelectedFile(e.target.files[0]);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         try {
-            const applicationData = {
-                jobId: Number(jobId),
-                coverLetter: coverLetter
-            };
+            const formData = new FormData();
+            formData.append('jobId', jobId?.toString() || '');
+            formData.append('coverLetter', coverLetter);
+            if (selectedFile) {
+                formData.append('cvPdf', selectedFile);
+            }
 
-            const result = await dispatch(applicationCreate(applicationData));
+            const result = await dispatch(applicationCreate(formData));
 
             if (result.payload?.response?.success === true) {
                 toast.success('Application submitted successfully!');
                 onSubmit(result.payload.response.data);
                 onClose();
                 setCoverLetter('');
+                setSelectedFile(null);
             } else {
                 toast.error('Failed to submit application');
             }
@@ -74,6 +83,24 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, onSubmit, jobI
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                             placeholder="Write your cover letter here..."
                         />
+                    </div>
+
+                    {/* File Upload */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Resume
+                        </label>
+                        <input
+                            type="file"
+                            onChange={handleFileChange}
+                            accept=".pdf,.doc,.docx"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                        {selectedFile && (
+                            <p className="mt-1 text-sm text-gray-500">
+                                Selected file: {selectedFile.name}
+                            </p>
+                        )}
                     </div>
 
                     {/* Buttons */}
