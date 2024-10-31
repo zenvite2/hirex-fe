@@ -59,7 +59,7 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, onSubmit, jobI
             <div className="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold">Apply for this position</h2>
+                    <h2 className="text-xl font-semibold">Ứng tuyển</h2>
                     <button
                         onClick={onClose}
                         className="text-gray-500 hover:text-gray-700"
@@ -73,7 +73,7 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, onSubmit, jobI
                     {/* Cover Letter */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Cover Letter
+                            Mô tả
                         </label>
                         <textarea
                             value={coverLetter}
@@ -111,7 +111,7 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, onSubmit, jobI
                             disabled={loading}
                             className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                         >
-                            Cancel
+                            Hủy
                         </button>
                         <button
                             type="submit"
@@ -119,7 +119,7 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, onSubmit, jobI
                             className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 
                 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                            {loading ? 'Submitting...' : 'Submit Application'}
+                            {loading ? 'Gửi...' : 'Gửi'}
                         </button>
                     </div>
                 </form>

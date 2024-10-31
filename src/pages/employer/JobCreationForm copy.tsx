@@ -12,7 +12,7 @@ interface FormData {
   city: number | null;
   district: number | null;
   location: string;
-  detail: string;
+  attributes: string;
   industry: number | null;
   yearExperience: number | null;
   jobType: string;
@@ -28,7 +28,7 @@ const initialFormData: FormData = {
   city: null,
   district: null,
   location: '',
-  detail: '',
+  attributes: '',
   industry: null,
   yearExperience: null,
   jobType: '',
@@ -64,7 +64,7 @@ const JobCreationForm: React.FC = () => {
               city: result.payload.response.data.city,
               district: result.payload.response.data.district,
               location: result.payload.response.data.location,
-              detail: result.payload.response.data.description,
+              attributes: result.payload.response.data.attributes,
               industry: result.payload.response.data.industry,
               yearExperience: result.payload.response.data.yearExperience,
               jobType: result.payload.response.data.jobType,
@@ -99,7 +99,7 @@ const JobCreationForm: React.FC = () => {
       city: city?.id,
       district: district?.id,
       location: formData.location,
-      detail: formData.detail,
+      attributes: formData.attributes,
       industry: formData.industry,
       yearExperience: formData.yearExperience,
       jobType: formData.jobType,
@@ -123,28 +123,20 @@ const JobCreationForm: React.FC = () => {
     }
   };
 
-  const parseDetail = (detail: string) => {
-    const lines = detail.split('\n'); // Tách từng dòng
-    const result: Record<string, string> = {};
-
-    let currentKey: string | null = null;
-
-    for (const line of lines) {
-        const trimmedLine = line.trim();
-        
-        // Nếu dòng bắt đầu bằng "Mô tả công việc" thì xác định là key
-        if (trimmedLine === 'Mô tả công việc' || trimmedLine === 'Yêu cầu ứng viên') {
-            currentKey = trimmedLine;
-            result[currentKey] = '';
-        } else if (currentKey) {
-            // Nếu đã xác định key thì thêm nội dung vào
-            result[currentKey] += trimmedLine + ' ';
-        }
-    }
-
-    // Trả về kết quả
-    return result;
-};
+  const parseAttributes = (attributesText) => {
+    const lines = attributesText.split('\n');
+    const attributesMap = {};
+  
+    lines.forEach(line => {
+      const [key, value] = line.split(':').map(part => part.trim());
+      if (key && value !== undefined) {
+        attributesMap[key] = value;
+      }
+    });
+  
+    return attributesMap;
+  };
+  
 
   const renderField = (name: keyof FormData, label: string, type: string = 'text') => (
     <div className="relative space-y-2">
@@ -195,7 +187,7 @@ const JobCreationForm: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
 
-            {renderField('detail', 'Mô tả', 'textarea')}
+            {renderField('attributes', 'Mô tả', 'textarea')}
 
             <div className="flex justify-end pt-6">
               <button

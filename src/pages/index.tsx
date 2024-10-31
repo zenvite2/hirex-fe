@@ -17,6 +17,7 @@ import VideoCallRequest from './chat/VideoCallRequest';
 import ResumePage from "./employee/ResumePage";
 import JobForm from "./employer/JobCreationForm";
 import ResumeContent from "./employee/ResumeContent";
+import CompanyDetail from "./employee/CompanyDetail";
 
 export {
   FindJobs,
@@ -37,5 +38,6 @@ export {
   VideoCallRequest,
   ResumePage,
   JobForm,
-  ResumeContent
+  ResumeContent,
+  CompanyDetail
 };
