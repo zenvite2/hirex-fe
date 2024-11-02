@@ -1,12 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
-import { axiosWsIns } from "./axiosIns";
+import axiosIns from "./axiosIns";
 
-export const getConversations = createAsyncThunk<any, { userId: number }>(
+export const getConversations = createAsyncThunk<any>(
     'messageReducers/getConversations',
-    async (payload) => {
-        return axiosWsIns.get(`/conversations/${payload.userId}`)
-            .then(response => { return { response: response.data } })
-            .catch(error => { toast.error(error.response.data); return []; });
+    async () => {
+        return axiosIns.get(`/conversations`, { includeToken: true })
+            .then(response => { return { response: response.data.data } })
+            .catch(error => { toast.error("Không thể tải tin nhắn."); return []; });
     }
 );

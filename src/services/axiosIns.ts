@@ -88,4 +88,4 @@ addInterceptors(axiosIns);
 addInterceptors(axiosWsIns);
 
 export default axiosIns;
-export { axiosWsIns }; 
+export { axiosWsIns };

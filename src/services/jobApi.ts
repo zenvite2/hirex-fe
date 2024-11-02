@@ -10,7 +10,7 @@ export const jobCreate = createAsyncThunk<any, any>(
             includeToken: true
         })
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
@@ -22,7 +22,7 @@ export const jobUpdate = createAsyncThunk<any, any>(
             includeToken: true
         })
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
@@ -34,27 +34,27 @@ export const jobGetAll = createAsyncThunk<any>(
             includeToken: true
         })
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
 // Get job
-export const jobGet = createAsyncThunk<any,any>(
+export const jobGet = createAsyncThunk<any, any>(
     'job/getJob',
     async (id) => {
         return axiosIns.get(`/job/${id}`)
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
 // Get jobWith
-export const jobGetWith = createAsyncThunk<any,any>(
+export const jobGetWith = createAsyncThunk<any, any>(
     'job/getJob',
     async (id) => {
         return axiosIns.get(`/job/detail/${id}`)
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
@@ -66,7 +66,7 @@ export const jobGetWithCompany = createAsyncThunk<any>(
             // includeToken: true
         })
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
@@ -78,6 +78,6 @@ export const jobDelete = createAsyncThunk<any, number>(
             includeToken: true
         })
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );

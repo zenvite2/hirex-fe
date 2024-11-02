@@ -10,7 +10,7 @@ export const experienceCreate = createAsyncThunk<any, any>(
             includeToken: true
         })
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
@@ -22,7 +22,7 @@ export const experienceUpdate = createAsyncThunk<any, any>(
             includeToken: true
         })
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
@@ -35,7 +35,7 @@ export const experienceGetAll = createAsyncThunk<any>(
             includeToken: true
         })
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
@@ -47,6 +47,6 @@ export const experienceDelete = createAsyncThunk<any, number>(
             includeToken: true
         })
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );

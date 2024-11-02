@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import ReusableModal from "../common/ReusableModal";
 import { Logo } from "../../assets";
-import { ChevronDown, FileText, Heart, Send, Bell, LogOut, Settings, HelpCircle } from "lucide-react";
+import { ChevronDown, FileText, Heart, Send, Bell, LogOut, Settings, HelpCircle, Inbox } from "lucide-react";
 import { useSelector } from 'react-redux';
 import { logout } from '../../redux/slice/authSlice';
 import { RootState } from "../../redux/store";
@@ -77,6 +77,10 @@ const Navbar: React.FC<NavbarProps> = () => {
         <Bell className="mr-3" size={20} />
         <span>Thông báo việc làm</span>
       </Link>
+      <div className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={() => { dispatch(openMessenger()) }}>
+        <Inbox className="mr-3" size={20} />
+        <span>Tin nhắn</span>
+      </div>
       <div className="border-t border-gray-200">
         <button
           onClick={handleLogout}
@@ -140,9 +144,6 @@ const Navbar: React.FC<NavbarProps> = () => {
                 >
                   Hồ sơ & CV
                 </Link>
-                <div onClick={() => dispatch(openMessenger())}>
-                  Tin nhắn
-                </div>
               </>
             ) : (
               <>

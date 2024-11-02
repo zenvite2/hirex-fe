@@ -10,7 +10,7 @@ export const skillCreate = createAsyncThunk<any, any>(
             includeToken: true
         })
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
@@ -22,7 +22,7 @@ export const skillUpdate = createAsyncThunk<any, any>(
             includeToken: true
         })
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
@@ -35,17 +35,17 @@ export const skillGetAll = createAsyncThunk<any>(
             includeToken: true
         })
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
 // Get skill
-export const skillGet = createAsyncThunk<any,any>(
+export const skillGet = createAsyncThunk<any, any>(
     'skill/getskill',
     async (id) => {
         return axiosIns.get(`/skill/${id}`)
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
@@ -57,6 +57,6 @@ export const skillDelete = createAsyncThunk<any, number>(
             includeToken: true
         })
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );

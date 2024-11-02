@@ -18,7 +18,7 @@ export const applicationCreate = createAsyncThunk<any, any>(
             },
         })
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
@@ -28,7 +28,7 @@ export const applicationLists = createAsyncThunk<any>(
     async () => {
         return axiosIns.get('/application')
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 

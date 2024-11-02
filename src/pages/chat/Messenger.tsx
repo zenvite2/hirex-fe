@@ -86,7 +86,7 @@ const Messenger: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        isConnected && userId != null && dispatch(getConversations({ userId }));
+        isConnected && userId != null && dispatch(getConversations());
     }, [userId]);
 
     const fetchConversations = useCallback(() => {
@@ -150,13 +150,14 @@ const Messenger: React.FC = () => {
         dispatch(updateConversations(updatedConversations));
     }
 
-    const handleSendMessage = useCallback((type: MessageType, fileUrl?: string) => {
+    const handleSendMessage = (type: MessageType, fileUrl?: string) => {
+        fileUrl && console.log('sending file: ', fileUrl)
         if (stompClient) {
             if ((msgInput.trim() || fileUrl) && currentConvers) {
                 const chatMessage: ChatMessage = {
                     sender: String(userId),
                     receiver: String(currentConvers?.id),
-                    message: msgInput.trim(),
+                    message: fileUrl ? '' : msgInput.trim(),
                     sentTime: new Date().toISOString(),
                     status: Status.MESSAGE,
                     direction: 'outgoing',
@@ -173,7 +174,7 @@ const Messenger: React.FC = () => {
         else {
             toast.error("Mất kết nối tới máy chủ, vui lòng tải lại trang");
         }
-    }, [msgInput]);
+    };
 
     const handleVideoCall = () => {
         const windowFeatures = `menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes,width=${window.screen.width},height=${window.screen.height}`;
@@ -200,7 +201,7 @@ const Messenger: React.FC = () => {
         const acceptPayload = {
             fromUser: userId,
             toUser: toCaller,
-            status: 'VIDEO_CALL_REQUEST_REFUSE',
+            status: VIDEO_CALL_RESPONSE.REFUSE,
         };
         stompClient.send("/app/accept", {}, JSON.stringify(acceptPayload));
     }
@@ -221,7 +222,7 @@ const Messenger: React.FC = () => {
     };
 
     return (
-        <div style={{ position: "relative" }}>
+        <div style={{ position: "relative", width: '100%' }}>
             {lstConvers.length > 0 ? <>
                 <MainContainer responsive>
                     <Sidebar position="left">
@@ -268,13 +269,13 @@ const Messenger: React.FC = () => {
                                         type: msg.type
                                     }}
                                 >
-                                    {msg.type == 'image' && <Message.ImageContent src={msg.fileUrl} />}
+                                    {msg.type === 'image' && <Message.ImageContent src={msg.fileUrl} />}
                                     {msg.type === "custom" && (
                                         <Message.CustomContent>
                                             <embed
-                                                src={msg.fileUrl}
+                                                src={"https://docs.google.com/gview?embedded=true&url=" + msg.fileUrl}
                                                 width="100%"
-                                                height="400px"
+                                                height={'400px'}
                                                 type="application/pdf"
                                             />
                                         </Message.CustomContent>

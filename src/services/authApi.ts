@@ -8,7 +8,7 @@ export const login = createAsyncThunk<any, { username: string, password: string 
     async (payload) => {
         return axiosIns.post('/auth/login', payload)
             .then(response => { response.data?.success == true && toast.success('Welcome back to Hirex.'); return { response: response.data } })
-            .catch(error => { toast.error(error.response.data) });
+            .catch(error => { { } });
     }
 );
 
@@ -17,7 +17,7 @@ export const registerEmployee = createAsyncThunk<any, any>(
     async (info) => {
         return axiosIns.post('/employee/create', info)
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
 
@@ -26,6 +26,6 @@ export const registerEmployer = createAsyncThunk<any, any>(
     async (info) => {
         return axiosIns.post('/employer/create', info)
             .then(response => { return { response: response.data } })
-            .catch(error => toast.error(error.response.data));
+            .catch(error => { });
     }
 );
