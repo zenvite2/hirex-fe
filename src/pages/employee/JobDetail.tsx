@@ -5,6 +5,8 @@ import { jobGet } from '../../services/jobApi';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import ApplyModal from './ApplyModal';
+import CustomModal from '../../components/common/CustomModal';
+import ContactNow from './ContactNow';
 
 interface JobDetail {
     id: number;
@@ -23,6 +25,13 @@ interface JobDetail {
     aboutRole: string;
     qualifications: string[];
     responsibilities: string[];
+    employer: {
+        userId: number,
+        fullName: string | null,
+        email: string | null,
+        phoneNumber: string,
+        avatar: string | null
+    }
 }
 
 const SIMILAR_JOBS = [
@@ -89,6 +98,7 @@ const JobDetail = () => {
     const [error, setError] = useState<string | null>(null);
     const dispatch = useAppDispatch();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showContactModal, setShowContactModal] = useState(false);
 
     useEffect(() => {
         const fetchJobDetail = async () => {
@@ -111,6 +121,8 @@ const JobDetail = () => {
         console.log("Button clicked!"); // Thêm dòng này
         setIsModalOpen(true);
     }
+
+
 
     const handleSubmit = () => {
         setIsModalOpen(false);
@@ -188,6 +200,12 @@ const JobDetail = () => {
                                     className="p-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600"
                                 >
                                     <Share2 className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => setShowContactModal(true)}
+                                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium"
+                                >
+                                    Liên hệ
                                 </button>
                                 <button
                                     onClick={handleApplyNow}
@@ -280,6 +298,9 @@ const JobDetail = () => {
                 onSubmit={handleSubmit}
                 jobId={id}
             />
+            <CustomModal isOpen={showContactModal} onClose={() => setShowContactModal(false)} height='small' width='small'>
+                {job?.employer && <ContactNow employer={job.employer} />}
+            </CustomModal>
         </div>
 
     );

@@ -48,7 +48,6 @@ const addInterceptors = (instance: AxiosInstance) => {
             logMessage += `headers: ${JSON.stringify(config.headers, null, 2)}\n`;
             logMessage += `payload: ${config.data ? JSON.stringify(config.data, null, 2) : '{}'}\n`;
             console.log(logMessage);
-
             return config;
         },
         (error) => {
@@ -68,9 +67,8 @@ const addInterceptors = (instance: AxiosInstance) => {
         (error) => {
             let logMessage = '==============RESPONSE ERROR==============:\n';
             if (error.response) {
-                logMessage += `status code: ${error.response.status}\n`;
-                logMessage += `data: ${JSON.stringify(error.response.data, null, 2)}\n`;
-
+                logMessage += `status_code: ${error.response.status}\n`;
+                logMessage += `message: ${JSON.stringify(error.response, null, 2)}\n`
                 if (error.response.status === 401) {
                     window.location.href = '/login';
                     authService.clearCredential();

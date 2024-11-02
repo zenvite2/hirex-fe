@@ -4,8 +4,8 @@ interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
     children: React.ReactNode;
-    width: "small" | "medium" | "large";
-    height: "small" | "medium" | "large";
+    width?: "small" | "medium" | "large";
+    height?: "small" | "medium" | "large";
 }
 
 const CustomModal: React.FC<ModalProps> = ({
@@ -35,29 +35,29 @@ const CustomModal: React.FC<ModalProps> = ({
 
     if (!isOpen) return null;
 
-    const getWidthClass = () => {
+    const getWidthClasses = () => {
         switch (width) {
             case "small":
-                return "w-1/4";
+                return "min-w-[25%] max-w-[75%]";
             case "medium":
-                return "w-1/2";
+                return "min-w-[50%] max-w-[75%]";
             case "large":
-                return "w-3/4";
+                return "min-w-[75%] max-w-[75%]";
             default:
-                return "w-1/2";
+                return "min-w-[50%] max-w-[75%]";
         }
     };
 
-    const getHeightClass = () => {
+    const getHeightClasses = () => {
         switch (height) {
             case "small":
-                return "h-1/4";
+                return "min-h-[25%] max-h-[75%]";
             case "medium":
-                return "h-1/2";
+                return "min-h-[50%] max-h-[75%]";
             case "large":
-                return "h-3/4";
+                return "min-h-[75%] max-h-[75%]";
             default:
-                return "h-1/2";
+                return "min-h-[50%] max-h-[75%]";
         }
     };
 
@@ -65,7 +65,7 @@ const CustomModal: React.FC<ModalProps> = ({
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-10">
             <div
                 ref={modalRef}
-                className={`bg-white rounded-lg p-8 shadow-lg relative mx-auto ${getWidthClass()} ${getHeightClass()} flex`}
+                className={`bg-white rounded-lg p-8 shadow-lg relative mx-auto ${getWidthClasses()} ${getHeightClasses()} flex`}
             >
                 {children}
             </div>

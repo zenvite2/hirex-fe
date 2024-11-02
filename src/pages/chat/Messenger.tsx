@@ -23,12 +23,13 @@ import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import CustomModal from '../../components/CustomModal';
+import CustomModal from '../../components/common/CustomModal';
 import VideoCallRequest from './VideoCallRequest';
 import { updateConversations } from '../../redux/slice/messageSlice';
 import { getConversations } from '../../services/messageApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { uploadFile } from '../../services/fileUploadApi';
+import { Inbox } from 'lucide-react';
 
 const VIDEO_CALL_RESPONSE = {
     ACCEPT: 'VIDEO_CALL_RESPONSE_ACCEPT',
@@ -107,10 +108,10 @@ const Messenger: React.FC = () => {
             const sock = new SockJS(wsUrl + '/ws');
             stompClient = over(sock);
             isConnected = true;
-            stompClient.connect({}, onConnected, (e) => { dispatch(stopLoading()); toast.error('Cannot connect to server.\nPlease reload the page and try again.'); });
+            stompClient.connect({}, onConnected, (e) => { dispatch(stopLoading()); toast.error('Mất kết nối tới máy chủ, vui lòng thử lại.'); });
 
             sock.onerror = () => {
-                toast.error('Something wrong happened.');
+                toast.error('Mất kết nối tới máy chủ, vui lòng thử lại.');
             }
         }
     };
@@ -170,7 +171,7 @@ const Messenger: React.FC = () => {
             }
         }
         else {
-            toast.error("Cannot connect to server. Please reload the page and try again.");
+            toast.error("Mất kết nối tới máy chủ, vui lòng tải lại trang");
         }
     }, [msgInput]);
 
@@ -214,89 +215,95 @@ const Messenger: React.FC = () => {
                 }
             })
             .catch((error) => {
-                console.error("Error uploading file:", error);
-                toast.error("Something went wrong during file upload");
+                toast.error('Có lỗi xảy ra khi tải file.');
             });
         event.target.value = '';
     };
 
     return (
-        <div style={{ position: "relative", height: "100%", width: "100%", flex: 1 }}>
-            <MainContainer responsive>
-                <Sidebar position="left">
-                    <ConversationList>
-                        {lstConvers?.length > 0 && lstConvers.map(conversation => (
-                            <Conversation
-                                key={conversation.id}
-                                name={conversation.name}
-                                lastSenderName={conversation.name}
-                                info={conversation.last10Messages[conversation.last10Messages.length - 1]?.message ?? ''}
-                                active={currentConvers?.id === conversation.id}
-                                onClick={() => {
-                                    setCurrentConversation(conversation);
-                                    setToCaller(conversation.id + '');
-                                }}
-                            >
-                                <Avatar src={conversation.avtUrl} name={conversation.name} />
-                            </Conversation>
-                        ))}
-                    </ConversationList>
-                </Sidebar>
+        <div style={{ position: "relative" }}>
+            {lstConvers.length > 0 ? <>
+                <MainContainer responsive>
+                    <Sidebar position="left">
+                        <ConversationList>
+                            {lstConvers?.length > 0 && lstConvers.map(conversation => (
+                                <Conversation
+                                    key={conversation.id}
+                                    name={conversation.name}
+                                    lastSenderName={conversation.name}
+                                    info={conversation.last10Messages[conversation.last10Messages.length - 1]?.message ?? ''}
+                                    active={currentConvers?.id === conversation.id}
+                                    onClick={() => {
+                                        setCurrentConversation(conversation);
+                                        setToCaller(conversation.id + '');
+                                    }}
+                                >
+                                    <Avatar src={conversation.avtUrl} name={conversation.name} />
+                                </Conversation>
+                            ))}
+                        </ConversationList>
+                    </Sidebar>
 
-                <ChatContainer>
-                    {currentConvers && (
-                        <ConversationHeader>
-                            <Avatar src={currentConvers?.avtUrl} name={currentConvers?.name} />
-                            <ConversationHeader.Content userName={currentConvers?.name} info="Online" />
-                            <ConversationHeader.Actions>
-                                <VideoCallButton onClick={handleVideoCall} />
-                            </ConversationHeader.Actions>
-                        </ConversationHeader>
-                    )}
+                    <ChatContainer>
+                        {currentConvers && (
+                            <ConversationHeader>
+                                <Avatar src={currentConvers?.avtUrl} name={currentConvers?.name} />
+                                <ConversationHeader.Content userName={currentConvers?.name} info="Online" />
+                                <ConversationHeader.Actions>
+                                    <VideoCallButton onClick={handleVideoCall} />
+                                </ConversationHeader.Actions>
+                            </ConversationHeader>
+                        )}
 
-                    <MessageList>
-                        {lstCurrentMsg.map((msg: ChatMessage, index) => (
-                            <Message
-                                key={index}
-                                model={{
-                                    message: msg.type === 'text' ? msg.message : undefined,
-                                    sentTime: new Date(msg.sentTime).toISOString(),
-                                    sender: msg.sender,
-                                    direction: msg.sender === userId + '' ? 'outgoing' : 'incoming',
-                                    position: 'single',
-                                    type: msg.type
-                                }}
-                            >
-                                {msg.type == 'image' && <Message.ImageContent src={msg.fileUrl} />}
-                                {msg.type === "custom" && (
-                                    <Message.CustomContent>
-                                        <embed
-                                            src={msg.fileUrl}
-                                            width="100%"
-                                            height="400px"
-                                            type="application/pdf"
-                                        />
-                                    </Message.CustomContent>
-                                )}
-                            </Message>
-                        ))}
+                        <MessageList>
+                            {lstCurrentMsg.map((msg: ChatMessage, index) => (
+                                <Message
+                                    key={index}
+                                    model={{
+                                        message: msg.type === 'text' ? msg.message : undefined,
+                                        sentTime: new Date(msg.sentTime).toISOString(),
+                                        sender: msg.sender,
+                                        direction: msg.sender === userId + '' ? 'outgoing' : 'incoming',
+                                        position: 'single',
+                                        type: msg.type
+                                    }}
+                                >
+                                    {msg.type == 'image' && <Message.ImageContent src={msg.fileUrl} />}
+                                    {msg.type === "custom" && (
+                                        <Message.CustomContent>
+                                            <embed
+                                                src={msg.fileUrl}
+                                                width="100%"
+                                                height="400px"
+                                                type="application/pdf"
+                                            />
+                                        </Message.CustomContent>
+                                    )}
+                                </Message>
+                            ))}
 
-                        {/* <TypingIndicator content={`${currentConvers?.name} is typing...`} /> */}
-                    </MessageList>
+                            {/* <TypingIndicator content={`${currentConvers?.name} is typing...`} /> */}
+                        </MessageList>
 
-                    <MessageInput
-                        placeholder={`Type message to ${currentConvers?.name || "anonymous"}...`}
-                        value={msgInput}
-                        onChange={val => setMsgInput(val)}
-                        onSend={() => { handleSendMessage('text') }}
-                        onAttachClick={() => {
-                            if (fileInputRef.current) {
-                                fileInputRef.current.click();
-                            }
-                        }}
-                    />
-                </ChatContainer>
-            </MainContainer>
+                        <MessageInput
+                            placeholder={`Type message to ${currentConvers?.name || "anonymous"}...`}
+                            value={msgInput}
+                            onChange={val => setMsgInput(val)}
+                            onSend={() => { handleSendMessage('text') }}
+                            onAttachClick={() => {
+                                if (fileInputRef.current) {
+                                    fileInputRef.current.click();
+                                }
+                            }}
+                        />
+                    </ChatContainer>
+                </MainContainer>
+            </> : <div className="flex flex-col items-center justify-center h-full bg-gray-100">
+                <div className="flex items-center mb-4">
+                    <Inbox color="gray" className="mr-3" size={50} />
+                </div>
+                <p className="text-gray-400 text-lg font-medium">You don’t have any conversations</p>
+            </div>}
             {showCallRqModal && <CustomModal isOpen={showCallRqModal} onClose={() => setShowCallRqModal(false)} width='large' height='large'>
                 <VideoCallRequest fromUser={toCaller} toUser={userId + ''} setShowCallRequestModal={setShowCallRqModal} handleRefuseCall={handleRefuseCall} />
             </CustomModal>}

@@ -5,7 +5,7 @@ import useAppDispatch from '../../hooks/useAppDispatch';
 import { registerEmployee } from '../../services/authApi';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const RegistrationForm = () => {
   const dispatch = useAppDispatch();
@@ -17,6 +17,7 @@ const RegistrationForm = () => {
   const [passwordError, setPasswordError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showRetryPassword, setShowRetryPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +30,7 @@ const RegistrationForm = () => {
     dispatch(stopLoading());
 
     if (result?.payload?.response?.success == true) {
+      navigate("/login");
       toast.success('Đăng ký thành công');
     } else {
       toast.error(result?.payload?.response?.message || 'Đăng ký thất bại');

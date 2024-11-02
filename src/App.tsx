@@ -18,11 +18,11 @@ import {
     ResumeContent
 } from "./pages";
 import { ToastContainer } from 'react-toastify';
-import Loading from './components/Loading';
+import Loading from './components/common/Loading';
 import LoginPage from "./pages/auth/Login";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./redux/store";
-import CustomModal from "./components/CustomModal";
+import CustomModal from "./components/common/CustomModal";
 import { closeMessenger } from "./redux/slice/loadingSlice";
 import useAppDispatch from "./hooks/useAppDispatch";
 
@@ -30,14 +30,14 @@ function SidebarLayout() {
     const location = useLocation();
     const showSidebar = [
         "/dashboard",
-        "/company-info", 
+        "/company-info",
         "/job-posts",
         "/applicants",
         "/info-page",
         "/apply-job"
-    ].includes(location.pathname) || 
+    ].includes(location.pathname) ||
         /^\/jobs\/edit\/\d+$/.test(location.pathname);
-        
+
     return (
         <div className="flex min-h-screen">
             {/* Sidebar chỉ hiển thị trên các trang có Sidebar */}
@@ -98,13 +98,15 @@ function App() {
                 </div>
             </main>
             <ToastContainer
-                position="top-center"
-                autoClose={3000}
+                position="bottom-right"
+                autoClose={4000}
                 hideProgressBar={false}
                 newestOnTop={false}
                 closeOnClick
                 draggable
                 theme="light"
+                pauseOnFocusLoss={false}
+                stacked
             />
             {showMessenger && <CustomModal isOpen={showMessenger} width='large' height='large' onClose={() => { dispatch(closeMessenger()); }} children={<Messenger />} />}
             { }

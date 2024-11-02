@@ -14,6 +14,9 @@ const messagesSlice = createSlice({
   name: 'messageReducers',
   initialState,
   reducers: {
+    createConversation: (state, action: PayloadAction<Conversation>) => {
+      state.lstConvers = [...state.lstConvers, action.payload];
+    },
     updateConversations: (state, action: PayloadAction<Conversation[]>) => {
       state.lstConvers = action.payload;
     },
@@ -32,5 +35,5 @@ const messagesSlice = createSlice({
   }
 });
 
-export const { updateConversations, clearConversations } = messagesSlice.actions;
+export const { updateConversations, clearConversations, createConversation } = messagesSlice.actions;
 export default messagesSlice.reducer;

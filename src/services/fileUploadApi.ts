@@ -14,7 +14,6 @@ export const uploadFile = async (file: File) => {
 
         return response.data;
     } catch (error) {
-        toast.error('Error uploading file:', error);
         throw error;
     }
 };
