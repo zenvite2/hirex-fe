@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import ReusableModal from "../common/ReusableModal";
 import { Logo } from "../../assets";
-import { ChevronDown, FileText, Heart, Send, Bell, LogOut, Settings, HelpCircle, Inbox } from "lucide-react";
+import { ChevronDown, FileText, Heart, Send, Bell, LogOut, Settings, HelpCircle } from "lucide-react";
 import { useSelector } from 'react-redux';
 import { logout } from '../../redux/slice/authSlice';
 import { RootState } from "../../redux/store";
 import { openMessenger } from "../../redux/slice/loadingSlice";
 import useAppDispatch from "../../hooks/useAppDispatch";
-
 interface NavbarProps { }
 
 const Navbar: React.FC<NavbarProps> = () => {
@@ -52,7 +51,7 @@ const Navbar: React.FC<NavbarProps> = () => {
   };
 
   const renderUserDropdown = () => (
-    <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg">
+    <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg hidden group-hover:block">
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center space-x-3">
           <img src={Logo} alt="My CareerLink Logo" className="w-12 h-12" />
@@ -78,10 +77,6 @@ const Navbar: React.FC<NavbarProps> = () => {
         <Bell className="mr-3" size={20} />
         <span>Thông báo việc làm</span>
       </Link>
-      <Link to="" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100" onClick={() => dispatch(openMessenger())}>
-        <Inbox className="mr-3" size={20} />
-        <span>Tin nhắn</span>
-      </Link>
       <div className="border-t border-gray-200">
         <button
           onClick={handleLogout}
@@ -95,7 +90,7 @@ const Navbar: React.FC<NavbarProps> = () => {
   );
 
   const renderAdminDropdown = () => (
-    <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg">
+    <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg hidden group-hover:block">
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center space-x-3">
           <img src={Logo} alt="TinaSoft Logo" className="w-12 h-12" />
@@ -132,34 +127,38 @@ const Navbar: React.FC<NavbarProps> = () => {
           <Link to="/" className="flex-shrink-0">
             <img src={Logo} alt="TopCV Logo" className="h-8 w-auto" />
           </Link>
-          {!isEmployerPage ? (
-            <div className="hidden lg:flex space-x-6 ml-10">
-              <Link to="/find-jobs" className={getLinkClassName('/find-jobs')}>
-                Việc làm
-              </Link>
-              <Link
-                to={isLoggedIn && role === 'EMPLOYEE' ? '/resume' : '/resume-content'}
-                className={getLinkClassName(['/resume', '/resume-content'])}
-              >
-                Hồ sơ & CV
-              </Link>
-              <Link to="/companies" className={getLinkClassName('/companies')}>
-                Công ty
-              </Link>
-            </div>
-          ) : (
-            <div className="hidden lg:flex space-x-6 ml-10">
-              <Link
-                to="/employer"
-                className={`${getLinkClassName('/employer')} ${location.pathname.startsWith('/employer')
-                  ? 'text-[#0069DB] font-semibold border-b-2 border-[#0069DB]'
-                  : ''
-                  }`}
-              >
-                Đăng việc làm
-              </Link>
-            </div>
-          )}
+          <div className="hidden lg:flex space-x-6 ml-10">
+            {!isEmployerPage && (!isLoggedIn || role === 'EMPLOYEE') ? (
+              <>
+                {/* Hiển thị "Việc làm" và "Hồ sơ & CV" khi chưa đăng nhập hoặc khi vai trò là 'EMPLOYEE' */}
+                <Link to="/find-jobs" className={getLinkClassName('/find-jobs')}>
+                  Việc làm
+                </Link>
+                <Link
+                  to={isLoggedIn && role === 'EMPLOYEE' ? '/resume' : '/resume-content'}
+                  className={getLinkClassName(['/resume', '/resume-content'])}
+                >
+                  Hồ sơ & CV
+                </Link>
+                <div onClick={() => dispatch(openMessenger())}>
+                  Tin nhắn
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Hiển thị "Đăng việc làm" khi vai trò là 'EMPLOYER' */}
+                <Link
+                  to="/employer"
+                  className={`${getLinkClassName('/employer')} ${location.pathname.startsWith('/employer')
+                    ? 'text-[#0069DB] font-semibold border-b-2 border-[#0069DB]'
+                    : ''
+                    }`}
+                >
+                  Đăng việc làm
+                </Link>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="hidden lg:flex items-center space-x-2">
@@ -170,10 +169,7 @@ const Navbar: React.FC<NavbarProps> = () => {
                 <span className="font-medium">{username || 'Login'}</span>
                 <ChevronDown size={16} />
               </button>
-
-              <div className="absolute right-0 z-50 hidden group-hover:block transition-opacity duration-300">
-                {role === 'EMPLOYEE' ? renderUserDropdown() : renderAdminDropdown()}
-              </div>
+              {role === 'EMPLOYEE' ? renderUserDropdown() : renderAdminDropdown()}
             </div>
           ) : (
             <>
@@ -194,12 +190,11 @@ const Navbar: React.FC<NavbarProps> = () => {
           <Link
             to={isEmployerPage ? "/find-jobs" : "/employer"}
             onClick={(e) => {
-              e.preventDefault(); // Prevent the default link behavior
-              handleLogout();     // Log out the user
-              // After logging out, navigate to the appropriate page
+              e.preventDefault();
+              handleLogout();
               setTimeout(() => {
                 navigate(isEmployerPage ? "/find-jobs" : "/employer");
-              }, 0);  // Use a slight delay to ensure logout finishes before navigation
+              }, 0);
             }}
             className="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-900 transition duration-300 whitespace-nowrap"
           >

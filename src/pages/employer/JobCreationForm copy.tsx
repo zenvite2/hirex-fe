@@ -4,15 +4,7 @@ import useAppDispatch from '../../hooks/useAppDispatch';
 import {  contracTypeList } from '../../services/autofillApi';
 import { jobCreate, jobUpdate, jobGet } from '../../services/jobApi';
 import { useLocationSelector } from './useLocationSelector';
-import { LocationSelector } from '../../components/registration/LocationSelector';
 import { toast } from 'react-toastify';
-
-
-interface ContractType {
-  id: number;
-  name: string;
-}
-
 
 interface FormData {
   id: number | null;
@@ -20,7 +12,7 @@ interface FormData {
   city: number | null;
   district: number | null;
   location: string;
-  description: string;
+  attributes: string;
   industry: number | null;
   yearExperience: number | null;
   jobType: string;
@@ -28,8 +20,6 @@ interface FormData {
   deadline: string;
   salary: number | null;
   contractType: string;
-  email: string;
-  phone: string;
 }
 
 const initialFormData: FormData = {
@@ -38,7 +28,7 @@ const initialFormData: FormData = {
   city: null,
   district: null,
   location: '',
-  description: '',
+  attributes: '',
   industry: null,
   yearExperience: null,
   jobType: '',
@@ -46,8 +36,6 @@ const initialFormData: FormData = {
   deadline: '',
   salary: null,
   contractType: null,
-  email: '',
-  phone: ''
 };
 
 const JobCreationForm: React.FC = () => {
@@ -55,37 +43,13 @@ const JobCreationForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [contractTypes, setContractTypes] = useState<ContractType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const {
     city,
     district,
-    cities,
-    districts,
-    handleSelectCity,
-    handleSelectDistrict,
-    fetchCities,
-    fetchDistricts,
   } = useLocationSelector();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [ contractResult] = await Promise.all([
-
-          dispatch(contracTypeList()).unwrap(),
-        ]);
-        if (contractResult.response?.data) {
-          setContractTypes(contractResult.response.data);
-        }
-      } catch (error) {
-        toast.error('Lỗi khi tải dữ liệu. Vui lòng thử lại sau.');
-      }
-    };
-
-    fetchData();
-  }, [dispatch]);
 
   useEffect(() => {
     const fetchJobData = async () => {
@@ -100,16 +64,14 @@ const JobCreationForm: React.FC = () => {
               city: result.payload.response.data.city,
               district: result.payload.response.data.district,
               location: result.payload.response.data.location,
-              description: result.payload.response.data.description,
+              attributes: result.payload.response.data.attributes,
               industry: result.payload.response.data.industry,
               yearExperience: result.payload.response.data.yearExperience,
               jobType: result.payload.response.data.jobType,
               position: result.payload.response.data.position,
               deadline: result.payload.response.data.deadline,
               salary: result.payload.response.data.salary,
-              contractType: result.payload.response.data.contractType,
-              email: result.payload.response.data.email,
-              phone: result.payload.response.data.phone
+              contractType: result.payload.response.data.contractType
             });
           }
         }
@@ -137,7 +99,7 @@ const JobCreationForm: React.FC = () => {
       city: city?.id,
       district: district?.id,
       location: formData.location,
-      description: formData.description,
+      attributes: formData.attributes,
       industry: formData.industry,
       yearExperience: formData.yearExperience,
       jobType: formData.jobType,
@@ -145,8 +107,6 @@ const JobCreationForm: React.FC = () => {
       deadline: formData.deadline,
       salary: formData.salary,
       contractType: formData.contractType,
-      email: formData.email,
-      phone: formData.phone
     };
 
     try {
@@ -163,19 +123,20 @@ const JobCreationForm: React.FC = () => {
     }
   };
 
-  const renderSelectOptions = (fieldName: keyof FormData) => {
-    switch (fieldName) {
-
-      case 'contractType':
-        return contractTypes.map(type => (
-          <option key={type.id} value={type.id}>
-            {type.name}
-          </option>
-        ));
-      default:
-        return [];
-    }
+  const parseAttributes = (attributesText) => {
+    const lines = attributesText.split('\n');
+    const attributesMap = {};
+  
+    lines.forEach(line => {
+      const [key, value] = line.split(':').map(part => part.trim());
+      if (key && value !== undefined) {
+        attributesMap[key] = value;
+      }
+    });
+  
+    return attributesMap;
   };
+  
 
   const renderField = (name: keyof FormData, label: string, type: string = 'text') => (
     <div className="relative space-y-2">
@@ -192,7 +153,6 @@ const JobCreationForm: React.FC = () => {
             className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
           >
             <option value="">Chọn {label}</option>
-            {renderSelectOptions(name)}
           </select>
         ) : type === 'textarea' ? (
           <textarea
@@ -226,49 +186,8 @@ const JobCreationForm: React.FC = () => {
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {renderField('title', 'Tiêu đề')}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <LocationSelector
-                label="Tỉnh / TP"
-                placeholder="Chọn tỉnh thành"
-                locations={cities}
-                value={city?.name || ''}
-                onChange={(selectedCity) => {
-                  handleSelectCity(selectedCity);
-                  setFormData(prev => ({
-                    ...prev,
-                    city: selectedCity?.id || null,
-                    district: null
-                  }));
-                }}
-                onSearch={fetchCities}
-                disabled={false}
-              />
-
-              <LocationSelector
-                label="Quận / Huyện"
-                placeholder="Chọn quận huyện"
-                locations={districts}
-                value={district?.name || ''}
-                onChange={(selectedDistrict) => {
-                  handleSelectDistrict(selectedDistrict);
-                  setFormData(prev => ({
-                    ...prev,
-                    district: selectedDistrict?.id || null
-                  }));
-                }}
-                onSearch={(query) => fetchDistricts(query, city?.id || 0)}
-                disabled={!city}
-              />
-            </div>
-
-            {renderField('location', 'Địa chỉ cụ thể')}
-            {renderField('description', 'Mô tả', 'textarea')}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {renderField('contractType', 'Hợp đồng làm việc', 'select')}
-            </div>
+            {renderField('attributes', 'Mô tả', 'textarea')}
 
             <div className="flex justify-end pt-6">
               <button

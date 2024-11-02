@@ -82,7 +82,6 @@
     const [techs, setTechs] = useState<TechType[]>([]);
     const [salarys, setSalarys] = useState<TechType[]>([]);
     const [contractTypes, setContractTypes] = useState<ContractType[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
 
     const {
       city,
@@ -135,7 +134,6 @@
 
     useEffect(() => {
       const fetchJobData = async () => {
-        setIsLoading(true);
         try {
           if (id) {
             const result = await dispatch(jobGetWith(id));
@@ -161,8 +159,6 @@
           }
         } catch (error) {
           toast.error('Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.');
-        } finally {
-          setIsLoading(false);
         }
       };
 

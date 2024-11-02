@@ -15,7 +15,8 @@ import {
     Messenger,
     ResumePage,
     JobForm,
-    ResumeContent
+    ResumeContent,
+    CompanyDetail
 } from "./pages";
 import { ToastContainer } from 'react-toastify';
 import Loading from './components/common/Loading';
@@ -83,6 +84,7 @@ function App() {
                             <Route path="/info-page" element={<CompanyInfo />} />
                             <Route path="/apply-job" element={<JobForm />} />
                             <Route path="/jobs/edit/:id" element={<JobForm />} />
+                            <Route path="/company/detail" element={<CompanyDetail />} />
                         </Route>
 
                         {/* Các route khác */}

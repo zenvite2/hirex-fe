@@ -87,7 +87,7 @@ const JobListings = () => {
                 <td className="py-4">
                   <div className="font-medium">{job.title}</div>
                   <div className="text-gray-500 text-sm mt-1">
-                    {job.location}, {job.district}, {job.city}
+                    {job.location}
                   </div>
                 </td>
                 <td className="py-4">
