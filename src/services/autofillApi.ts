@@ -14,7 +14,7 @@ export const cityList = createAsyncThunk<any, { name: string }>(
             return { response: response.data }; // Trả về dữ liệu khi thành công
         } catch (error: any) {
             // Hiển thị lỗi qua toast notification và trả về lỗi
-            toast.error(error.response?.data || "An error occurred");
+            toast.error("An error occurred");
         }
     }
 );
@@ -30,7 +30,7 @@ export const districtList = createAsyncThunk<any, { name?: string; cityIds?: num
             });
             return { response: response.data };
         } catch (error: any) {
-            toast.error(error.response?.data || "An error occurred");
+            toast.error("An error occurred");
         }
     });
 

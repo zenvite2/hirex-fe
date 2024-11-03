@@ -8,7 +8,7 @@ export const getEmployees = createAsyncThunk<any>(
     return axiosIns.get('/employee', {
       includeToken: true
     }).then(response => { return { response: response.data } })
-      .catch(error => toast.error(error.response?.data))
+      .catch(error => { })
   }
 );
 
@@ -21,7 +21,7 @@ export const updateEmployee = createAsyncThunk<any, FormData>(
         'Content-Type': 'multipart/form-data',
       },
     }).then(response => { return { response: response.data } })
-      .catch(error => toast.error(error.response?.data?.message))
+      .catch(error => { })
   }
 );
 

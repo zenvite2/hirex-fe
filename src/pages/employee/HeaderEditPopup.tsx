@@ -89,7 +89,7 @@ const HeaderEditPopup: React.FC<HeaderEditPopupProps> = ({ isOpen, onClose, onSa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setHasSubmitted(true);
-    
+
     if (!validateForm()) {
       return;
     }
@@ -119,7 +119,7 @@ const HeaderEditPopup: React.FC<HeaderEditPopupProps> = ({ isOpen, onClose, onSa
       toast.success('Cập nhật thông tin cá nhân thành công');
       onClose();
     } else {
-      toast.error(result?.payload?.response?.message || 'Cập nhật thông tin cá nhân thất bại');
+      toast.error('Cập nhật thông tin cá nhân thất bại');
     }
     setIsSubmitting(false);
   };
@@ -150,11 +150,10 @@ const HeaderEditPopup: React.FC<HeaderEditPopupProps> = ({ isOpen, onClose, onSa
                 type="text"
                 id="fullName"
                 name="fullName"
-                className={`block w-full rounded-md border-2 ${
-                  hasSubmitted && validationErrors.fullName 
-                    ? 'border-red-500' 
+                className={`block w-full rounded-md border-2 ${hasSubmitted && validationErrors.fullName
+                    ? 'border-red-500'
                     : 'border-gray-300'
-                } shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2`}
+                  } shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2`}
                 value={editedData.fullName}
                 onChange={handleChange}
               />
@@ -171,11 +170,10 @@ const HeaderEditPopup: React.FC<HeaderEditPopupProps> = ({ isOpen, onClose, onSa
                 type="email"
                 id="email"
                 name="email"
-                className={`block w-full rounded-md border-2 ${
-                  hasSubmitted && validationErrors.email 
-                    ? 'border-red-500' 
+                className={`block w-full rounded-md border-2 ${hasSubmitted && validationErrors.email
+                    ? 'border-red-500'
                     : 'border-gray-300'
-                } shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2`}
+                  } shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2`}
                 value={editedData.email}
                 onChange={handleChange}
               />
@@ -192,11 +190,10 @@ const HeaderEditPopup: React.FC<HeaderEditPopupProps> = ({ isOpen, onClose, onSa
                 type="tel"
                 id="phoneNumber"
                 name="phoneNumber"
-                className={`block w-full rounded-md border-2 ${
-                  hasSubmitted && validationErrors.phoneNumber 
-                    ? 'border-red-500' 
+                className={`block w-full rounded-md border-2 ${hasSubmitted && validationErrors.phoneNumber
+                    ? 'border-red-500'
                     : 'border-gray-300'
-                } shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2`}
+                  } shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2`}
                 value={editedData.phoneNumber}
                 onChange={handleChange}
               />
@@ -213,11 +210,10 @@ const HeaderEditPopup: React.FC<HeaderEditPopupProps> = ({ isOpen, onClose, onSa
                 type="text"
                 id="address"
                 name="address"
-                className={`block w-full rounded-md border-2 ${
-                  hasSubmitted && validationErrors.address 
-                    ? 'border-red-500' 
+                className={`block w-full rounded-md border-2 ${hasSubmitted && validationErrors.address
+                    ? 'border-red-500'
                     : 'border-gray-300'
-                } shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2`}
+                  } shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2`}
                 value={editedData.address}
                 onChange={handleChange}
               />
@@ -267,11 +263,10 @@ const HeaderEditPopup: React.FC<HeaderEditPopupProps> = ({ isOpen, onClose, onSa
                 type="date"
                 id="dateOfBirth"
                 name="dateOfBirth"
-                className={`block w-full rounded-md border-2 ${
-                  hasSubmitted && validationErrors.dateOfBirth 
-                    ? 'border-red-500' 
+                className={`block w-full rounded-md border-2 ${hasSubmitted && validationErrors.dateOfBirth
+                    ? 'border-red-500'
                     : 'border-gray-300'
-                } shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2`}
+                  } shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2`}
                 value={editedData.dateOfBirth}
                 onChange={handleChange}
               />

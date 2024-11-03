@@ -70,9 +70,8 @@ const addInterceptors = (instance: AxiosInstance) => {
                 logMessage += `status_code: ${error.response.status}\n`;
                 logMessage += `message: ${JSON.stringify(error.response, null, 2)}\n`
                 if (error.response.status === 401) {
-                    window.location.href = '/login';
                     authService.clearCredential();
-                    toast.error('Your Session is expired.');
+                    window.location.href = '/login?expired=true';
                 }
             } else {
                 logMessage += `Error: ${error.message}\n`;

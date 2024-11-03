@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { RootState } from '../../redux/store';
 import { login } from '../../services/authApi';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
@@ -23,6 +23,8 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const queryParams = new URLSearchParams(useLocation().search);
+  const [sessionExp, setSessionExp] = useState(queryParams.get('expired') == null ? false : true);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,9 +39,14 @@ const LoginPage = () => {
       }
     }
     else {
-      toast.error(result?.payload?.response?.message || 'Something went wrong.');
+      toast.error('Đã có lỗi xảy ra.');
     }
   }
+
+  useEffect(() => {
+    sessionExp && toast.info("Your session has expired.", { autoClose: false })
+    console.log(sessionExp)
+  }, [sessionExp]);
 
   return (
     <div className="flex h-screen bg-gray-100">

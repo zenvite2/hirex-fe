@@ -46,7 +46,7 @@ export const applicationUpdate = createAsyncThunk<any, { id: number; status: App
         )
             .then(response => ({ response: response.data }))
             .catch(error => {
-                toast.error(error.response?.data?.message || 'Có lỗi xảy ra');
+                toast.error('Có lỗi xảy ra');
                 throw error;
             });
     }

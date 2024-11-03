@@ -33,7 +33,7 @@ const RegistrationForm = () => {
       navigate("/login");
       toast.success('Đăng ký thành công');
     } else {
-      toast.error(result?.payload?.response?.message || 'Đăng ký thất bại');
+      toast.error('Đăng ký thất bại');
     }
 
   };

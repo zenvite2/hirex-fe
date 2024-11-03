@@ -9,8 +9,8 @@ import { updateCompany } from '../../services/companyApi';
 interface CompanyInfo {
   companyName: string;
   address: string;
-  city: number | null;     
-  district: number | null; 
+  city: number | null;
+  district: number | null;
   companySize: string;
   website?: string;
   logo?: File;
@@ -19,7 +19,7 @@ interface CompanyInfo {
 
 const CompanyInfoForm: React.FC = () => {
   const dispatch = useAppDispatch();
-  
+
   const [formData, setFormData] = React.useState<CompanyInfo>({
     companyName: '',
     address: '',
@@ -65,19 +65,19 @@ const CompanyInfoForm: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    
+
     const submitFormData = new FormData();
     submitFormData.append('companyName', formData.companyName);
     submitFormData.append('address', formData.address);
-    
+
     if (formData.city !== null) {
       submitFormData.append('city', formData.city.toString()); // Convert number to string
     }
-    
+
     if (formData.district !== null) {
       submitFormData.append('district', formData.district.toString()); // Convert number to string
     }
-    
+
     if (formData.website) submitFormData.append('website', formData.website);
     if (formData.description) submitFormData.append('description', formData.description);
     if (logoFile) submitFormData.append('logo', logoFile);
@@ -87,9 +87,9 @@ const CompanyInfoForm: React.FC = () => {
     if (result?.payload?.response?.success === true) {
       toast.success('Cập nhật thông tin công ty thành công');
     } else {
-      toast.error(result?.payload?.response?.message || 'Cập nhật thông tin công ty thất bại');
+      toast.error('Cập nhật thông tin công ty thất bại');
     }
-};
+  };
   return (
     <div className="max-w-3xl mx-auto bg-white rounded-lg shadow p-6">
       <h1 className="text-2xl font-bold mb-6">

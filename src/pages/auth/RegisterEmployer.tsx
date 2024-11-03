@@ -138,7 +138,7 @@ const RegistrationForm: React.FC = () => {
       if (result?.payload?.response?.success === true) {
         toast.success('Đăng ký thành công');
       } else {
-        toast.error(result?.payload?.response?.message || 'Đăng ký thất bại');
+        toast.error('Đăng ký thất bại');
       }
     } catch (error) {
       toast.error('Có lỗi xảy ra khi đăng ký');
