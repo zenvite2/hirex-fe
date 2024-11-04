@@ -25,6 +25,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(useLocation().search);
   const [sessionExp, setSessionExp] = useState(queryParams.get('expired') == null ? false : true);
+  let toastId;
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,8 +45,15 @@ const LoginPage = () => {
   }
 
   useEffect(() => {
-    sessionExp && toast.info("Your session has expired.", { autoClose: false })
-    console.log(sessionExp)
+    if (sessionExp) {
+      toastId = toast.info("Your session has expired.", { autoClose: false })
+    }
+
+    return () => {
+      if (toastId) {
+        toast.dismiss(toastId);
+      }
+    };
   }, [sessionExp]);
 
   return (

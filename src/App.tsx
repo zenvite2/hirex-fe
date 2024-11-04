@@ -24,7 +24,7 @@ import LoginPage from "./pages/auth/Login";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./redux/store";
 import CustomModal from "./components/common/CustomModal";
-import { closeMessenger } from "./redux/slice/loadingSlice";
+import { closeMessenger } from "./redux/slice/messageSlice";
 import useAppDispatch from "./hooks/useAppDispatch";
 
 function SidebarLayout() {
@@ -54,9 +54,10 @@ function SidebarLayout() {
     );
 }
 
+
 function App() {
     const location = useLocation();
-    const { showMessenger } = useSelector((state: RootState) => state.loadingReducer);
+    const { showMessenger } = useSelector((state: RootState) => state.messageReducer);
     const dispatch = useAppDispatch();
     // Không hiển thị Navbar trên trang login và register-employee  
     const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer";

@@ -6,7 +6,7 @@ import { ChevronDown, FileText, Heart, Send, Bell, LogOut, Settings, HelpCircle,
 import { useSelector } from 'react-redux';
 import { logout } from '../../redux/slice/authSlice';
 import { RootState } from "../../redux/store";
-import { openMessenger } from "../../redux/slice/loadingSlice";
+import { openMessenger } from "../../redux/slice/messageSlice";
 import useAppDispatch from "../../hooks/useAppDispatch";
 interface NavbarProps { }
 
@@ -108,6 +108,10 @@ const Navbar: React.FC<NavbarProps> = () => {
         <Settings className="mr-3" size={20} />
         <span>Cài đặt tài khoản</span>
       </Link>
+      <div className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={() => { dispatch(openMessenger()) }}>
+        <Inbox className="mr-3" size={20} />
+        <span>Tin nhắn</span>
+      </div>
       <Link to="/help-support" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100">
         <HelpCircle className="mr-3" size={20} />
         <span>Trợ giúp và hỗ trợ</span>

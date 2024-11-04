@@ -2,12 +2,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface LoadingState {
     isLoading: boolean;
-    showMessenger: boolean;
 }
 
 const initialState: LoadingState = {
     isLoading: false,
-    showMessenger: false,
 };
 
 const loadingSlice = createSlice({
@@ -22,15 +20,9 @@ const loadingSlice = createSlice({
         },
         setLoading: (state, action: PayloadAction<boolean>) => {
             state.isLoading = action.payload;
-        },
-        openMessenger: (state) => {
-            state.showMessenger = true;
-        },
-        closeMessenger: (state) => {
-            state.showMessenger = false;
         }
     },
 });
 
-export const { startLoading, stopLoading, setLoading, openMessenger, closeMessenger } = loadingSlice.actions;
+export const { startLoading, stopLoading, setLoading } = loadingSlice.actions;
 export default loadingSlice.reducer;

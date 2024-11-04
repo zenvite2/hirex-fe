@@ -2,8 +2,7 @@ import { Mail, MessageCircleQuestion, PhoneCall } from 'lucide-react';
 import React from 'react';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
-import { createConversation } from '../../redux/slice/messageSlice';
-import { openMessenger } from '../../redux/slice/loadingSlice';
+import { addMessage } from '../../redux/slice/messageSlice';
 
 interface Employer {
     userId: number,
@@ -54,8 +53,7 @@ const ContactNow: React.FC<{ employer: Employer }> = ({ employer }) => {
                 <button
                     className="space-x-2 flex items-center justify-center w-full px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg shadow-sm transition duration-200"
                     onClick={() => {
-                        dispatch(createConversation({ id: employer.userId, avtUrl: employer.avatar, last10Messages: [], name: employer.fullName }));
-                        dispatch(openMessenger());
+                        dispatch(addMessage({ converId: employer.userId, msg: null, openMessenger: true }));
                     }}
                 >
                     <MessageCircleQuestion />

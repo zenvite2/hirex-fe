@@ -12,6 +12,33 @@ export const login = createAsyncThunk<any, { username: string, password: string 
     }
 );
 
+export interface UserInfo {
+    userId: number;
+    fullName: string;
+    email: string;
+    phoneNumber: string;
+    avatar: string;
+}
+
+export const getUserInfo = async (userId: number): Promise<UserInfo | null> => {
+    try {
+        const response = await axiosIns.get(`/user-info/${userId}`, { includeToken: true });
+        if (response.data?.success === true) {
+            return {
+                userId: response.data.data.userId,
+                fullName: response.data.data.fullName,
+                email: response.data.data.email,
+                phoneNumber: response.data.data.phoneNumber,
+                avatar: response.data.data.avatar
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error("Error fetching user info:", error);
+        return null;
+    }
+};
+
 export const registerEmployee = createAsyncThunk<any, any>(
     'authReducers/registerEmployee',
     async (info) => {

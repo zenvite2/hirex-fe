@@ -10,3 +10,4 @@ export const getConversations = createAsyncThunk<any>(
             .catch(error => { toast.error("Không thể tải tin nhắn."); return []; });
     }
 );
+

@@ -30,7 +30,7 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(login.fulfilled, (state, action) => {
-        if (action.payload.response?.['success'] == true) {
+        if (action.payload?.response?.['success'] == true) {
           authService.saveCredential(action.payload.response.data);
           state.isLoggedIn = true;
           state.role = authService.getRole();
