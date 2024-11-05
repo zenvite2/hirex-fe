@@ -26,6 +26,7 @@ import { RootState } from "./redux/store";
 import CustomModal from "./components/common/CustomModal";
 import { closeMessenger } from "./redux/slice/messageSlice";
 import useAppDispatch from "./hooks/useAppDispatch";
+import CVPreview from "./pages/cv/CVPreview";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -89,7 +90,8 @@ function App() {
                         </Route>
 
                         {/* Các route khác */}
-                        <Route path='/messenger' element={<Messenger />} />
+                        {/* <Route path='/messenger' element={<Messenger />} /> */}
+                        <Route path='/cv-preview' element={<CVPreview />} />
                         <Route path="/register-employee" element={<RegisterEmployee />} />
                         <Route path="/register-employer" element={<RegisterEmployer />} />
                         <Route path="/employer" element={<EmployerLanding />} />

@@ -1,0 +1,35 @@
+/* Define font size variables */
+.font-xs {
+    font-size: 0.8rem;
+    /* Equivalent to text-xs */
+}
+
+.font-sm {
+    font-size: 0.875rem;
+    /* Equivalent to text-sm */
+}
+
+.font-md {
+    font-size: 1rem;
+    /* Equivalent to text-md */
+}
+
+.font-lg {
+    font-size: 1.125rem;
+    /* Equivalent to text-lg */
+}
+
+.font-xl {
+    font-size: 1.25rem;
+    /* Equivalent to text-xl */
+}
+
+.font-2xl {
+    font-size: 1.5rem;
+    /* Equivalent to text-2xl */
+}
+
+.font-3xl {
+    font-size: 1.875rem;
+    /* Equivalent to text-3xl */
+}
