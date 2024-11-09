@@ -1,22 +1,36 @@
 /* Font Size Classes */
 .font-xs {
-    font-size: 12px;
+    font-size: 10px;
     /* Convert rem to pixels */
-    color: 'red';
 }
 
 .font-sm {
-    font-size: 14px;
+    font-size: 11px;
     /* Convert rem to pixels */
 }
 
 .font-md {
-    font-size: 16px;
+    font-size: 12px;
     /* Convert rem to pixels */
 }
 
 .font-lg {
-    font-size: 20px;
+    font-size: 14px;
+    /* Convert rem to pixels */
+}
+
+.font-xl {
+    font-size: 16px;
+    /* Convert rem to pixels */
+}
+
+.font-2xl {
+    font-size: 18px;
+    /* Convert rem to pixels */
+}
+
+.font-3xl {
+    font-size: 22px;
     /* Convert rem to pixels */
 }
 
@@ -65,20 +79,17 @@
 /* Avatar */
 .cv-avatar {
     margin-bottom: 16px;
+    text-align: center;
     width: 100%;
 }
 
 .cv-avatar-placeholder {
-    width: 100%;
-    /* Full width of the container */
-    padding-top: 100%;
-    /* Creates a responsive square aspect ratio */
+    width: 150px;
+    /* Fixed width instead of aspect-ratio */
+    height: 150px;
+    /* Equal height */
     background-color: #D1D5DB;
-    position: relative;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border-radius: 5px;
+    margin: 0 auto;
 }
 
 /* Margin Utilities */
@@ -124,6 +135,7 @@
     width: 100%;
 }
 
+/* Additional Fixes */
 a {
     color: blue;
     text-decoration: underline;

@@ -1,19 +1,18 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import '../../styles/cv.css';
 import Title from './CVTitle';
 
 
 const CVPreview = () => {
-    const backgroundImageUrl = 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?semt=ais_hybrid';
+    const backgroundImageUrl = '';
 
     return (
-        // <div className="flex justify-center p-8 bg-gray-100 min-h-screen">
         <div
             className="cv-container"
             style={{
-                // backgroundImage: `url(${backgroundImageUrl})`,
-                // backgroundSize: 'cover',
-                // backgroundPosition: 'bottom'
+                backgroundImage: `url(${backgroundImageUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'bottom'
             }}
         >
             <div className="cv-grid">
@@ -23,7 +22,7 @@ const CVPreview = () => {
                         <div
                             className="cv-avatar-placeholder"
                             style={{
-                                backgroundImage: `url(${backgroundImageUrl})`,
+                                backgroundImage: `url()`,
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center',
                                 backgroundRepeat: 'no-repeat'
@@ -78,7 +77,7 @@ const CVPreview = () => {
                 <div className="cv-main font-xs">
                     {/* Header Section */}
                     <div className="cv-mb-6">
-                        <h1 className="font-lg font-bold">Trương Quốc Việt</h1>
+                        <h1 className="font-2xl font-bold">Trương Quốc Việt</h1>
                         <p className="font-md cv-font-semibold">Web Developer</p>
                     </div>
                     {/* Career Objective Section */}
@@ -124,7 +123,6 @@ const CVPreview = () => {
                 </div>
             </div>
         </div>
-        // </div>
     );
 };
 

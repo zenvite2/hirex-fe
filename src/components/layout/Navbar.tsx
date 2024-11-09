@@ -192,19 +192,19 @@ const Navbar: React.FC<NavbarProps> = () => {
               </button>
             </>
           )}
-          <Link
-            to={isEmployerPage ? "/find-jobs" : "/employer"}
-            onClick={(e) => {
-              e.preventDefault();
-              handleLogout();
-              setTimeout(() => {
-                navigate(isEmployerPage ? "/find-jobs" : "/employer");
-              }, 0);
-            }}
+          <div
+            // to={isEmployerPage ? "/find-jobs" : "/employer"}
+            // onClick={(e) => {
+            //   e.preventDefault();
+            //   handleLogout();
+            //   setTimeout(() => {
+            //     navigate(isEmployerPage ? "/find-jobs" : "/employer");
+            //   }, 0);
+            // }}
             className="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-900 transition duration-300 whitespace-nowrap"
           >
-            {isEmployerPage ? "Tìm việc" : "Nhà tuyển dụng"}
-          </Link>
+            {!isEmployerPage ? "Người tìm việc" : "Nhà tuyển dụng"}
+          </div>
         </div>
       </div>
 

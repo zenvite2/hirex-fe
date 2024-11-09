@@ -27,6 +27,9 @@ import CustomModal from "./components/common/CustomModal";
 import { closeMessenger } from "./redux/slice/messageSlice";
 import useAppDispatch from "./hooks/useAppDispatch";
 import CVPreview from "./pages/cv/CVPreview";
+import CVGenerate from "./pages/cv/CVGenerate";
+import TestCV from "./pages/cv/TestCV";
+import TestCV_bk from "./pages/cv/TestCV_bk";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -91,6 +94,8 @@ function App() {
 
                         {/* Các route khác */}
                         {/* <Route path='/messenger' element={<Messenger />} /> */}
+                        <Route path='/generate-cv' element={<CVGenerate />} />
+                        <Route path='/test-cv' element={<TestCV />} />
                         <Route path='/cv-preview' element={<CVPreview />} />
                         <Route path="/register-employee" element={<RegisterEmployee />} />
                         <Route path="/register-employer" element={<RegisterEmployer />} />
