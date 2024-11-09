@@ -26,10 +26,9 @@ import { RootState } from "./redux/store";
 import CustomModal from "./components/common/CustomModal";
 import { closeMessenger } from "./redux/slice/messageSlice";
 import useAppDispatch from "./hooks/useAppDispatch";
+import TestCV from "./pages/cv/CVGenerate";
 import CVPreview from "./pages/cv/CVPreview";
 import CVGenerate from "./pages/cv/CVGenerate";
-import TestCV from "./pages/cv/TestCV";
-import TestCV_bk from "./pages/cv/TestCV_bk";
 
 function SidebarLayout() {
     const location = useLocation();
