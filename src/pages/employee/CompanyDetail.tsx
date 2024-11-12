@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MapPin, Users, Facebook, Linkedin, Youtube, Twitter } from 'lucide-react';
+import CommentCard from './Comment';
 
 interface CompanyInfo {
   name: string;
@@ -21,6 +22,20 @@ interface CompanyInfo {
     department: string;
     updatedAt: string;
   }>;
+}
+
+interface Comment {
+  id: number;
+  content: string;
+  author: string;
+  createdAt: string;
+}
+
+interface Reply {
+  id: number;
+  content: string;
+  author: string;
+  createdAt: string;
 }
 
 const CompanyDetail = () => {
@@ -62,11 +77,11 @@ const CompanyDetail = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-6"> {/* Added consistent padding to container */}
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Previous content remains the same */}
         {/* Banner Image Section */}
         <div className="relative w-full h-40 bg-gradient-to-r from-cyan-700 to-blue-900">
           <div className="absolute inset-0 overflow-hidden">
-            {/* Left side - Team Image */}
             <div className="absolute left-0 w-3/4 h-full">
               <img
                 src={company.teamImage}
@@ -75,7 +90,6 @@ const CompanyDetail = () => {
               />
             </div>
             
-            {/* Right side - Factory Image in Hexagon */}
             <div className="absolute right-0 w-1/4 h-full">
               <div className="absolute right-0 top-1/2 -translate-y-1/2 w-64 h-64 overflow-hidden" style={{
                 clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)'
@@ -89,10 +103,8 @@ const CompanyDetail = () => {
             </div>
           </div>
 
-          {/* Overlay with brand gradient */}
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-700/60 to-blue-900/60" />
 
-          {/* Company Logo on the far right */}
           <div className="absolute top-4 right-0">
             <div className="flex justify-end">
               <img src="/api/placeholder/150/50" alt="Daeyeong Vina" className="h-8 object-contain" />
@@ -103,7 +115,6 @@ const CompanyDetail = () => {
         {/* Company Info Bar */}
         <div className="relative bg-white shadow-md">
           <div className="px-6 py-3 flex items-center">
-            {/* Company Logo */}
             <div className="w-24 h-24 bg-white rounded-lg shadow-lg -mt-12 flex items-center justify-center p-2">
               <img
                 src={company.logo}
@@ -112,7 +123,6 @@ const CompanyDetail = () => {
               />
             </div>
 
-            {/* Company Details */}
             <div className="ml-6 flex-grow">
               <h1 className="text-2xl font-bold text-gray-900">{company.name}</h1>
               <div className="flex items-center gap-2 mt-2 text-gray-600">
@@ -121,7 +131,6 @@ const CompanyDetail = () => {
               </div>
             </div>
 
-            {/* Employee Count */}
             <div className="flex items-center gap-2 text-gray-600">
               <Users className="w-5 h-5" />
               <span>{company.employeeCount}</span>
@@ -160,6 +169,15 @@ const CompanyDetail = () => {
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl shadow-sm">
+                <div className="p-6">
+                  <div>
+                    {/* <CommentCard></CommentCard> */}
+                    <CommentCard companyId={4} userId={15} />
                   </div>
                 </div>
               </div>
