@@ -1,8 +1,8 @@
 import React from "react";
 
 interface Option {
-  value: string;
-  label: string;
+  id: number;
+  name: string;
 }
 
 interface CheckboxDropdownProps {
@@ -45,15 +45,15 @@ const CheckboxDropdown: React.FC<CheckboxDropdownProps> = ({
         <div className="absolute left-0 mt-2 w-full bg-white border rounded-lg shadow-lg z-10">
           <div className="max-h-60 overflow-y-auto">
             {options.map((option) => (
-              <label key={option.value} className="flex items-center p-2 hover:bg-gray-100 cursor-pointer">
+              <label key={option.name} className="flex items-center p-2 hover:bg-gray-100 cursor-pointer">
                 <input
                   type="checkbox"
-                  value={option.value}
-                  checked={selectedValues.includes(option.value)}
-                  onChange={() => handleOptionChange(option.value)}
+                  value={option.id}
+                  checked={selectedValues.includes(option.name)}
+                  onChange={() => handleOptionChange(option.name)}
                   className="mr-2"
                 />
-                <span>{option.label}</span>
+                <span>{option.name}</span>
               </label>
             ))}
           </div>

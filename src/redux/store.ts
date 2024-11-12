@@ -3,12 +3,14 @@ import { thunk } from 'redux-thunk';
 import loadingReducer from './slice/loadingSlice';
 import authReducer from './slice/authSlice';
 import messageReducer from './slice/messageSlice';
+import autoFillReducer from './slice/autoFillSlice';
 
 const store = configureStore({
     reducer: {
         loadingReducer,
         authReducer,
-        messageReducer
+        messageReducer,
+        autoFillReducer
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(thunk),

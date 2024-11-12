@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useAppDispatch from '../../hooks/useAppDispatch';
-import {  contracTypeList } from '../../services/autofillApi';
-import { jobCreate, jobUpdate, jobGet } from '../../services/jobApi';
-import { useLocationSelector } from './useLocationSelector';
+import { jobCreate, jobUpdate, jobGetWith } from '../../services/jobApi';
 import { toast } from 'react-toastify';
+
+interface JobDetails {
+  description: string[];
+  responsibilities: string[];
+}
 
 interface FormData {
   id: number | null;
@@ -12,15 +15,23 @@ interface FormData {
   city: number | null;
   district: number | null;
   location: string;
-  attributes: string;
-  industry: number | null;
+  description: string;
+  tech: number | null;
   yearExperience: number | null;
-  jobType: string;
+  jobType: number | null;
   position: number | null;
   deadline: string;
   salary: number | null;
-  contractType: string;
+  contractType: number | null;
+  email: string;
+  phone: string;
+  jobDetails: JobDetails;
 }
+
+const initialJobDetails: JobDetails = {
+  description: [''],
+  responsibilities: [''],
+};
 
 const initialFormData: FormData = {
   id: null,
@@ -28,14 +39,17 @@ const initialFormData: FormData = {
   city: null,
   district: null,
   location: '',
-  attributes: '',
-  industry: null,
+  description: '',
+  tech: null,
   yearExperience: null,
-  jobType: '',
+  jobType: null,
   position: null,
   deadline: '',
   salary: null,
   contractType: null,
+  email: '',
+  phone: '',
+  jobDetails: initialJobDetails
 };
 
 const JobCreationForm: React.FC = () => {
@@ -43,139 +57,139 @@ const JobCreationForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const {
-    city,
-    district,
-  } = useLocationSelector();
-
 
   useEffect(() => {
     const fetchJobData = async () => {
-      setIsLoading(true);
       try {
         if (id) {
-          const result = await dispatch(jobGet(id));
+          const result = await dispatch(jobGetWith(id));
           if (result?.payload?.response?.success) {
+            const jobData = result.payload.response.data;
             setFormData({
-              id: result.payload.response.data.id,
-              title: result.payload.response.data.title,
-              city: result.payload.response.data.city,
-              district: result.payload.response.data.district,
-              location: result.payload.response.data.location,
-              attributes: result.payload.response.data.attributes,
-              industry: result.payload.response.data.industry,
-              yearExperience: result.payload.response.data.yearExperience,
-              jobType: result.payload.response.data.jobType,
-              position: result.payload.response.data.position,
-              deadline: result.payload.response.data.deadline,
-              salary: result.payload.response.data.salary,
-              contractType: result.payload.response.data.contractType
+              ...jobData,
+              jobDetails: jobData.jobDetails || initialJobDetails
             });
           }
         }
       } catch (error) {
         toast.error('Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.');
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchJobData();
   }, [dispatch, id]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleJobDetailsChange = (
+    section: 'description' | 'responsibilities' | 'note',
+    value: string,
+    index?: number
+  ) => {
+    setFormData(prev => {
+      if (section === 'note') {
+        return {
+          ...prev,
+          jobDetails: {
+            ...prev.jobDetails,
+            note: value
+          }
+        };
+      }
+
+      const newSection = [...prev.jobDetails[section]];
+      if (index !== undefined) newSection[index] = value;
+      return {
+        ...prev,
+        jobDetails: {
+          ...prev.jobDetails,
+          [section]: newSection
+        }
+      };
+    });
+  };
+
+  const handleAddField = (section: 'description' | 'responsibilities') => {
+    setFormData(prev => ({
+      ...prev,
+      jobDetails: {
+        ...prev.jobDetails,
+        [section]: [...prev.jobDetails[section], '']
+      }
+    }));
+  };
+
+  const handleRemoveField = (section: 'description' | 'responsibilities', index: number) => {
+    setFormData(prev => {
+      const newSection = [...prev.jobDetails[section]];
+      newSection.splice(index, 1);
+      return {
+        ...prev,
+        jobDetails: {
+          ...prev.jobDetails,
+          [section]: newSection
+        }
+      };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const jobData = {
-      id: formData.id,
-      title: formData.title,
-      city: city?.id,
-      district: district?.id,
-      location: formData.location,
-      attributes: formData.attributes,
-      industry: formData.industry,
-      yearExperience: formData.yearExperience,
-      jobType: formData.jobType,
-      position: formData.position,
-      deadline: formData.deadline,
-      salary: formData.salary,
-      contractType: formData.contractType,
+      ...formData
     };
 
-    try {
-      if (formData.id) {
-        await dispatch(jobUpdate(jobData));
-        toast.success('Cập nhật job thành công!');
-      } else {
-        await dispatch(jobCreate(jobData));
-        toast.success('Tạo job thành công!');
-      }
-      navigate('/job-posts');
-    } catch (error: any) {
-      toast.error('Có lỗi xảy ra. Vui lòng thử lại.');
+    if (formData.id) {
+      await dispatch(jobUpdate({ id: formData.id, info: jobData }));
+      toast.success('Cập nhật job thành công!');
+    } else {
+      await dispatch(jobCreate(jobData));
+      toast.success('Tạo job thành công!');
     }
+    navigate('/job-posts');
   };
 
-  const parseAttributes = (attributesText) => {
-    const lines = attributesText.split('\n');
-    const attributesMap = {};
-  
-    lines.forEach(line => {
-      const [key, value] = line.split(':').map(part => part.trim());
-      if (key && value !== undefined) {
-        attributesMap[key] = value;
-      }
-    });
-  
-    return attributesMap;
-  };
-  
+  const renderDynamicFields = (
+    section: 'description' | 'responsibilities',
+    title: string,
+    placeholder: string
+  ) => {
+    const values = formData.jobDetails[section];
 
-  const renderField = (name: keyof FormData, label: string, type: string = 'text') => (
-    <div className="relative space-y-2">
-      <label className="block text-sm font-semibold text-gray-700">
-        {label}
-      </label>
-      <div>
-        {type === 'select' ? (
-          <select
-            id={name}
-            name={name}
-            value={formData[name] as string}
-            onChange={handleInputChange}
-            className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+    return (
+      <div className="bg-white p-4 rounded-lg shadow mb-6">
+        <h3 className="text-lg font-semibold mb-4">{title}</h3>
+        <div className="space-y-4">
+          {values.map((value, index) => (
+            <div key={index} className="flex gap-2">
+              <input
+                type="text"
+                value={value}
+                onChange={(e) => handleJobDetailsChange(section, e.target.value, index)}
+                className="flex-1 p-2 border border-gray-300 rounded-md"
+                placeholder={placeholder}
+              />
+              {index > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleRemoveField(section, index)}
+                  className="p-2 text-red-500 hover:text-red-700"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => handleAddField(section)}
+            className="mt-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            <option value="">Chọn {label}</option>
-          </select>
-        ) : type === 'textarea' ? (
-          <textarea
-            id={name}
-            name={name}
-            value={formData[name] as string}
-            onChange={handleInputChange}
-            className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-            rows={4}
-          />
-        ) : (
-          <input
-            type={type}
-            id={name}
-            name={name}
-            value={formData[name] as string}
-            onChange={handleInputChange}
-            className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-          />
-        )}
+            + Thêm
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -186,14 +200,14 @@ const JobCreationForm: React.FC = () => {
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
-
-            {renderField('attributes', 'Mô tả', 'textarea')}
-
+            {renderDynamicFields('description', 'Mô tả công việc', 'Nhập mô tả công việc')}
+            {renderDynamicFields('responsibilities', 'Trách nhiệm công việc', 'Nhập trách nhiệm công việc')}
+            
             <div className="flex justify-end pt-6">
               <button
                 type="submit"
                 className={`px-6 py-3 bg-blue-600 text-white text-base font-medium rounded-lg 
-                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors`}
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors`}
               >
                 {formData.id ? 'Cập nhật' : 'Lưu'}
               </button>
