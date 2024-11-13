@@ -1,6 +1,17 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { toast } from "react-toastify";
 import axiosIns from "./axiosIns";
+
+interface JobSearchRequest {
+    searchQuery?: string;
+    city?: number;
+    techIds?: number[];
+    positionIds?: number[];
+    experienceIds?: number[];
+    salaryIds?: number[];
+    educationIds?: number[];
+    jobTypeIds?: number[];
+    contractTypeIds?: number[];
+}
 
 // Create job
 export const jobCreate = createAsyncThunk<any, any>(
@@ -76,6 +87,28 @@ export const jobDelete = createAsyncThunk<any, number>(
     async (id) => {
         return axiosIns.delete(`/job/${id}`, {
             includeToken: true
+        })
+            .then(response => { return { response: response.data } })
+            .catch(error => { });
+    }
+);
+
+// Search jobs
+export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
+    'job/search',
+    async (request) => {
+        return axiosIns.get('/job/search', {
+            params: {
+                searchQuery: request.searchQuery,
+                city: request.city,
+                techIds: request.techIds,
+                positionIds: request.positionIds,
+                experienceIds: request.experienceIds,
+                salaryIds: request.salaryIds,
+                educationIds: request.educationIds,
+                jobTypeIds: request.jobTypeIds,
+                contractTypeIds: request.contractTypeIds
+            },
         })
             .then(response => { return { response: response.data } })
             .catch(error => { });
