@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { login } from "../../services/authApi"; // Make sure login is defined as a thunk
 import authService from "../../services/authService";
 
@@ -7,6 +7,8 @@ interface AuthState {
   role: string;
   username: string;
   userId: number;
+  fullName: string;
+  avatar: string;
 }
 
 let initialState: AuthState = {
@@ -14,6 +16,8 @@ let initialState: AuthState = {
   role: authService.getRole() || 'GUEST',
   username: authService.getUsername() || null,
   userId: authService.getUserId() || null,
+  fullName: '',
+  avatar: '',
 };
 
 const authSlice = createSlice({
@@ -25,7 +29,13 @@ const authSlice = createSlice({
       state.isLoggedIn = false;
       state.role = 'GUEST';
       state.username = null;
+      state.fullName = '';
+      state.avatar = '';
     },
+    setUserInfo: (state, action: PayloadAction<{ fullName: string, avatar: string }>) => {
+      state.fullName = action.payload?.fullName;
+      state.avatar = action.payload?.avatar;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -47,5 +57,5 @@ const authSlice = createSlice({
   }
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, setUserInfo } = authSlice.actions;
 export default authSlice.reducer;

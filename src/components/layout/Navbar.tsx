@@ -16,7 +16,7 @@ const Navbar: React.FC<NavbarProps> = () => {
   const navigate = useNavigate();
   const isEmployerPage = location.pathname.startsWith('/employer');
   const [isModalOpen, setModalOpen] = useState(false);
-  const { isLoggedIn, role, username } = useSelector((state: RootState) => state.authReducer);
+  const { isLoggedIn, role, username, fullName, avatar } = useSelector((state: RootState) => state.authReducer);
   const dispatch = useAppDispatch();
 
   const isLinkActive = (path: string | string[]) => {
@@ -52,12 +52,12 @@ const Navbar: React.FC<NavbarProps> = () => {
   };
 
   const renderUserDropdown = () => (
-    <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg hidden group-hover:block">
+    <div className="absolute right-0 w-72 bg-white rounded-md shadow-lg hidden group-hover:block">
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <img src={Logo} alt="My CareerLink Logo" className="w-12 h-12" />
+          <img src={avatar ? avatar : Logo} alt="My CareerLink Logo" className="w-12 h-12" />
           <div>
-            <h3 className="font-semibold text-lg">HireX</h3>
+            <h3 className="font-semibold text-lg">{fullName}</h3>
             <p className="text-gray-500">Tài khoản</p>
           </div>
         </div>
@@ -95,7 +95,7 @@ const Navbar: React.FC<NavbarProps> = () => {
   );
 
   const renderAdminDropdown = () => (
-    <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg hidden group-hover:block">
+    <div className="absolute right-0 w-72 bg-white rounded-md shadow-lg hidden group-hover:block">
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center space-x-3">
           <img src={Logo} alt="TinaSoft Logo" className="w-12 h-12" />
@@ -130,7 +130,11 @@ const Navbar: React.FC<NavbarProps> = () => {
   );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
+    <nav className="fixed top-0 left-0 right-0 bg-white shadow-sm z-50"
+      style={{
+        backgroundImage: 'radial-gradient( circle 311px at 8.6% 27.9%,  rgba(62,147,252,0.57) 12.9%, rgba(239,183,192,0.44) 91.2% )'
+      }}
+    >
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center">
           <Link to="/" className="flex-shrink-0">
@@ -166,17 +170,17 @@ const Navbar: React.FC<NavbarProps> = () => {
             )}
           </div>
         </div>
-        
+
 
         <div className="hidden lg:flex items-center space-x-2">
-        <Notifications />
+          <Notifications />
           {isLoggedIn ? (
             <div className="relative group">
-              <button className="flex items-center space-x-2 text-gray-700 hover:text-[#0069DB] transition duration-300 border rounded-full px-2 py-1 hover:border-[#0069DB]">
-                <img src={Logo} alt="User Avatar" className="w-8 h-8 rounded-full" />
+              <div className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-[#0069DB] transition duration-300 border rounded-full px-2 py-1 hover:border-[#0069DB]">
+                <img src={avatar ? avatar : Logo} alt="User Avatar" className="w-8 h-8 rounded-full" />
                 <span className="font-medium">{username || 'Login'}</span>
                 <ChevronDown size={16} />
-              </button>
+              </div>
               {role === 'EMPLOYEE' ? renderUserDropdown() : renderAdminDropdown()}
             </div>
           ) : (

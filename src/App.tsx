@@ -29,8 +29,10 @@ import useAppDispatch from "./hooks/useAppDispatch";
 import TestCV from "./pages/cv/CVGenerate";
 import CVPreview from "./pages/cv/CVPreview";
 import CVGenerate from "./pages/cv/CVGenerate";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { getConversations } from "./services/messageApi";
+import { getUserInfo } from "./services/authApi";
+import { setUserInfo } from "./redux/slice/authSlice";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -59,7 +61,6 @@ function SidebarLayout() {
     );
 }
 
-
 function App() {
     const location = useLocation();
     const { showMessenger } = useSelector((state: RootState) => state.messageReducer);
@@ -68,8 +69,16 @@ function App() {
     // Không hiển thị Navbar trên trang login và register-employee  
     const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer";
 
-    useEffect(() => {
+    const fetchUserInfo = useCallback(async () => {
+        const res = await getUserInfo(userId);
+        if (res) {
+            dispatch(setUserInfo({ fullName: res.fullName, avatar: res.avatar }));
+        }
         dispatch(getConversations());
+    }, [userId])
+
+    useEffect(() => {
+        fetchUserInfo();
     }, [userId]);
 
     return (

@@ -33,7 +33,7 @@ const CheckboxDropdown: React.FC<CheckboxDropdownProps> = ({
 
   return (
     <div className="relative">
-      <div onClick={onToggle} className="flex items-center justify-between p-2 border rounded-lg cursor-pointer">
+      <div onClick={onToggle} className="flex items-center justify-between p-2 border rounded-lg cursor-pointer bg-white">
         <div className="flex items-center">
           <Icon className="mr-2 text-gray-600" />
           <span className="text-gray-700">{title}</span>

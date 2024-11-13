@@ -174,8 +174,13 @@ const FindJobs: React.FC = () => {
 
   return (
     <div className="bg-[#f7fdfd]">
-      <div className="bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8">
+      <div
+        className="bg-fixed shadow-md"
+        style={{
+          backgroundImage: 'radial-gradient( circle 311px at 8.6% 27.9%,  rgba(62,147,252,0.57) 12.9%, rgba(239,183,192,0.44) 91.2% )'
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8 ">
           {/* Search and Location inputs */}
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="flex-1 w-full md:w-auto">
@@ -225,7 +230,7 @@ const FindJobs: React.FC = () => {
       {/* Job List */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <p className="text-base mb-6">
-          Showing: <span className="font-semibold">{jobs.length}</span> Jobs Available
+          Tất cả: <span className="font-semibold">{jobs.length}</span> việc làm.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
