@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { BsSearch } from 'react-icons/bs';
-import { HiOutlineLocationMarker } from 'react-icons/hi';
 import { FaIndustry, FaLevelUpAlt, FaBriefcase, FaDollarSign, FaGraduationCap, FaCalendarAlt } from 'react-icons/fa';
 import { JobCard } from '../../components';
 import CheckboxDropdown from '../../components/common/CheckboxDropdown';
@@ -35,19 +34,19 @@ const FindJobs: React.FC = () => {
   const dispatch = useAppDispatch();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedJobFields, setSelectedJobFields] = useState<string[]>([]);
-  const [selectedJobLevels, setSelectedJobLevels] = useState<string[]>([]);
-  const [selectedExperiences, setSelectedExperiences] = useState<string[]>([]);
-  const [selectedSalaries, setSelectedSalaries] = useState<string[]>([]);
-  const [selectedEducations, setSelectedEducations] = useState<string[]>([]);
-  const [selectedJobTypes, setSelectedJobTypes] = useState<string[]>([]);
+  const [selectedJobFieldIds, setSelectedJobFieldIds] = useState<number[]>([]);
+  const [selectedJobLevelIds, setSelectedJobLevelIds] = useState<number[]>([]);
+  const [selectedExperienceIds, setSelectedExperienceIds] = useState<number[]>([]);
+  const [selectedSalaryIds, setSelectedSalaryIds] = useState<number[]>([]);
+  const [selectedEducationIds, setSelectedEducationIds] = useState<number[]>([]);
+  const [selectedJobTypeIds, setSelectedJobTypeIds] = useState<number[]>([]);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
+  const [techOptions, setTechOptions] = useState<Option[]>([]);
+  const [positionOptions, setPositionOptions] = useState<Option[]>([]);
+  const [experienceOptions, setExperienceOptions] = useState<Option[]>([]);
   const [salaryOptions, setSalaryOptions] = useState<Option[]>([]);
   const [jobTypeOptions, setJobTypeOptions] = useState<Option[]>([]);
-  const [experienceOptions, setExperienceOptions] = useState<Option[]>([]);
-  const [positionOptions, setPositionOptions] = useState<Option[]>([]);
-  const [techOptions, setTechOptions] = useState<Option[]>([]);
   const [contractTypeOptions, setContractTypeOptions] = useState<Option[]>([]);
 
   const {
@@ -58,34 +57,19 @@ const FindJobs: React.FC = () => {
     fetchCities,
   } = useLocationSelector();
 
-  // useEffect(() => {
-  //   const fetchJobs = async () => {
-  //     try {
-  //       const result = await dispatch(jobGetWithCompany()).unwrap();
-  //       if (result && result.response && result.response.success) {
-  //         setJobs(result.response.data);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching jobs:', error);
-  //     }
-  //   };
-
-  //   fetchJobs();
-  // }, [dispatch]);
-
   useEffect(() => {
     const fetchJobs = async () => {
       try {
+
         const result = await dispatch(jobSearch({
           searchQuery,
-          city: city?.id,
-          techIds: selectedJobFields.map(Number),
-          positionIds: selectedJobLevels.map(Number),
-          experienceIds: selectedExperiences.map(Number),
-          salaryIds: selectedSalaries.map(Number),
-          educationIds: selectedEducations.map(Number),
-          jobTypeIds: selectedJobTypes.map(Number),
-          // contractTypeIds: selectedContractTypes.map(Number),
+          ...(city?.id ? { city: city.id } : {}),
+          techIds: selectedJobFieldIds,
+          positionIds: selectedJobLevelIds,
+          experienceIds: selectedExperienceIds,
+          salaryIds: selectedSalaryIds,
+          educationIds: selectedEducationIds,
+          jobTypeIds: selectedJobTypeIds,
         })).unwrap();
         if (result && result.response && result.response.success) {
           setJobs(result.response.data);
@@ -98,16 +82,15 @@ const FindJobs: React.FC = () => {
     fetchJobs();
   }, [
     dispatch,
-    searchQuery,
-    city?.id,
-    selectedJobFields,
-    selectedJobLevels,
-    selectedExperiences,
-    selectedSalaries,
-    selectedEducations,
-    selectedJobTypes,
+    selectedJobFieldIds,
+    selectedJobLevelIds,
+    selectedExperienceIds,
+    selectedSalaryIds,
+    selectedEducationIds,
+    selectedJobTypeIds,
   ]);
 
+  
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
@@ -151,13 +134,12 @@ const FindJobs: React.FC = () => {
     fetchDropdownData();
   }, [dispatch]);
 
-  // Helper function to render the dropdowns
   const renderDropdown = (
     icon: React.ElementType,
     title: string,
     options: Option[],
-    selectedValues: string[],
-    setSelectedValues: (values: string[]) => void,
+    selectedValues: number[],
+    setSelectedValues: (values: number[]) => void,
     openDropdown: string | null,
     setOpenDropdown: (dropdown: string | null) => void
   ) => (
@@ -172,6 +154,26 @@ const FindJobs: React.FC = () => {
     />
   );
 
+  const handleSearch = async () => {
+    try {
+      const result = await dispatch(jobSearch({
+        searchQuery,
+        ...(city?.id ? { city: city.id } : {}),
+        techIds: selectedJobFieldIds,
+        positionIds: selectedJobLevelIds,
+        experienceIds: selectedExperienceIds,
+        salaryIds: selectedSalaryIds,
+        educationIds: selectedEducationIds,
+        jobTypeIds: selectedJobTypeIds
+      })).unwrap();
+      if (result && result.response && result.response.success) {
+        setJobs(result.response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
+
   return (
     <div className="bg-[#f7fdfd]">
       <div
@@ -180,7 +182,7 @@ const FindJobs: React.FC = () => {
           backgroundImage: 'radial-gradient( circle 311px at 8.6% 27.9%,  rgba(62,147,252,0.57) 12.9%, rgba(239,183,192,0.44) 91.2% )'
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8 ">
+        <div className="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8">
           {/* Search and Location inputs */}
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="flex-1 w-full md:w-auto">
@@ -198,17 +200,17 @@ const FindJobs: React.FC = () => {
 
             {/* City Selector */}
             <div className="flex-1 w-full md:w-auto">
-              <LocationSelector
-                placeholder="Nhập tỉnh/thành phố"
+            <LocationSelector
+                placeholder="Chọn tỉnh thành"
                 locations={cities}
-                value={city ? city.name : ''}
+                value={city?.name || ''}
                 onChange={handleSelectCity}
                 onSearch={fetchCities}
-                disabled={isLoadingCities}
+                disabled={false}
               />
             </div>
 
-            <button className="w-full md:w-auto px-6 py-2 bg-[#0069DB] text-white rounded-lg hover:bg-[#004bb5] transition duration-300">
+            <button className="w-full md:w-auto px-6 py-2 bg-[#0069DB] text-white rounded-lg hover:bg-[#004bb5] transition duration-300" onClick={handleSearch}>
               Tìm kiếm
             </button>
 
@@ -216,13 +218,12 @@ const FindJobs: React.FC = () => {
 
           {/* Dropdowns */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mt-4">
-            {renderDropdown(FaIndustry, 'Công nghệ', techOptions, selectedJobFields, setSelectedJobFields, openDropdown, setOpenDropdown)}
-            {renderDropdown(FaLevelUpAlt, 'Cấp bậc', positionOptions, selectedJobLevels, setSelectedJobLevels, openDropdown, setOpenDropdown)}
-            {renderDropdown(FaBriefcase, 'Kinh nghiệm', experienceOptions, selectedExperiences, setSelectedExperiences, openDropdown, setOpenDropdown)}
-            {renderDropdown(FaDollarSign, 'Mức lương', salaryOptions, selectedSalaries, setSelectedSalaries, openDropdown, setOpenDropdown)}
-            {renderDropdown(FaGraduationCap, 'Học vấn', [], selectedEducations, setSelectedEducations, openDropdown, setOpenDropdown)}
-            {renderDropdown(FaBriefcase, 'Loại công việc', jobTypeOptions, selectedJobTypes, setSelectedJobTypes, openDropdown, setOpenDropdown)}
-            {/* {renderDropdown(FaCalendarAlt, 'Đăng trong', [], selectedPostingDates, setSelectedPostingDates, openDropdown, setOpenDropdown)} */}
+            {renderDropdown(FaIndustry, 'Công nghệ', techOptions, selectedJobFieldIds, setSelectedJobFieldIds, openDropdown, setOpenDropdown)}
+            {renderDropdown(FaLevelUpAlt, 'Cấp bậc', positionOptions, selectedJobLevelIds, setSelectedJobLevelIds, openDropdown, setOpenDropdown)}
+            {renderDropdown(FaBriefcase, 'Kinh nghiệm', experienceOptions, selectedExperienceIds, setSelectedExperienceIds, openDropdown, setOpenDropdown)}
+            {renderDropdown(FaDollarSign, 'Mức lương', salaryOptions, selectedSalaryIds, setSelectedSalaryIds, openDropdown, setOpenDropdown)}
+            {renderDropdown(FaGraduationCap, 'Học vấn', [], selectedEducationIds, setSelectedEducationIds, openDropdown, setOpenDropdown)}
+            {renderDropdown(FaBriefcase, 'Loại công việc', jobTypeOptions, selectedJobTypeIds, setSelectedJobTypeIds, openDropdown, setOpenDropdown)}
           </div>
         </div>
       </div>
@@ -230,7 +231,7 @@ const FindJobs: React.FC = () => {
       {/* Job List */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <p className="text-base mb-6">
-          Tất cả: <span className="font-semibold">{jobs.length}</span> việc làm.
+          Showing: <span className="font-semibold">{jobs.length}</span> Jobs Available
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">

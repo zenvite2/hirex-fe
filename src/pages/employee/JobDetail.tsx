@@ -110,10 +110,12 @@ const JobDetail = () => {
     }, [id]);
 
     const handleApplyNow = () => {
-        console.log("Button clicked!"); // Thêm dòng này
-        setIsModalOpen(true);
-    }
-
+        if (!isLoggedIn) {
+          window.location.href = '/login';
+        } else {
+          setIsModalOpen(true);
+        }
+      };
     const handleSubmit = () => {
         setIsModalOpen(false);
     };

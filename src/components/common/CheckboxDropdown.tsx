@@ -9,8 +9,8 @@ interface CheckboxDropdownProps {
   icon: React.ElementType;
   title: string;
   options: Option[];
-  selectedValues: string[];
-  onChange: (values: string[]) => void;
+  selectedValues: number[];
+  onChange: (values: number[]) => void;
   isOpen: boolean;
   onToggle: () => void;
 }
@@ -24,7 +24,8 @@ const CheckboxDropdown: React.FC<CheckboxDropdownProps> = ({
   isOpen,
   onToggle,
 }) => {
-  const handleOptionChange = (value: string) => {
+  // Hàm xử lý khi thay đổi checkbox
+  const handleOptionChange = (value: number) => {
     const newValues = selectedValues.includes(value)
       ? selectedValues.filter((v) => v !== value)
       : [...selectedValues, value];
@@ -45,12 +46,12 @@ const CheckboxDropdown: React.FC<CheckboxDropdownProps> = ({
         <div className="absolute left-0 mt-2 w-full bg-white border rounded-lg shadow-lg z-10">
           <div className="max-h-60 overflow-y-auto">
             {options.map((option) => (
-              <label key={option.name} className="flex items-center p-2 hover:bg-gray-100 cursor-pointer">
+              <label key={option.id} className="flex items-center p-2 hover:bg-gray-100 cursor-pointer">
                 <input
                   type="checkbox"
                   value={option.id}
-                  checked={selectedValues.includes(option.name)}
-                  onChange={() => handleOptionChange(option.name)}
+                  checked={selectedValues.includes(option.id)}
+                  onChange={() => handleOptionChange(option.id)}
                   className="mr-2"
                 />
                 <span>{option.name}</span>

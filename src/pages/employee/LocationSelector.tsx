@@ -32,8 +32,8 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (disabled) return;
     const newSearchTerm = e.target.value;
-    setSearchTerm(newSearchTerm);
-    onSearch(newSearchTerm);
+    setSearchTerm(newSearchTerm); // Lưu searchTerm khi người dùng gõ
+    onSearch(newSearchTerm); // Tìm kiếm khi có thay đổi
   };
 
   const handleSelectLocation = (location: Location) => {
@@ -46,10 +46,10 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   const handleInputFocus = () => {
     if (disabled) return;
     setIsOpen(true);
-    setSearchTerm('');
-    onChange({ id: 0, name: '' }); // Clear the selected value
+    setSearchTerm(''); // Dọn dẹp searchTerm khi focus
+    onChange({ id: 0, name: '' }); // Xóa giá trị đã chọn
   };
-
+  
   return (
     <div className="relative">
       <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -64,13 +64,13 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
             : 'border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500'
         }`}
         placeholder={placeholder}
-        value={isOpen ? searchTerm : value}
+        value={isOpen ? searchTerm : value} // Lúc này sử dụng searchTerm khi mở dropdown
         onChange={handleInputChange}
         onFocus={handleInputFocus}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
         disabled={disabled}
       />
-
+  
       {isOpen && !disabled && (
         <ul className="absolute z-10 w-full mt-1 bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none">
           {locations.map((location) => (

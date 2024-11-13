@@ -97,17 +97,54 @@ export const jobDelete = createAsyncThunk<any, number>(
 export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
     'job/search',
     async (request) => {
+        let techIdsParam;
+        let positionIdsParam;
+        let experienceIdsParam;
+        let salaryIdsParam;
+        let jobTypeIdsParam;
+
+        console.log("xxxxxxxx: " + request.searchQuery)
+
+        if (request.techIds.length > 0) {
+            techIdsParam = request.techIds.join(',');
+        } else {
+            techIdsParam = null; 
+        }
+
+        if (request.positionIds.length > 0) {
+            positionIdsParam = request.positionIds.join(',');
+        } else {
+            positionIdsParam = null;
+        }
+
+        if (request.experienceIds.length > 0) {
+            experienceIdsParam = request.experienceIds.join(',');
+        } else {
+            experienceIdsParam = null;
+        }
+
+        if (request.salaryIds.length > 0) {
+            salaryIdsParam = request.salaryIds.join(',');
+        } else {
+            salaryIdsParam = null;
+        }
+
+        if (request.jobTypeIds.length > 0) {
+            jobTypeIdsParam = request.jobTypeIds.join(',');
+        } else {
+            jobTypeIdsParam = null;
+        }
+
         return axiosIns.get('/job/search', {
             params: {
                 searchQuery: request.searchQuery,
                 city: request.city,
-                techIds: request.techIds,
-                positionIds: request.positionIds,
-                experienceIds: request.experienceIds,
-                salaryIds: request.salaryIds,
+                techIds: techIdsParam,
+                positionIds: positionIdsParam,
+                experienceIds: experienceIdsParam,
+                salaryIds: salaryIdsParam,
                 educationIds: request.educationIds,
-                jobTypeIds: request.jobTypeIds,
-                contractTypeIds: request.contractTypeIds
+                jobTypeIds: jobTypeIdsParam,
             },
         })
             .then(response => { return { response: response.data } })
