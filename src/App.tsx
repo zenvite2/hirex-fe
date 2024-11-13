@@ -104,7 +104,7 @@ function App() {
                             <Route path="/info-page" element={<CompanyInfo />} />
                             <Route path="/apply-job" element={<JobForm />} />
                             <Route path="/jobs/edit/:id" element={<JobForm />} />
-                            <Route path="/company/detail" element={<CompanyDetail />} />
+                            <Route path="/company/detail/:id" element={<CompanyDetail />} />
                         </Route>
 
                         {/* Các route khác */}
