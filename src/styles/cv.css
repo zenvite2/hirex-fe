@@ -1,8 +1,6 @@
 /* Font Size Classes */
 .font-xs {
-    font-size: 12px;
-    /* Convert rem to pixels */
-    color: 'red';
+    font-size: 13px;
 }
 
 .font-sm {
@@ -15,116 +13,22 @@
     /* Convert rem to pixels */
 }
 
+.font-xmd {
+    font-size: 18px;
+    /* Convert rem to pixels */
+}
+
 .font-lg {
     font-size: 20px;
     /* Convert rem to pixels */
 }
 
-/* CV Container */
-.cv-container {
-    overflow: hidden;
-    position: relative;
-    border-radius: 8px;
+.font-xl {
+    font-size: 22px;
     /* Convert rem to pixels */
-    width: 100%;
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    /* Replace box-shadow with border */
-    max-width: 794px;
 }
 
-/* Grid Layout */
-.cv-grid {
-    display: block;
-    /* Fallback for grid */
-    width: 100%;
-}
-
-@media (min-width: 768px) {
-    .cv-grid {
-        display: table;
-        width: 100%;
-    }
-}
-
-/* Sidebar */
-.cv-sidebar {
-    padding: 20px;
-    background-color: #F9FAFB;
-    width: 100%;
-}
-
-@media (min-width: 768px) {
-    .cv-sidebar {
-        width: 30%;
-        /* Approximate column width */
-        float: left;
-    }
-}
-
-/* Avatar */
-.cv-avatar {
-    margin-bottom: 16px;
-    width: 100%;
-}
-
-.cv-avatar-placeholder {
-    width: 100%;
-    /* Full width of the container */
-    padding-top: 100%;
-    /* Creates a responsive square aspect ratio */
-    background-color: #D1D5DB;
-    position: relative;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border-radius: 5px;
-}
-
-/* Margin Utilities */
-.cv-mb-4 {
-    margin-bottom: 16px;
-}
-
-.cv-mb-6 {
-    margin-bottom: 24px;
-}
-
-.cv-mb-1 {
-    margin-bottom: 4px;
-}
-
-.cv-mt-2 {
-    margin-top: 8px;
-}
-
-/* Main Content */
-.cv-main {
-    padding: 20px;
-    width: 100%;
-}
-
-@media (min-width: 768px) {
-    .cv-main {
-        width: 70%;
-        /* Approximate column width */
-        float: right;
-    }
-}
-
-/* Font Utilities */
-.cv-font-semibold {
-    font-weight: bold;
-}
-
-/* Page Container */
-.cv-page {
-    padding: 32px;
-    background-color: #F3F4F6;
-    width: 100%;
-}
-
-a {
-    color: blue;
-    text-decoration: underline;
+.font-2xl {
+    font-size: 24px;
+    /* Convert rem to pixels */
 }

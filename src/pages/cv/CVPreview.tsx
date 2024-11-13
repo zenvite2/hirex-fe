@@ -1,22 +1,21 @@
 import React from 'react';
-import '../../styles/cv.css';
-import Title from './CVTitle';
+import '../../styles/cv.css'
 
 const CVPreview = () => {
-    const avtUrl = 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?semt=ais_hybrid';
+    const avtUrl = 'https://s3.deploy-hirexptit.io.vn/hirex/images/1731423859557_wallpaperflare.com_wallpaper__1_.jpg';
     const backgroundImageUrl = '/assets/cv-bg-1.jpg';
 
     return (
         <div
             className="bg-white shadow-md rounded-lg overflow-hidden relative p-0 m-0"
             style={{
-                width: '794px',   // A4 width for 96 PPI screens
-                height: '1123px', // A4 height for 96 PPI screens
+                width: '794px',
+                height: '1123px',
                 backgroundImage: `url(${backgroundImageUrl})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'bottom',
-                margin: 0,        // Ensure no extra margin
-                padding: 0,       // Ensure no extra padding
+                margin: 0,
+                padding: 0,
             }}
         >
             <div className="grid grid-cols-1 md:grid-cols-3">
@@ -77,18 +76,28 @@ const CVPreview = () => {
                 <div className="col-span-2 p-6 font-xs">
                     {/* Header Section */}
                     <div className="mb-6">
-                        <h1 className="font-lg font-bold">Trương Quốc Việt</h1>
+                        <h1 className="font-2xl font-bold">Trương Quốc Việt</h1>
                         <p className="font-md font-semibold">Web Developer</p>
                     </div>
                     {/* Career Objective Section */}
                     <div className="mb-6 flex flex-col">
-                        <Title title='Mục tiêu nghề nghiệp' />
+                        <div className="py-2 rounded-t-md w-full">
+                            <div className="text-blue-800 font-bold mb-2 font-xmd">
+                                {'Mục tiêu nghề nghiệp'}
+                            </div>
+                            <div className="border-b-2 border-gray-700 rounded-r-md"></div>
+                        </div>
                         <p>Ứng tuyển vào vị trí thực tập sinh để áp dụng kiến thức từ trường vào công việc thực tế. Mục tiêu dài hạn: trở thành kỹ sư DevOps.</p>
                     </div>
 
                     {/* Education Section */}
                     <div className="mb-6">
-                        <Title title='Học vấn' />
+                        <div className="py-2 rounded-t-md w-full">
+                            <div className="text-blue-800 font-bold mb-2 font-xmd">
+                                {'Học vấn'}
+                            </div>
+                            <div className="border-b-2 border-gray-700 rounded-r-md"></div>
+                        </div>
                         <p> Ngành:Công Nghệ Thông Tin // 2020 - Hiện tại</p>
                         <p>Học viện Công nghệ Bưu Chính Viễn Thông (PTIT)</p>
                         <p>GPA: 3.35</p>
@@ -97,27 +106,31 @@ const CVPreview = () => {
 
                     {/* Projects Section */}
                     <div className="mb-6">
-                        <Title title='Dự án' />
-
+                        <div className="py-2 rounded-t-md w-full">
+                            <div className="text-blue-800 font-bold mb-2 font-xmd">
+                                {'Dự án quan trọng'}
+                            </div>
+                            <div className="border-b-2 border-gray-700 rounded-r-md"></div>
+                        </div>
                         <div className="mt-2">
-                            <h3 className="font-semibold">Bookstore-eCommerce (4/2023 - 6/2023)</h3>
+                            <h3 className="font-semibold font-md">Bookstore-eCommerce (4/2023 - 6/2023)</h3>
                             <p>Vị trí: Cá nhân | Công nghệ: MSSQL, Spring Boot, ReactJS + Redux</p>
                             <p>Mô tả: Trang web thương mại điện tử quản lý và bán sách online.</p>
-                            <a href="https://github.com/Cutiepie4/Bookstore_eCommerce" className="text-blue-500">GitHub Link</a>
+                            <p>Link: <a href="https://github.com/Cutiepie4/Bookstore_eCommerce" className="text-blue-500">https://github.com/Cutiepie4/Bookstore_eCommerce</a></p>
                         </div>
 
                         <div className="mt-2">
-                            <h3 className="font-semibold">Haunted World - Game (9/2022 - 12/2022)</h3>
+                            <h3 className="font-semibold font-md">Haunted World - Game (9/2022 - 12/2022)</h3>
                             <p>Vị trí: Leader | Công nghệ: LibGDX Framework Java</p>
                             <p>Mô tả: Game RPG nhỏ dùng framework game 2D.</p>
-                            <a href="https://github.com/Cutiepie4/HauntedWorld" className="text-blue-500">GitHub Link</a>
+                            <p>Link: <a href="https://github.com/Cutiepie4/Bookstore_eCommerce" className="text-blue-500">https://github.com/Cutiepie4/Bookstore_eCommerce</a></p>
                         </div>
 
                         <div className="mt-2">
-                            <h3 className="font-semibold">BTL-IoT (9/2023 - Hiện tại)</h3>
+                            <h3 className="font-semibold font-md">BTL-IoT (9/2023 - Hiện tại)</h3>
                             <p>Vị trí: Leader | Công nghệ: Flask, MongoDB, ReactJS, Arduino</p>
                             <p>Mô tả: Cửa hàng sách dùng RFID cho quản lý tồn kho và thanh toán.</p>
-                            <a href="https://github.com/Cutiepie4/IoT_assignment" className="text-blue-500">GitHub Link</a>
+                            <p>Link: <a href="https://github.com/Cutiepie4/Bookstore_eCommerce" className="text-blue-500">https://github.com/Cutiepie4/Bookstore_eCommerce</a></p>
                         </div>
                     </div>
                 </div>

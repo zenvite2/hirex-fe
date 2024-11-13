@@ -10,35 +10,30 @@ const CVGenerate: React.FC = () => {
     const handleExportPdf = async () => {
         if (!componentRef.current) return;
 
-        setIsLoading(true);
-
         try {
-            const images = componentRef.current.getElementsByTagName('img');
-            const imagePromises = Array.from(images).map(img => {
-                return new Promise<HTMLImageElement>((resolve, reject) => {
-                    const htmlImg = img as HTMLImageElement;
+            // Preload images to ensure they render correctly
+            // const images = componentRef.current.getElementsByTagName('img');
+            // const imagePromises = Array.from(images).map(img => {
+            //     return new Promise((resolve, reject) => {
+            //         if (img.complete) {
+            //             resolve(img);
+            //         } else {
+            //             img.onload = () => resolve(img);
+            //             img.onerror = reject;
+            //         }
+            //     });
+            // });
 
-                    if (htmlImg.complete) {
-                        resolve(htmlImg);
-                    } else {
-                        htmlImg.onload = () => resolve(htmlImg);
-                        htmlImg.onerror = (error) => reject(error);
-                    }
-                });
-            });
-
-            await Promise.all(imagePromises);
+            // await Promise.all(imagePromises);
 
             const canvas = await html2canvas(componentRef.current, {
-                scale: 4,   // High scale for high-resolution capture
-                proxy: 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?semt=ais_hybrid',
+                scale: 5,
                 useCORS: true,
                 logging: false,
                 allowTaint: true,
-                imageTimeout: 20000,
+                imageTimeout: 15000,
                 scrollX: 0,
-                scrollY: -window.scrollY,
-                backgroundColor: '#ffffff'
+                scrollY: -window.scrollY
             });
 
             const pdf = new jsPDF({
@@ -54,12 +49,12 @@ const CVGenerate: React.FC = () => {
             const imgHeight = canvas.height;
 
             const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-
             const scaledWidth = imgWidth * ratio;
             const scaledHeight = imgHeight * ratio;
 
-            const marginX = 0;
-            const marginY = 0;
+            const marginX = (pdfWidth - scaledWidth) / 2;
+            const marginY = (pdfHeight - scaledHeight) / 2;
+
             pdf.addImage(
                 imgData,
                 'JPEG',
@@ -69,38 +64,37 @@ const CVGenerate: React.FC = () => {
                 scaledHeight
             );
 
-            pdf.save('cv-export.pdf');
+            pdf.save('cv.pdf');
         } catch (error) {
             console.error('PDF Export Error:', error);
-            alert('Failed to export PDF. Please check your network and try again.');
-        } finally {
-            setIsLoading(false);
+            alert('Failed to export PDF. Please try again.');
         }
     };
 
     return (
-        <div className="flex justify-center">
-            <div
-                ref={componentRef}
-                className="flex flex-col items-center"
-            >
-                <CVPreview />
-            </div>
+        <div className="flex justify-center mt-6">
 
-            <div className="flex justify-center mt-6">
+            <div className="justify-center mr-6">
                 <button
                     onClick={handleExportPdf}
                     disabled={isLoading}
                     className={`
                         px-6 py-3 rounded-lg transition-colors duration-300
                         ${isLoading
-                            ? 'bg-gray-400 cursor-not-allowed'
+                            ? 'bg-gray-300 cursor-not-allowed'
                             : 'bg-blue-600 text-white hover:bg-blue-700'
                         }
                     `}
                 >
                     {isLoading ? 'Exporting...' : 'Export to PDF'}
                 </button>
+            </div>
+
+            <div
+                ref={componentRef}
+                className="flex flex-col items-center"
+            >
+                <CVPreview />
             </div>
         </div>
     );
