@@ -1,9 +1,9 @@
-import { GoLocation } from "react-icons/go";
+import { FaDollarSign } from "react-icons/fa";
 import moment from "moment";
 import { Link } from "react-router-dom";
-import { Building2 } from 'lucide-react';
+import { Building2, Bookmark } from 'lucide-react';
+import { toast } from 'react-toastify';
 
-// Interface matching API response
 interface Job {
   id: number;
   title: string;
@@ -15,55 +15,71 @@ interface Job {
   companyName: string;
   companyLogo: string | null;
   companyDescription: string | null;
+  jobType: string;
+  experience: string;
+  salary: string;
 }
 
 interface JobCardProps {
   job: Job;
 }
 
+const handleSaveJob = () => {
+  toast.success('Job saved successfully!');
+  // Add your save job logic here
+};
+
 const JobCard: React.FC<JobCardProps> = ({ job }) => {
   return (
     <Link to={`/job-detail/${job.id}`}>
-      <div
-        className='w-full md:w-[16rem] 2xl:w-[18rem] h-[16rem] md:h-[18rem] bg-white flex flex-col justify-between shadow-lg 
-                rounded-md px-3 py-5'
-      >
-        <div className='flex gap-3'>
-          {job.companyLogo ? (
-            <img
-              src={job.companyLogo}
-              alt={`${job.companyName}`}
-              className="h-12 w-12 object-contain"
-            />
-          ) : (
-            <Building2 className="h-12 w-12 text-gray-400" />
-          )}
-
-          <div>
-            <p className='text-lg font-semibold truncate'>{job.title}</p>
-            <span className='flex gap-2 items-center'>
-              <GoLocation className='text-slate-900 text-sm' />
-              {job.district}, {job.city}
-            </span>
+      <div className="w-full max-w-sm bg-white shadow-lg rounded-md overflow-hidden">
+        <div className="p-4">
+          <div className="flex items-center mb-2">
+            {job.companyLogo ? (
+              <img
+                src={job.companyLogo}
+                alt={job.companyName}
+                className="h-12 w-12 object-contain mr-3"
+              />
+            ) : (
+              <Building2 className="h-24 w-24 text-gray-400 mr-3" />
+            )}
+            <div>
+              <h3 className="text-lg font-semibold truncate">{job.title}</h3>
+              <p className="text-gray-500 text-sm">{job.companyName}</p>
+            </div>
+            <button
+              onClick={handleSaveJob}
+              className="ml-auto p-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600"
+            >
+              <Bookmark className="ml-auto w-4 h-4" />
+            </button>          </div>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center">
+              <span className="bg-[#26d81d26] text-[#26d81d] py-1 px-2 rounded-md text-xs font-semibold">
+                Full-Time
+              </span>
+            </div>
+            <div className="flex items-center">
+              <FaDollarSign className="text-gray-500 mr-1" />
+              <span className="text-xs text-gray-600">10-12 triệu</span>
+            </div>
           </div>
-        </div>
-
-        <div className='py-3'>
-          <p className='text-sm'>
+          <p className="text-gray-700 text-sm mb-4 line-clamp-2">
             {job.companyDescription
-              ? job.companyDescription.slice(0, 150) + "..."
+              ? job.companyDescription
               : `${job.companyName} is hiring for the position of ${job.title} in ${job.location}.`
             }
           </p>
-        </div>
-
-        <div className='flex items-center justify-between'>
-          <p className='bg-[#1d4fd826] text-[#1d4fd8] py-0.5 px-1.5 rounded font-semibold text-sm'>
-            {job.companyName}
-          </p>
-          <span className='text-gray-500 text-sm'>
-            {moment(job.createdAt).fromNow()}
-          </span>
+          <div className="my-2 border-b border-gray-300"></div>
+          <div className="flex items-center justify-between">
+            <span className="bg-[#1d4fd826] text-[#1d4fd8] py-1 px-2 rounded-md text-xs font-semibold">
+              {job.district}, {job.city}
+            </span>
+            <span className="text-gray-500 text-xs">
+              {moment(job.createdAt).fromNow()}
+            </span>
+          </div>
         </div>
       </div>
     </Link>

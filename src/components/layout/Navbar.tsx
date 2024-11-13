@@ -8,6 +8,7 @@ import { logout } from '../../redux/slice/authSlice';
 import { RootState } from "../../redux/store";
 import { openMessenger } from "../../redux/slice/messageSlice";
 import useAppDispatch from "../../hooks/useAppDispatch";
+import Notifications from "../../pages/Notifications";
 interface NavbarProps { }
 
 const Navbar: React.FC<NavbarProps> = () => {
@@ -165,8 +166,10 @@ const Navbar: React.FC<NavbarProps> = () => {
             )}
           </div>
         </div>
+        
 
         <div className="hidden lg:flex items-center space-x-2">
+        <Notifications />
           {isLoggedIn ? (
             <div className="relative group">
               <button className="flex items-center space-x-2 text-gray-700 hover:text-[#0069DB] transition duration-300 border rounded-full px-2 py-1 hover:border-[#0069DB]">

@@ -47,7 +47,6 @@ export const jobTypeList = createAsyncThunk<any>(
     'job-type/list',
     async () => {
         return axiosIns.get('/auto-fill/job-type', {
-            includeToken: true
         }).then(response => { return { response: response.data } })
             .catch(error => { })
     }
@@ -57,7 +56,6 @@ export const experienceList = createAsyncThunk<any>(
     'experience/list',
     async () => {
         return axiosIns.get('/auto-fill/year-experience', {
-            includeToken: true
         }).then(response => { return { response: response.data } })
             .catch(error => { })
     }
@@ -67,7 +65,6 @@ export const positionList = createAsyncThunk<any>(
     'position/list',
     async () => {
         return axiosIns.get('/auto-fill/position', {
-            includeToken: true
         }).then(response => { return { response: response.data } })
             .catch(error => { })
     }
@@ -86,7 +83,6 @@ export const contracTypeList = createAsyncThunk<any>(
     'job-type/list',
     async () => {
         return axiosIns.get('/auto-fill/contract-type', {
-            includeToken: true
         }).then(response => { return { response: response.data } })
             .catch(error => { })
     }
