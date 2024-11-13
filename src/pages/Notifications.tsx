@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Bell } from 'lucide-react';
 import axiosIns from '../services/axiosIns';
+import { useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
 
 interface NotificationType {
   id: number;
@@ -15,10 +17,12 @@ const Notifications: React.FC = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
 
+  const {userId, isLoggedIn} = useSelector((state: RootState) => state.authReducer)
+
   // Hàm fetch notifications từ API
   const fetchNotifications = async () => {
     try {
-      const response = await axiosIns.get(`/notifications/13`);
+      const response = await axiosIns.get(`/notifications/${userId}`);
       const fetchedNotifications: NotificationType[] = response.data.data;
 
       setNotifications(fetchedNotifications);
@@ -34,7 +38,7 @@ const Notifications: React.FC = () => {
 
     const interval = setInterval(() => {
       fetchNotifications(); // Gọi liên tục mỗi 30 giây
-    }, 300000); // 30 giây
+    }, 3000); // 30 giây
 
     // Cleanup để hủy setInterval khi component unmount
     return () => clearInterval(interval);
@@ -44,7 +48,7 @@ const Notifications: React.FC = () => {
   const handleNotificationClick = async (notificationId: number) => {
     try {
       // Đánh dấu thông báo đã đọc
-      await axiosIns.patch(`/notifications/mark-read/13`);
+      await axiosIns.patch(`/notifications/mark-read/${userId}`);
 
       // Cập nhật trạng thái local
       const updatedNotifications = notifications.map(noti =>
@@ -62,7 +66,7 @@ const Notifications: React.FC = () => {
     setIsOpen(!isOpen);
     if (unreadCount > 0) {
       // Đánh dấu tất cả thông báo đã đọc khi mở
-      axiosIns.patch(`/notifications/mark-read/13`);
+      axiosIns.patch(`/notifications/mark-read/${userId}`);
     }
   };
 

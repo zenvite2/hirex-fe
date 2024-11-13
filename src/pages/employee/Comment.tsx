@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { MapPin, Users, Facebook, Linkedin, Youtube, Twitter, Reply, X } from 'lucide-react';
 import axios from 'axios';
 import axiosIns from '../../services/axiosIns';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import { useNavigate } from 'react-router-dom';
 
 // Interfaces for API responses
 interface ApiResponse<T> {
@@ -39,41 +42,41 @@ const getComments = async (companyId: number) => {
 
 const createComment = async (content: string, companyId: number, userId: number) => {
     try {
-      const response = await axiosIns.post<ApiResponse<CommentType>>('/comments', {
-        content,
-        companyId, 
-        userId
-      });
-      return response.data;
+        const response = await axiosIns.post<ApiResponse<CommentType>>('/comments', {
+            content,
+            companyId,
+            userId
+        });
+        return response.data;
     } catch (error) {
-      // Xử lý lỗi token hết hạn
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        // Token hết hạn, yêu cầu đăng nhập lại
-        // Có thể chuyển hướng đến trang đăng nhập hoặc refresh token
-        localStorage.removeItem('accessToken');
-        window.location.href = '/login';
-      }
-      throw error;
+        // Xử lý lỗi token hết hạn
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+            // Token hết hạn, yêu cầu đăng nhập lại
+            // Có thể chuyển hướng đến trang đăng nhập hoặc refresh token
+            localStorage.removeItem('accessToken');
+            window.location.href = '/login';
+        }
+        throw error;
     }
-  };
-  
-  const createReply = async (content: string, commentId: number, userId: number) => {
+};
+
+const createReply = async (content: string, commentId: number, userId: number) => {
     try {
-      const response = await axiosIns.post<ApiResponse<ReplyType>>('/replies', {
-        content,
-        commentId,
-        userId
-      });
-      return response.data;
+        const response = await axiosIns.post<ApiResponse<ReplyType>>('/replies', {
+            content,
+            commentId,
+            userId
+        });
+        return response.data;
     } catch (error) {
-      // Tương tự như createComment
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        localStorage.removeItem('accessToken');
-        window.location.href = '/login';
-      }
-      throw error;
+        // Tương tự như createComment
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+            localStorage.removeItem('accessToken');
+            window.location.href = '/login';
+        }
+        throw error;
     }
-  };
+};
 
 // Comment component
 const Comment = ({
@@ -102,7 +105,7 @@ const Comment = ({
         const now = new Date();
         const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
         const diffInHours = Math.floor(diffInMinutes / 60);
-    
+
         if (diffInHours < 1) return `${diffInMinutes} phút trước`;
         if (diffInHours < 24) return `${diffInHours} giờ trước`;
         return `${Math.floor(diffInHours / 24)} ngày trước`;
@@ -176,6 +179,8 @@ const CommentCard = ({ companyId, userId }: { companyId: number; userId: number 
     const [comments, setComments] = useState<CommentType[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { isLoggedIn } = useSelector((state: RootState) => state.authReducer);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchComments();
@@ -195,6 +200,12 @@ const CommentCard = ({ companyId, userId }: { companyId: number; userId: number 
     };
 
     const handleAddReply = async (commentId: number, content: string) => {
+
+        if (!isLoggedIn) {
+            navigate('/login');
+            return;
+        }
+
         try {
             await createReply(content, commentId, userId);
             await fetchComments(); // Refresh comments after adding reply
@@ -204,7 +215,14 @@ const CommentCard = ({ companyId, userId }: { companyId: number; userId: number 
     };
 
     const handleSubmitComment = async (e: React.FormEvent) => {
+
         e.preventDefault();
+
+        if (!isLoggedIn) {
+            navigate('/login');
+            return;
+        }
+
         if (!newComment.trim()) return;
 
         try {
@@ -225,13 +243,13 @@ const CommentCard = ({ companyId, userId }: { companyId: number; userId: number 
             <div className="bg-white rounded-xl shadow-sm">
                 <div className="p-6">
                     <h2 className="text-xl font-semibold text-gray-800">Bình luận</h2>
-    
+
                     {error && (
                         <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg">
                             {error}
                         </div>
                     )}
-    
+
                     {/* Cố định chiều cao và thêm thuộc tính cuộn cho danh sách bình luận */}
                     <div className="mt-6 space-y-4 h-96 overflow-y-scroll">
                         {comments.map((comment) => (
@@ -243,7 +261,7 @@ const CommentCard = ({ companyId, userId }: { companyId: number; userId: number 
                             />
                         ))}
                     </div>
-    
+
                     <form onSubmit={handleSubmitComment} className="mt-6">
                         <div className="flex gap-4">
                             <input
@@ -264,7 +282,7 @@ const CommentCard = ({ companyId, userId }: { companyId: number; userId: number 
                 </div>
             </div>
         </div>
-    );    
+    );
 };
 
 export default CommentCard;

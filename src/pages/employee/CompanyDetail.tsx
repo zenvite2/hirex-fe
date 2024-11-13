@@ -1,114 +1,113 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Users, Facebook, Linkedin, Youtube, Twitter } from 'lucide-react';
 import CommentCard from './Comment';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import { Link, useParams } from 'react-router-dom';
+import axiosIns from '../../services/axiosIns';
 
-interface CompanyInfo {
-  name: string;
-  logo: string;
-  teamImage: string;
-  factoryImage: string;
+interface JobDetail {
+  responsibilities: string[];
+  description: string[];
+}
+
+interface Job {
+  id: number;
+  title: string;
   description: string;
+  requirements: string | null;
+  location: string;
+  yearExperience: number;
+  salary: number;
+  tech: number;
+  city: number;
+  district: number;
+  position: number;
+  jobType: number;
+  contractType: number;
+  deadline: string;
+  status: string | null;
+  jobDetails: JobDetail;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface CompanyData {
+  id: number;
+  employerId: number;
+  companyName: string;
+  description: string;
+  website: string;
+  logo: string;
   address: string;
-  employeeCount: string;
-  socialLinks: {
-    facebook: string;
-    linkedin: string;
-    youtube: string;
-    twitter: string;
-  };
-  jobs: Array<{
-    title: string;
-    location: string;
-    department: string;
-    updatedAt: string;
-  }>;
+  city: string;
+  district: string;
+  scale: string;
+  jobs: Job[];
 }
 
-interface Comment {
-  id: number;
-  content: string;
-  author: string;
-  createdAt: string;
-}
-
-interface Reply {
-  id: number;
-  content: string;
-  author: string;
-  createdAt: string;
+interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
 }
 
 const CompanyDetail = () => {
-  const company: CompanyInfo = {
-    name: "CÔNG TY TNHH DAEYEONG VINA",
-    logo: "/api/placeholder/150/150",
-    teamImage: "/api/placeholder/800/400",
-    factoryImage: "/api/placeholder/400/300",
-    description: "Công ty với 100% vốn đầu tư của Hàn Quốc chuyên sản xuất các linh kiện điện tử cho máy giặt và tủ lạnh",
-    address: "Lô 406, Đường 13, KCN Amata, phường Long Bình, Biên Hòa, Thành phố Biên Hòa, Đồng Nai",
-    employeeCount: "100 - 499 nhân viên",
-    socialLinks: {
-      facebook: "#",
-      linkedin: "#",
-      youtube: "#",
-      twitter: "#"
-    },
-    jobs: [
-      {
-        title: "HR Senior Specialist / Chuyên Viên Nhân Sự Cao Cấp",
-        location: "Đồng Nai",
-        department: "Trưởng nhóm / Giám sát",
-        updatedAt: "3 giờ trước"
-      },
-      {
-        title: "ACCOUNTANT SPECIALIST / CHUYÊN VIÊN KẾ TOÁN",
-        location: "Đồng Nai",
-        department: "Trưởng nhóm / Giám sát",
-        updatedAt: "3 giờ trước"
-      },
-      {
-        title: "NHÂN VIÊN EHS HIỆN TRƯỜNG",
-        location: "Đồng Nai",
-        department: "Nhân viên",
-        updatedAt: "3 giờ trước"
+  const { id } = useParams();
+  const { userId, username, isLoggedIn } = useSelector((state: RootState) => state.authReducer);
+  // Cập nhật phần fetch data trong component:
+  const [company, setCompany] = useState<CompanyData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCompanyData = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosIns.get<ApiResponse<CompanyData>>(`/company/${id}`);
+        if (response.data.success) {
+          setCompany(response.data.data);
+        } else {
+          throw new Error(response.data.message);
+        }
+      } catch (err) {
+        console.error('Error fetching company:', err);
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
       }
-    ]
-  };
+    };
+
+    if (id) {
+      fetchCompanyData();
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error || !company) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-red-600">{error || 'Company not found'}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-6">
-        {/* Previous content remains the same */}
         {/* Banner Image Section */}
         <div className="relative w-full h-40 bg-gradient-to-r from-cyan-700 to-blue-900">
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute left-0 w-3/4 h-full">
-              <img
-                src={company.teamImage}
-                alt="Team"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            
-            <div className="absolute right-0 w-1/4 h-full">
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-64 h-64 overflow-hidden" style={{
-                clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)'
-              }}>
-                <img
-                  src={company.factoryImage}
-                  alt="Factory"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-          </div>
-
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-700/60 to-blue-900/60" />
 
-          <div className="absolute top-4 right-0">
-            <div className="flex justify-end">
-              <img src="/api/placeholder/150/50" alt="Daeyeong Vina" className="h-8 object-contain" />
-            </div>
+          <div className="absolute top-4 right-4">
+            <img src={company.logo} alt={company.companyName} className="h-8 object-contain" />
           </div>
         </div>
 
@@ -124,16 +123,16 @@ const CompanyDetail = () => {
             </div>
 
             <div className="ml-6 flex-grow">
-              <h1 className="text-2xl font-bold text-gray-900">{company.name}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{company.companyName}</h1>
               <div className="flex items-center gap-2 mt-2 text-gray-600">
                 <MapPin className="w-4 h-4" />
-                <span className="text-sm">{company.address}</span>
+                <span className="text-sm">{company.district}, {company.city}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-2 text-gray-600">
               <Users className="w-5 h-5" />
-              <span>{company.employeeCount}</span>
+              <span>{company.scale}</span>
             </div>
           </div>
         </div>
@@ -148,7 +147,15 @@ const CompanyDetail = () => {
                 <div className="p-6">
                   <h2 className="text-xl font-semibold text-gray-800">Về công ty</h2>
                   <p className="mt-4 text-gray-600">{company.description}</p>
-                  <div className="mt-6 rounded-lg overflow-hidden">
+                  <div className="mt-4">
+                    <a
+                      href={company.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      Website: {company.website}
+                    </a>
                   </div>
                 </div>
               </div>
@@ -158,16 +165,22 @@ const CompanyDetail = () => {
                 <div className="p-6">
                   <h2 className="text-xl font-semibold text-gray-800">Việc đang tuyển</h2>
                   <div className="mt-4 space-y-4">
-                    {company.jobs.map((job, index) => (
-                      <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-gray-50">
+                    {company.jobs.map((job) => (
+                      <Link
+                        key={job.id}
+                        to={`/job-detail/${job.id}`}
+                        className="block border rounded-lg p-4 hover:shadow-md transition-shadow bg-gray-50 cursor-pointer"
+                      >
                         <h3 className="text-lg font-semibold text-blue-600">{job.title}</h3>
                         <div className="mt-2 flex items-center gap-4 text-gray-600 text-sm">
                           <span>{job.location}</span>
                           <span>•</span>
-                          <span>{job.department}</span>
-                          <span className="ml-auto">Cập nhật: {job.updatedAt}</span>
+                          <span>{job.yearExperience} năm kinh nghiệm</span>
+                          <span className="ml-auto">
+                            Cập nhật: {new Date(job.updatedAt).toLocaleDateString()}
+                          </span>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -176,8 +189,7 @@ const CompanyDetail = () => {
               <div className="bg-white rounded-xl shadow-sm">
                 <div className="p-6">
                   <div>
-                    {/* <CommentCard></CommentCard> */}
-                    <CommentCard companyId={4} userId={15} />
+                    <CommentCard companyId={Number(id)} userId={userId} />
                   </div>
                 </div>
               </div>
@@ -185,22 +197,18 @@ const CompanyDetail = () => {
 
             {/* Right Column */}
             <div className="space-y-6">
-              {/* Social Links Card */}
+              {/* Website Link Card */}
               <div className="bg-white rounded-xl shadow-sm">
                 <div className="p-6">
-                  <h2 className="text-xl font-semibold text-gray-800">Theo dõi</h2>
-                  <div className="mt-4 flex gap-4">
-                    <a href={company.socialLinks.facebook} className="text-blue-600 hover:text-blue-700">
-                      <Facebook className="w-6 h-6" />
-                    </a>
-                    <a href={company.socialLinks.linkedin} className="text-blue-600 hover:text-blue-700">
-                      <Linkedin className="w-6 h-6" />
-                    </a>
-                    <a href={company.socialLinks.youtube} className="text-red-600 hover:text-red-700">
-                      <Youtube className="w-6 h-6" />
-                    </a>
-                    <a href={company.socialLinks.twitter} className="text-blue-400 hover:text-blue-500">
-                      <Twitter className="w-6 h-6" />
+                  <h2 className="text-xl font-semibold text-gray-800">Thông tin liên hệ</h2>
+                  <div className="mt-4">
+                    <a
+                      href={company.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-700 flex items-center gap-2"
+                    >
+                      <span className="underline">{company.website}</span>
                     </a>
                   </div>
                 </div>
