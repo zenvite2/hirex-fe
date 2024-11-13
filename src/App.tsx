@@ -29,6 +29,8 @@ import useAppDispatch from "./hooks/useAppDispatch";
 import TestCV from "./pages/cv/CVGenerate";
 import CVPreview from "./pages/cv/CVPreview";
 import CVGenerate from "./pages/cv/CVGenerate";
+import { useEffect } from "react";
+import { getConversations } from "./services/messageApi";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -62,8 +64,13 @@ function App() {
     const location = useLocation();
     const { showMessenger } = useSelector((state: RootState) => state.messageReducer);
     const dispatch = useAppDispatch();
+    const { userId } = useSelector((state: RootState) => state.authReducer);
     // Không hiển thị Navbar trên trang login và register-employee  
     const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer";
+
+    useEffect(() => {
+        dispatch(getConversations());
+    }, [userId]);
 
     return (
         <>
@@ -117,8 +124,7 @@ function App() {
                 pauseOnFocusLoss={false}
                 stacked
             />
-            {showMessenger && <CustomModal isOpen={showMessenger} width='large' height='large' onClose={() => { dispatch(closeMessenger()); }} children={<Messenger />} />}
-            { }
+            <CustomModal isOpen={showMessenger} width='large' height='large' onClose={() => { dispatch(closeMessenger()); }} children={<Messenger />} />
             <Loading />
         </>
     );

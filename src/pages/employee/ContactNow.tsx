@@ -53,7 +53,8 @@ const ContactNow: React.FC<{ employer: Employer }> = ({ employer }) => {
                 <button
                     className="space-x-2 flex items-center justify-center w-full px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg shadow-sm transition duration-200"
                     onClick={() => {
-                        dispatch(addMessage({ converId: employer.userId, msg: null, openMessenger: true }));
+                        console.log('employer', employer)
+                        employer && dispatch(addMessage({ converId: employer.userId, avtUrl: employer.avatar, name: employer.fullName, msg: null, openMessenger: true }));
                     }}
                 >
                     <MessageCircleQuestion />

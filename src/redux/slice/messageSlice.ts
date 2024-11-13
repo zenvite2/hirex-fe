@@ -19,16 +19,15 @@ const messagesSlice = createSlice({
   name: 'messages',
   initialState,
   reducers: {
-    addMessage: (state, action: PayloadAction<{ converId: number; msg: ChatMessage; openMessenger?: boolean }>) => {
-      // cái lstConvers không update giao diện dù đã được add newConver
-      const { converId, msg, openMessenger } = action.payload;
+    addMessage: (state, action: PayloadAction<{ converId: number; msg: ChatMessage; avtUrl?: string; name?: string; openMessenger?: boolean }>) => {
+      const { converId, msg, openMessenger, avtUrl, name } = action.payload;
       const existed = state.lstConvers.some(item => item.userId == converId);
       if (existed) {
         state.lstConvers = state.lstConvers.map(conver => {
           if (conver.userId === converId) {
             const updatedMessages = [...conver.last10Messages, msg].filter((value, index, self) =>
               index === self.findIndex((t) => (
-                t.id === value.id
+                t?.id === value?.id
               ))
             );
             return {
@@ -39,7 +38,7 @@ const messagesSlice = createSlice({
           return conver;
         });
       } else {
-        const newConversation: Conversation = { avtUrl: '', last10Messages: [msg], name: '', userId: converId };
+        const newConversation: Conversation = { avtUrl: avtUrl, last10Messages: [msg], name, userId: converId };
         const exists = state.lstConvers.some(item => item.userId === newConversation.userId);
         if (!exists) {
           state.lstConvers = [...state.lstConvers, newConversation];
@@ -74,10 +73,10 @@ const messagesSlice = createSlice({
 });
 
 export const selectCurrentConver = createSelector(
-  (state: RootState) => state.messageReducer,
-  (messagesState) => {
-    const { lstConvers, currentIndex } = messagesState;
-    return lstConvers[currentIndex] || null;
+  [(state: RootState) => state.messageReducer.lstConvers,
+  (state: RootState) => state.messageReducer.currentIndex],
+  (lstConvers, currentIndex) => {
+    return lstConvers.find(conver => conver.userId === currentIndex) || null;
   }
 );
 

@@ -87,7 +87,7 @@ const Messenger: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        isConnected && userId != null && dispatch(getConversations());
+        isConnected && userId != null && lstConvers.length == 0 && dispatch(getConversations());
     }, []);
 
     const connect = () => {
@@ -160,7 +160,7 @@ const Messenger: React.FC = () => {
         } else {
             toast.error("Mất kết nối tới máy chủ, vui lòng tải lại trang");
         }
-    }, [currentConver, msgInput, stompClient, userId]);
+    }, [currentConver, msgInput, userId]);
 
     const handleVideoCall = () => {
         const windowFeatures = `menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes,width=${window.screen.width},height=${window.screen.height}`;

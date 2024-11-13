@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Building2, MapPin, Bookmark } from 'lucide-react';
 import { jobGet } from '../../services/jobApi';
 import { toast } from 'react-toastify';
@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import ApplyModal from './ApplyModal';
 import CustomModal from '../../components/common/CustomModal';
 import ContactNow from './ContactNow';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 interface JobDetail {
     id: number;
@@ -87,6 +89,8 @@ const JobDetail = () => {
     const dispatch = useAppDispatch();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showContactModal, setShowContactModal] = useState(false);
+    const { isLoggedIn } = useSelector((state: RootState) => state.authReducer);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchJobDetail = async () => {
@@ -179,17 +183,17 @@ const JobDetail = () => {
                                         <Bookmark className="w-4 h-4" />
                                     </button>
                                     <button
-                                        onClick={() => setShowContactModal(true)}
-                                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium"
-                                >
-                                    Liên hệ
-                                </button>
-                                <button
-                                    onClick={handleApplyNow}
-                                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium"
-                                >
-                                    Apply Now
-                                </button></div>
+                                        onClick={() => { isLoggedIn ? setShowContactModal(true) : navigate('/login') }}
+                                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium"
+                                    >
+                                        Liên hệ
+                                    </button>
+                                    <button
+                                        onClick={handleApplyNow}
+                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium"
+                                    >
+                                        Apply Now
+                                    </button></div>
                             </div>
                         </div>
 
