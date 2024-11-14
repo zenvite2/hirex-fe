@@ -183,7 +183,7 @@ const Navbar: React.FC<NavbarProps> = () => {
           {isLoggedIn ? (
             <div className="relative">
               <div
-                className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-[#0069DB] transition duration-300 border rounded-full px-2 py-1 hover:border-[#0069DB]"onClick={toggleDropdown}
+                className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-[#0069DB] transition duration-300 border rounded-full px-2 py-1 hover:border-[#0069DB]" onClick={toggleDropdown}
               >
                 <img src={avatar ? avatar : Logo} alt="User Avatar" className="w-8 h-8 rounded-full" />
                 <span className="font-medium">{username || 'Login'}</span>
@@ -207,18 +207,17 @@ const Navbar: React.FC<NavbarProps> = () => {
               </button>
             </>
           )}
-          <div
-            // to={isEmployerPage ? "/find-jobs" : "/employer"}
-            // onClick={(e) => {
-            //   e.preventDefault();
-            //   handleLogout();
-            //   setTimeout(() => {
-            //     navigate(isEmployerPage ? "/find-jobs" : "/employer");
-            //   }, 0);
-            // }}
-            className="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-900 transition duration-300 whitespace-nowrap"
+          <div className="ml-4 px-2 flex flex-col text-sm cursor-pointer"
+            onClick={() => {
+              let url = window.location.origin;
+              role !== 'EMPLOYER' ? url += '/employer' : url += '/find-jobs'
+              window.open(url, '_blank', 'noopener,noreferrer');
+            }}
           >
-            {!isEmployerPage ? "Người tìm việc" : "Nhà tuyển dụng"}
+            <span className="text-gray-500">{role !== 'EMPLOYER' ? 'Bạn là nhà tuyển dụng?' : 'Bạn muốn xin việc?'}</span>
+            <div className="text-blue-800 font-semibold hover:underline">
+              {role !== 'EMPLOYER' ? 'Đăng tuyển ngay' : 'Ứng tuyển ngay'} &raquo;
+            </div>
           </div>
         </div>
       </div>

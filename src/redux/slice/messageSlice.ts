@@ -21,39 +21,41 @@ const messagesSlice = createSlice({
   reducers: {
     addMessage: (state, action: PayloadAction<{ converId: number; msg: ChatMessage; avtUrl?: string; name?: string; openMessenger?: boolean }>) => {
       const { converId, msg, openMessenger, avtUrl, name } = action.payload;
-      const existed = state.lstConvers.some(item => item.userId == converId);
-      if (existed) {
-        state.lstConvers = state.lstConvers.map(conver => {
-          if (conver.userId === converId) {
-            const updatedMessages = [...conver.last10Messages, msg].filter((value, index, self) =>
-              index === self.findIndex((t) => (
-                t?.id === value?.id
-              ))
-            );
-            return {
-              ...conver,
-              last10Messages: updatedMessages,
-            };
-          }
-          return conver;
-        });
+
+      const existingConversationIndex = state.lstConvers.findIndex(item => item.userId === converId);
+
+      if (existingConversationIndex !== -1) {
+        const existingConversation = state.lstConvers[existingConversationIndex];
+        const updatedMessages = [...existingConversation.last10Messages, msg]
+          .filter((value, index, self) =>
+            index === self.findIndex((t) => t?.id === value?.id)
+          )
+          .slice();
+
+        state.lstConvers = state.lstConvers.map((conver, index) =>
+          index === existingConversationIndex
+            ? { ...conver, last10Messages: updatedMessages }
+            : conver
+        );
       } else {
-        const newConversation: Conversation = { avtUrl: avtUrl, last10Messages: [msg], name, userId: converId };
-        const exists = state.lstConvers.some(item => item.userId === newConversation.userId);
-        if (!exists) {
-          state.lstConvers = [...state.lstConvers, newConversation];
-        }
+        const newConversation: Conversation = {
+          avtUrl: avtUrl,
+          last10Messages: [msg],
+          name,
+          userId: converId
+        };
+
+        state.lstConvers = [...state.lstConvers, newConversation];
       }
+
       if (openMessenger) {
-        state.showMessenger = true
-      };
+        state.showMessenger = true;
+      }
     },
     setCurrentIndex: (state, action: PayloadAction<number>) => {
       state.currentIndex = action.payload;
     },
-    clearLstConvers: (state) => {
-      state.lstConvers = [];
-    },
+    clearLstConvers: () => initialState,
     openMessenger: (state) => {
       state.showMessenger = true;
     },
@@ -66,18 +68,20 @@ const messagesSlice = createSlice({
       .addCase(getConversations.fulfilled, (state, action) => {
         state.lstConvers = action.payload?.response ?? [];
       })
-      .addCase(getConversations.rejected, (state) => {
-        state.lstConvers = [];
-      });
-  },
+      .addCase(getConversations.rejected, () => ({
+        ...initialState,
+        lstConvers: []
+      }));
+  }
 });
 
 export const selectCurrentConver = createSelector(
-  [(state: RootState) => state.messageReducer.lstConvers,
-  (state: RootState) => state.messageReducer.currentIndex],
-  (lstConvers, currentIndex) => {
-    return lstConvers.find(conver => conver.userId === currentIndex) || null;
-  }
+  [
+    (state: RootState) => state.messageReducer.lstConvers,
+    (state: RootState) => state.messageReducer.currentIndex
+  ],
+  (lstConvers, currentIndex) =>
+    lstConvers.find(conver => conver.userId === currentIndex) || null
 );
 
 export const {

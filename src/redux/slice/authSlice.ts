@@ -5,13 +5,13 @@ import authService from "../../services/authService";
 interface AuthState {
   isLoggedIn: boolean;
   role: string;
-  username: string;
-  userId: number;
+  username: string | null;
+  userId: number | null;
   fullName: string;
   avatar: string;
 }
 
-let initialState: AuthState = {
+const initialState: AuthState = {
   isLoggedIn: authService.getAccessToken() !== null,
   role: authService.getRole() || 'GUEST',
   username: authService.getUsername() || null,
@@ -26,33 +26,52 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       authService.clearCredential();
-      state.isLoggedIn = false;
-      state.role = 'GUEST';
-      state.username = null;
-      state.fullName = '';
-      state.avatar = '';
+      return {
+        isLoggedIn: null,
+        role: 'GUEST',
+        username: null,
+        userId: null,
+        fullName: '',
+        avatar: '',
+      };
     },
-    setUserInfo: (state, action: PayloadAction<{ fullName: string, avatar: string }>) => {
-      state.fullName = action.payload?.fullName;
-      state.avatar = action.payload?.avatar;
+    setUserInfo: (state, action: PayloadAction<{ fullName?: string, avatar?: string }>) => {
+      const { fullName, avatar } = action.payload;
+
+      if (fullName !== undefined) {
+        state.fullName = fullName;
+      }
+
+      if (avatar !== undefined) {
+        state.avatar = avatar;
+      }
     }
   },
   extraReducers: (builder) => {
     builder
       .addCase(login.fulfilled, (state, action) => {
-        if (action.payload?.response?.['success'] == true) {
-          authService.saveCredential(action.payload.response.data);
-          state.isLoggedIn = true;
-          state.role = authService.getRole();
-          state.username = authService.getUsername();
-          state.userId = authService.getUserId();
+        if (action.payload?.response?.['success'] === true) {
+          const { data } = action.payload.response;
+          authService.saveCredential(data);
+          return {
+            ...state,
+            isLoggedIn: true,
+            role: authService.getRole(),
+            username: authService.getUsername(),
+            userId: authService.getUserId(),
+          };
         }
+
+        return state;
       })
-      .addCase(login.rejected, (state) => {
-        state.isLoggedIn = false;
-        state.role = 'GUEST';
-        state.username = null;
+      .addCase(login.rejected, () => {
         authService.clearCredential();
+        return {
+          ...initialState,
+          isLoggedIn: false,
+          role: 'GUEST',
+          username: null,
+        };
       });
   }
 });
