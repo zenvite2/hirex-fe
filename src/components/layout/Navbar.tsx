@@ -19,12 +19,6 @@ const Navbar: React.FC<NavbarProps> = () => {
   const { isLoggedIn, role, username, fullName, avatar } = useSelector((state: RootState) => state.authReducer);
   const dispatch = useAppDispatch();
 
-  const [isDropdownOpen, setDropdownOpen] = useState(false);
-
-  const toggleDropdown = () => {
-    setDropdownOpen(!isDropdownOpen);
-  };
-
   const isLinkActive = (path: string | string[]) => {
     if (Array.isArray(path)) {
       return path.some(p => location.pathname === p);
@@ -58,7 +52,7 @@ const Navbar: React.FC<NavbarProps> = () => {
   };
 
   const renderUserDropdown = () => (
-    <div className="absolute right-0 w-72 bg-white rounded-md shadow-lg">
+    <div className="absolute right-0 w-72 bg-white rounded-md shadow-lg hidden group-hover:block">
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center space-x-3">
           <img src={avatar ? avatar : Logo} alt="My CareerLink Logo" className="w-12 h-12" />
@@ -101,7 +95,7 @@ const Navbar: React.FC<NavbarProps> = () => {
   );
 
   const renderAdminDropdown = () => (
-    <div className="absolute right-0 w-72 bg-white rounded-md shadow-lg">
+    <div className="absolute right-0 w-72 bg-white rounded-md shadow-lg hidden group-hover:block">
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center space-x-3">
           <img src={Logo} alt="TinaSoft Logo" className="w-12 h-12" />
@@ -179,17 +173,15 @@ const Navbar: React.FC<NavbarProps> = () => {
 
 
         <div className="hidden lg:flex items-center space-x-2">
-          {isLoggedIn && <Notifications />}
+        {isLoggedIn && <Notifications />}
           {isLoggedIn ? (
-            <div className="relative">
-              <div
-                className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-[#0069DB] transition duration-300 border rounded-full px-2 py-1 hover:border-[#0069DB]"onClick={toggleDropdown}
-              >
+            <div className="relative group">
+              <div className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-[#0069DB] transition duration-300 border rounded-full px-2 py-1 hover:border-[#0069DB]">
                 <img src={avatar ? avatar : Logo} alt="User Avatar" className="w-8 h-8 rounded-full" />
                 <span className="font-medium">{username || 'Login'}</span>
                 <ChevronDown size={16} />
               </div>
-              {isDropdownOpen && (role === 'EMPLOYEE' ? renderUserDropdown() : renderAdminDropdown())}
+              {role === 'EMPLOYEE' ? renderUserDropdown() : renderAdminDropdown()}
             </div>
           ) : (
             <>
