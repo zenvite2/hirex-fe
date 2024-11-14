@@ -65,20 +65,22 @@ function App() {
     const location = useLocation();
     const { showMessenger } = useSelector((state: RootState) => state.messageReducer);
     const dispatch = useAppDispatch();
-    const { userId } = useSelector((state: RootState) => state.authReducer);
+    const { userId, isLoggedIn } = useSelector((state: RootState) => state.authReducer);
     // Không hiển thị Navbar trên trang login và register-employee  
     const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer";
 
     const fetchUserInfo = useCallback(async () => {
-        const res = await getUserInfo(userId);
-        if (res) {
-            dispatch(setUserInfo({ fullName: res.fullName, avatar: res.avatar }));
+        if (userId) {
+            const res = await getUserInfo(userId);
+            if (res) {
+                dispatch(setUserInfo({ fullName: res.fullName, avatar: res.avatar }));
+            }
+            dispatch(getConversations());
         }
-        dispatch(getConversations());
-    }, [userId])
+    }, [userId]);
 
     useEffect(() => {
-        fetchUserInfo();
+        isLoggedIn && fetchUserInfo();
     }, [userId]);
 
     return (
@@ -110,7 +112,6 @@ function App() {
                         {/* Các route khác */}
                         {/* <Route path='/messenger' element={<Messenger />} /> */}
                         <Route path='/generate-cv' element={<CVGenerate />} />
-                        <Route path='/test-cv' element={<TestCV />} />
                         <Route path='/cv-preview' element={<CVPreview />} />
                         <Route path="/register-employee" element={<RegisterEmployee />} />
                         <Route path="/register-employer" element={<RegisterEmployer />} />

@@ -46,7 +46,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (sessionExp) {
-      toastId = toast.info("Your session has expired.", { autoClose: false })
+      toastId = toast.info("Phiên đăng nhập hết hạn.", { autoClose: false })
     }
 
     return () => {
