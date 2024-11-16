@@ -6,6 +6,7 @@ import { login } from '../../services/authApi';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
+import bannerLogin from '../../assets/banner-login.jpg';
 
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
@@ -59,8 +60,12 @@ const LoginPage = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="m-auto flex w-3/4 max-w-4xl overflow-hidden rounded-xl bg-white shadow-2xl">
-        <div className="relative w-1/2 bg-gradient-to-br from-emerald-400 to-blue-900 p-8 text-white">
-          {/* Left side content */}
+        <div className="relative w-1/2 bg-gradient-to-br from-emerald-500 to-blue-950 p-8 text-white">
+          <img
+            src={bannerLogin}
+            alt="Mô tả ảnh"
+            className="w-full h-full object-cover"
+          />
         </div>
         <div className="w-1/2 p-8 bg-white shadow-lg">
           <h2 className="mb-6 text-3xl font-bold text-gray-800">Đăng nhập</h2>
