@@ -8,6 +8,7 @@ import { experienceList, positionList, jobTypeList, techList, salaryList, contra
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { useLocationSelector } from '../employer/useLocationSelector';
 import { LocationSelector } from './LocationSelector';
+import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 
 interface Option {
   id: number;
@@ -60,7 +61,7 @@ const FindJobs: React.FC = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-
+        dispatch(startLoading());
         const result = await dispatch(jobSearch({
           searchQuery,
           ...(city?.id ? { city: city.id } : {}),
@@ -76,6 +77,8 @@ const FindJobs: React.FC = () => {
         }
       } catch (error) {
         console.error('Error fetching jobs:', error);
+      } finally {
+        dispatch(stopLoading());
       }
     };
 
@@ -90,7 +93,7 @@ const FindJobs: React.FC = () => {
     selectedJobTypeIds,
   ]);
 
-  
+
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
@@ -200,7 +203,7 @@ const FindJobs: React.FC = () => {
 
             {/* City Selector */}
             <div className="flex-1 w-full md:w-auto">
-            <LocationSelector
+              <LocationSelector
                 placeholder="Chọn tỉnh thành"
                 locations={cities}
                 value={city?.name || ''}

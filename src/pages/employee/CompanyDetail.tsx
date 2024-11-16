@@ -5,6 +5,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { Link, useParams } from 'react-router-dom';
 import axiosIns from '../../services/axiosIns';
+import useAppDispatch from '../../hooks/useAppDispatch';
+import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 
 interface JobDetail {
   responsibilities: string[];
@@ -57,13 +59,13 @@ const CompanyDetail = () => {
   const { userId, username, isLoggedIn } = useSelector((state: RootState) => state.authReducer);
   // Cập nhật phần fetch data trong component:
   const [company, setCompany] = useState<CompanyData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCompanyData = async () => {
       try {
-        setLoading(true);
+        dispatch(startLoading());
         const response = await axiosIns.get<ApiResponse<CompanyData>>(`/company/${id}`);
         if (response.data.success) {
           setCompany(response.data.data);
@@ -74,7 +76,7 @@ const CompanyDetail = () => {
         console.error('Error fetching company:', err);
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
-        setLoading(false);
+        dispatch(stopLoading());
       }
     };
 
@@ -83,15 +85,7 @@ const CompanyDetail = () => {
     }
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
-      </div>
-    );
-  }
-
-  if (error || !company) {
+  if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-red-600">{error || 'Company not found'}</div>
@@ -107,7 +101,7 @@ const CompanyDetail = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-700/60 to-blue-900/60" />
 
           <div className="absolute top-4 right-4">
-            <img src={company.logo} alt={company.companyName} className="h-8 object-contain" />
+            <img src={company?.logo} alt={company?.companyName} className="h-8 object-contain" />
           </div>
         </div>
 
@@ -116,23 +110,23 @@ const CompanyDetail = () => {
           <div className="px-6 py-3 flex items-center">
             <div className="w-24 h-24 bg-white rounded-lg shadow-lg -mt-12 flex items-center justify-center p-2">
               <img
-                src={company.logo}
+                src={company?.logo}
                 alt="Logo"
                 className="w-20 h-20 object-contain"
               />
             </div>
 
             <div className="ml-6 flex-grow">
-              <h1 className="text-2xl font-bold text-gray-900">{company.companyName}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{company?.companyName}</h1>
               <div className="flex items-center gap-2 mt-2 text-gray-600">
                 <MapPin className="w-4 h-4" />
-                <span className="text-sm">{company.district}, {company.city}</span>
+                <span className="text-sm">{company?.district}, {company?.city}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-2 text-gray-600">
               <Users className="w-5 h-5" />
-              <span>{company.scale}</span>
+              <span>{company?.scale}</span>
             </div>
           </div>
         </div>
@@ -146,15 +140,15 @@ const CompanyDetail = () => {
               <div className="bg-white rounded-xl shadow-sm">
                 <div className="p-6">
                   <h2 className="text-xl font-semibold text-gray-800">Về công ty</h2>
-                  <p className="mt-4 text-gray-600">{company.description}</p>
+                  <p className="mt-4 text-gray-600">{company?.description}</p>
                   <div className="mt-4">
                     <a
-                      href={company.website}
+                      href={company?.website}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-700"
                     >
-                      Website: {company.website}
+                      Website: {company?.website}
                     </a>
                   </div>
                 </div>
@@ -165,7 +159,7 @@ const CompanyDetail = () => {
                 <div className="p-6">
                   <h2 className="text-xl font-semibold text-gray-800">Việc đang tuyển</h2>
                   <div className="mt-4 space-y-4">
-                    {company.jobs.map((job) => (
+                    {company?.jobs.map((job) => (
                       <Link
                         key={job.id}
                         to={`/job-detail/${job.id}`}
@@ -203,12 +197,12 @@ const CompanyDetail = () => {
                   <h2 className="text-xl font-semibold text-gray-800">Thông tin liên hệ</h2>
                   <div className="mt-4">
                     <a
-                      href={company.website}
+                      href={company?.website}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-700 flex items-center gap-2"
                     >
-                      <span className="underline">{company.website}</span>
+                      <span className="underline">{company?.website}</span>
                     </a>
                   </div>
                 </div>
