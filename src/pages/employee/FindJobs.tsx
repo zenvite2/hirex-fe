@@ -13,6 +13,7 @@ import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 interface Option {
   id: number;
   name: string;
+  value?: any;
 }
 
 interface Job {
@@ -31,6 +32,40 @@ interface Job {
   salary: string;
 }
 
+export const salaryOptions: Option[] = [
+  {
+    name: "Dưới 5 triệu",
+    id: 1,
+    value: {
+      minSalary: 0,
+      maxSalary: 5000000
+    }
+  },
+  {
+    name: "Từ 5-10 triệu",
+    id: 2,
+    value: {
+      minSalary: 5000000,
+      maxSalary: 10000000
+    }
+  },
+  {
+    name: "Từ 10-20 triệu",
+    id: 3,
+    value: {
+      minSalary: 10000000,
+      maxSalary: 20000000
+    }
+  },
+  {
+    name: "Trên 20 triệu",
+    id: 4,
+    value: {
+      minSalary: 20000000,
+    }
+  }
+];
+
 const FindJobs: React.FC = () => {
   const dispatch = useAppDispatch();
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -46,7 +81,6 @@ const FindJobs: React.FC = () => {
   const [techOptions, setTechOptions] = useState<Option[]>([]);
   const [positionOptions, setPositionOptions] = useState<Option[]>([]);
   const [experienceOptions, setExperienceOptions] = useState<Option[]>([]);
-  const [salaryOptions, setSalaryOptions] = useState<Option[]>([]);
   const [jobTypeOptions, setJobTypeOptions] = useState<Option[]>([]);
   const [contractTypeOptions, setContractTypeOptions] = useState<Option[]>([]);
 
@@ -68,7 +102,7 @@ const FindJobs: React.FC = () => {
           techIds: selectedJobFieldIds,
           positionIds: selectedJobLevelIds,
           experienceIds: selectedExperienceIds,
-          salaryIds: selectedSalaryIds,
+          salaryOptionsId: selectedSalaryIds,
           educationIds: selectedEducationIds,
           jobTypeIds: selectedJobTypeIds,
         })).unwrap();
@@ -122,10 +156,6 @@ const FindJobs: React.FC = () => {
           setTechOptions(techResult.response.data);
         }
 
-        if (salaryResult?.response?.data) {
-          setSalaryOptions(salaryResult.response.data);
-        }
-
         if (contractResult?.response?.data) {
           setContractTypeOptions(contractResult.response.data);
         }
@@ -165,9 +195,9 @@ const FindJobs: React.FC = () => {
         techIds: selectedJobFieldIds,
         positionIds: selectedJobLevelIds,
         experienceIds: selectedExperienceIds,
-        salaryIds: selectedSalaryIds,
+        salaryOptionsId: selectedSalaryIds,
         educationIds: selectedEducationIds,
-        jobTypeIds: selectedJobTypeIds
+        jobTypeIds: selectedJobTypeIds,
       })).unwrap();
       if (result && result.response && result.response.success) {
         setJobs(result.response.data);
