@@ -1,9 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../styles/cv.css'
 
 const CVPreview = () => {
+    const [resumeData, setResumeData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
     const avtUrl = 'https://s3.deploy-hirexptit.io.vn/hirex/images/1731423859557_wallpaperflare.com_wallpaper__1_.jpg';
     const backgroundImageUrl = '/assets/cv-bg-1.jpg';
+
+    useEffect(() => {
+        const fetchResumeData = async () => {
+            try {
+                const response = await fetch('http://localhost:8080/resumes/1');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch resume data');
+                }
+                const data = await response.json();
+                setResumeData(data);
+                setLoading(false);
+            } catch (err) {
+                setError(err.message);
+                setLoading(false);
+            }
+        };
+
+        fetchResumeData();
+    }, []);
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
 
     return (
         <div
@@ -26,7 +52,6 @@ const CVPreview = () => {
                             className="bg-gray-300 w-full aspect-square rounded-md object-cover"
                             src={avtUrl}
                             alt="Avatar"
-                        // crossOrigin='anonymous'
                         />
                     </div>
 
@@ -79,6 +104,7 @@ const CVPreview = () => {
                         <h1 className="font-2xl font-bold">Trương Quốc Việt</h1>
                         <p className="font-md font-semibold">Web Developer</p>
                     </div>
+
                     {/* Career Objective Section */}
                     <div className="mb-6 flex flex-col">
                         <div className="py-2 rounded-t-md w-full">
@@ -87,7 +113,7 @@ const CVPreview = () => {
                             </div>
                             <div className="border-b-2 border-gray-700 rounded-r-md"></div>
                         </div>
-                        <p>Ứng tuyển vào vị trí thực tập sinh để áp dụng kiến thức từ trường vào công việc thực tế. Mục tiêu dài hạn: trở thành kỹ sư DevOps.</p>
+                        <p>{resumeData?.career || 'Ứng tuyển vào vị trí thực tập sinh để áp dụng kiến thức từ trường vào công việc thực tế. Mục tiêu dài hạn: trở thành kỹ sư DevOps.'}</p>
                     </div>
 
                     {/* Education Section */}
@@ -98,41 +124,39 @@ const CVPreview = () => {
                             </div>
                             <div className="border-b-2 border-gray-700 rounded-r-md"></div>
                         </div>
-                        <p> Ngành:Công Nghệ Thông Tin // 2020 - Hiện tại</p>
+                        <p>Ngành: Công Nghệ Thông Tin // 2020 - Hiện tại</p>
                         <p>Học viện Công nghệ Bưu Chính Viễn Thông (PTIT)</p>
                         <p>GPA: 3.35</p>
                         <p>Học bổng loại Giỏi kỳ 1 và kỳ 2 năm 3</p>
                     </div>
-
                     {/* Projects Section */}
-                    <div className="mb-6">
-                        <div className="py-2 rounded-t-md w-full">
-                            <div className="text-blue-800 font-bold mb-2 font-xmd">
-                                {'Dự án quan trọng'}
+                    {resumeData?.projects && resumeData.projects.length > 0 && (
+                        <div className="mb-6">
+                            <div className="py-2 rounded-t-md w-full">
+                                <div className="text-blue-800 font-bold mb-2 font-xmd">
+                                    {'Dự án quan trọng'}
+                                </div>
+                                <div className="border-b-2 border-gray-700 rounded-r-md"></div>
                             </div>
-                            <div className="border-b-2 border-gray-700 rounded-r-md"></div>
+                            {resumeData.projects.map((project) => (
+                                <div key={project.id} className="mt-2">
+                                    <h3 className="font-semibold font-md">{project.name}</h3>
+                                    <p>Mô tả: {project.description}</p>
+                                    {project.link && (
+                                        <p>Link: <a
+                                            href={project.link}
+                                            className="text-blue-500"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            {project.link}
+                                        </a></p>
+                                    )}
+                                </div>
+                            ))}
                         </div>
-                        <div className="mt-2">
-                            <h3 className="font-semibold font-md">Bookstore-eCommerce (4/2023 - 6/2023)</h3>
-                            <p>Vị trí: Cá nhân | Công nghệ: MSSQL, Spring Boot, ReactJS + Redux</p>
-                            <p>Mô tả: Trang web thương mại điện tử quản lý và bán sách online.</p>
-                            <p>Link: <a href="https://github.com/Cutiepie4/Bookstore_eCommerce" className="text-blue-500">https://github.com/Cutiepie4/Bookstore_eCommerce</a></p>
-                        </div>
+                    )}
 
-                        <div className="mt-2">
-                            <h3 className="font-semibold font-md">Haunted World - Game (9/2022 - 12/2022)</h3>
-                            <p>Vị trí: Leader | Công nghệ: LibGDX Framework Java</p>
-                            <p>Mô tả: Game RPG nhỏ dùng framework game 2D.</p>
-                            <p>Link: <a href="https://github.com/Cutiepie4/Bookstore_eCommerce" className="text-blue-500">https://github.com/Cutiepie4/Bookstore_eCommerce</a></p>
-                        </div>
-
-                        <div className="mt-2">
-                            <h3 className="font-semibold font-md">BTL-IoT (9/2023 - Hiện tại)</h3>
-                            <p>Vị trí: Leader | Công nghệ: Flask, MongoDB, ReactJS, Arduino</p>
-                            <p>Mô tả: Cửa hàng sách dùng RFID cho quản lý tồn kho và thanh toán.</p>
-                            <p>Link: <a href="https://github.com/Cutiepie4/Bookstore_eCommerce" className="text-blue-500">https://github.com/Cutiepie4/Bookstore_eCommerce</a></p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

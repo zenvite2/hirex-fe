@@ -11,21 +11,6 @@ const CVGenerate: React.FC = () => {
         if (!componentRef.current) return;
 
         try {
-            // Preload images to ensure they render correctly
-            // const images = componentRef.current.getElementsByTagName('img');
-            // const imagePromises = Array.from(images).map(img => {
-            //     return new Promise((resolve, reject) => {
-            //         if (img.complete) {
-            //             resolve(img);
-            //         } else {
-            //             img.onload = () => resolve(img);
-            //             img.onerror = reject;
-            //         }
-            //     });
-            // });
-
-            // await Promise.all(imagePromises);
-
             const canvas = await html2canvas(componentRef.current, {
                 scale: 5,
                 useCORS: true,
