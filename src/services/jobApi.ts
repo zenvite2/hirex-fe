@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axiosIns from "./axiosIns";
+import { salaryOptions } from "../pages/employee/FindJobs";
 
 interface JobSearchRequest {
     searchQuery?: string;
@@ -7,10 +8,10 @@ interface JobSearchRequest {
     techIds?: number[];
     positionIds?: number[];
     experienceIds?: number[];
-    salaryIds?: number[];
     educationIds?: number[];
     jobTypeIds?: number[];
     contractTypeIds?: number[];
+    salaryOptionsId?: number[];
 }
 
 // Create job
@@ -100,15 +101,14 @@ export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
         let techIdsParam;
         let positionIdsParam;
         let experienceIdsParam;
-        let salaryIdsParam;
         let jobTypeIdsParam;
+        let salaryOptionsParam;
 
-        console.log("xxxxxxxx: " + request.searchQuery)
-
+        // Map other parameters if needed
         if (request.techIds.length > 0) {
             techIdsParam = request.techIds.join(',');
         } else {
-            techIdsParam = null; 
+            techIdsParam = null;
         }
 
         if (request.positionIds.length > 0) {
@@ -123,10 +123,16 @@ export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
             experienceIdsParam = null;
         }
 
-        if (request.salaryIds.length > 0) {
-            salaryIdsParam = request.salaryIds.join(',');
+        if (request.salaryOptionsId && request.salaryOptionsId.length > 0) {
+            salaryOptionsParam =
+                salaryOptions
+                    .filter(option => request.salaryOptionsId.includes(option.id))
+                    .map(option => ({
+                        minSalary: option.value.minSalary,
+                        maxSalary: option.value.maxSalary
+                    }));
         } else {
-            salaryIdsParam = null;
+            salaryOptionsParam = null;
         }
 
         if (request.jobTypeIds.length > 0) {
@@ -142,12 +148,12 @@ export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
                 techIds: techIdsParam,
                 positionIds: positionIdsParam,
                 experienceIds: experienceIdsParam,
-                salaryIds: salaryIdsParam,
                 educationIds: request.educationIds,
                 jobTypeIds: jobTypeIdsParam,
+                salaryOptions: salaryOptionsParam && encodeURIComponent(JSON.stringify(salaryOptionsParam))
             },
         })
             .then(response => { return { response: response.data } })
-            .catch(error => { });
+            .catch(error => { console.error(error); });
     }
 );
