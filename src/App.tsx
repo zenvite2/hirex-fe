@@ -33,6 +33,7 @@ import { useCallback, useEffect } from "react";
 import { getConversations } from "./services/messageApi";
 import { getUserInfo } from "./services/authApi";
 import { setUserInfo } from "./redux/slice/authSlice";
+import SavedJobsPage from "./pages/employee/SavedJobsPage";
 import TestCV1 from "./pages/cv/Resume";
 
 function SidebarLayout() {
@@ -66,20 +67,22 @@ function App() {
     const location = useLocation();
     const { showMessenger } = useSelector((state: RootState) => state.messageReducer);
     const dispatch = useAppDispatch();
-    const { userId } = useSelector((state: RootState) => state.authReducer);
+    const { userId, isLoggedIn } = useSelector((state: RootState) => state.authReducer);
     // Không hiển thị Navbar trên trang login và register-employee  
     const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer";
 
     const fetchUserInfo = useCallback(async () => {
-        const res = await getUserInfo(userId);
-        if (res) {
-            dispatch(setUserInfo({ fullName: res.fullName, avatar: res.avatar }));
+        if (userId) {
+            const res = await getUserInfo(userId);
+            if (res) {
+                dispatch(setUserInfo({ fullName: res.fullName, avatar: res.avatar }));
+            }
+            dispatch(getConversations());
         }
-        dispatch(getConversations());
-    }, [userId])
+    }, [userId]);
 
     useEffect(() => {
-        fetchUserInfo();
+        isLoggedIn && fetchUserInfo();
     }, [userId]);
 
     return (
@@ -107,12 +110,12 @@ function App() {
                             <Route path="/jobs/edit/:id" element={<JobForm />} />
                             <Route path="/company/detail/:id" element={<CompanyDetail />} />
                             <Route path="/test" element={<TestCV1 />} />
+                            <Route path="/saved-jobs" element={<SavedJobsPage />} />
                         </Route>
 
                         {/* Các route khác */}
                         {/* <Route path='/messenger' element={<Messenger />} /> */}
                         <Route path='/generate-cv' element={<CVGenerate />} />
-                        <Route path='/test-cv' element={<TestCV />} />
                         <Route path='/cv-preview' element={<CVPreview />} />
                         <Route path="/register-employee" element={<RegisterEmployee />} />
                         <Route path="/register-employer" element={<RegisterEmployer />} />

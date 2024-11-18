@@ -8,13 +8,11 @@ export const fetchAutoFillData = createAsyncThunk(
   async () => {
     try {
       const [
-        salariesResponse,
         experiencesResponse,
         positionsResponse,
         techsResponse,
         contractTypesResponse
       ] = await Promise.all([
-        axiosIns.get('/auto-fill/salary'),
         axiosIns.get('/auto-fill/year-experience'),
         axiosIns.get('/auto-fill/position'),
         axiosIns.get('/auto-fill/tech'),
@@ -22,7 +20,6 @@ export const fetchAutoFillData = createAsyncThunk(
       ]);
 
       return {
-        salaries: salariesResponse.data,
         experiences: experiencesResponse.data,
         positions: positionsResponse.data,
         techs: techsResponse.data,
@@ -47,7 +44,6 @@ const autoFillSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchAutoFillData.fulfilled, (state, action) => {
-      state.salaries = action.payload.salaries;
       state.experiences = action.payload.experiences;
       state.positions = action.payload.positions;
       state.techs = action.payload.techs;

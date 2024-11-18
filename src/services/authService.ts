@@ -25,10 +25,7 @@ class AuthenticationService {
   }
 
   clearCredential() {
-    sessionStorage.removeItem('accessToken');
-    sessionStorage.removeItem('role');
-    sessionStorage.removeItem('username');
-    sessionStorage.removeItem('userId');
+    sessionStorage.clear();
   }
 }
 

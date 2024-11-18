@@ -20,6 +20,7 @@ import ResumeContent from "./employee/ResumeContent";
 import CompanyDetail from "./employee/CompanyDetail";
 import CVPage from "./employee/CVPage";
 import AddCV from "./employee/AddCV";
+import SavedJobsPage from "./employee/SavedJobsPage";
 
 export {
   FindJobs,
@@ -42,6 +43,5 @@ export {
   JobForm,
   ResumeContent,
   CompanyDetail,
-  CVPage,
-  AddCV,
+  SavedJobsPage,
 };

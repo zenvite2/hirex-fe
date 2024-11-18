@@ -17,7 +17,7 @@ const Notifications: React.FC = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
 
-  const {userId, isLoggedIn} = useSelector((state: RootState) => state.authReducer)
+  const { userId, isLoggedIn } = useSelector((state: RootState) => state.authReducer)
 
   // Hàm fetch notifications từ API
   const fetchNotifications = async () => {
@@ -38,7 +38,7 @@ const Notifications: React.FC = () => {
 
     const interval = setInterval(() => {
       fetchNotifications(); // Gọi liên tục mỗi 30 giây
-    }, 3000); // 30 giây
+    }, 30000); // 30 giây
 
     // Cleanup để hủy setInterval khi component unmount
     return () => clearInterval(interval);
