@@ -16,7 +16,7 @@ import {
     ResumePage,
     JobForm,
     ResumeContent,
-    CompanyDetail
+    CompanyDetail,
 } from "./pages";
 import { ToastContainer } from 'react-toastify';
 import Loading from './components/common/Loading';
@@ -33,6 +33,7 @@ import { useCallback, useEffect } from "react";
 import { getConversations } from "./services/messageApi";
 import { getUserInfo } from "./services/authApi";
 import { setUserInfo } from "./redux/slice/authSlice";
+import TestCV1 from "./pages/cv/Resume";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -105,6 +106,7 @@ function App() {
                             <Route path="/apply-job" element={<JobForm />} />
                             <Route path="/jobs/edit/:id" element={<JobForm />} />
                             <Route path="/company/detail/:id" element={<CompanyDetail />} />
+                            <Route path="/test" element={<TestCV1 />} />
                         </Route>
 
                         {/* Các route khác */}
