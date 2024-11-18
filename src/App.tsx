@@ -33,6 +33,7 @@ import { useCallback, useEffect } from "react";
 import { getConversations } from "./services/messageApi";
 import { getUserInfo } from "./services/authApi";
 import { setUserInfo } from "./redux/slice/authSlice";
+import SavedJobsPage from "./pages/employee/SavedJobsPage";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -107,6 +108,7 @@ function App() {
                             <Route path="/apply-job" element={<JobForm />} />
                             <Route path="/jobs/edit/:id" element={<JobForm />} />
                             <Route path="/company/detail/:id" element={<CompanyDetail />} />
+                            <Route path="/saved-jobs" element={<SavedJobsPage />} />
                         </Route>
 
                         {/* Các route khác */}
