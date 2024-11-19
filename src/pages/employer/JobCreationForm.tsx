@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useAppDispatch from '../../hooks/useAppDispatch';
-import { experienceList, positionList, jobTypeList, industryList, salaryList, educationList } from '../../services/autofillApi';
-import { jobCreate, jobUpdate, jobGetWith } from '../../services/jobApi';
+import { experienceList, positionList, jobTypeList, industryList, contracTypeList, educationList } from '../../services/autofillApi';
+import { jobCreate, jobUpdate, jobGetWith, jobGet } from '../../services/jobApi';
 import { useLocationSelector } from './useLocationSelector';
 import { LocationSelector } from '../../components/registration/LocationSelector';
 import { toast } from 'react-toastify';
@@ -29,6 +29,11 @@ interface IndustryType {
   name: string;
 }
 
+interface contractType {
+  id: number;
+  name: string;
+}
+
 interface Education {
   id: number;
   name: string;
@@ -44,6 +49,7 @@ interface FormData {
   industry: number | null;
   yearExperience: number | null;
   jobType: number | null;
+  contractType: number | null;
   position: number | null;
   deadline: string;
   minSalary: number | null;
@@ -69,6 +75,7 @@ const initialFormData: FormData = {
   district: null,
   industry: null,
   jobType: null,
+  contractType: null,
   position: null,
   deadline: '',
   education: null,
@@ -89,6 +96,7 @@ const JobCreationForm: React.FC = () => {
   const [industrys, setIndustry] = useState<IndustryType[]>([]);
   const [salarys, setSalarys] = useState<IndustryType[]>([]);
   const [education, setEducation] = useState<Education[]>([]);
+  const [contractType, setContractType] = useState<contractType[]>([]);
 
   const {
     city,
@@ -116,12 +124,13 @@ const JobCreationForm: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [experienceResult, positionResult, jobTypeResult, industryResult, educationResult] = await Promise.all([
+        const [experienceResult, positionResult, jobTypeResult, industryResult, educationResult, contractTypeResult] = await Promise.all([
           dispatch(experienceList()).unwrap(),
           dispatch(positionList()).unwrap(),
           dispatch(jobTypeList()).unwrap(),
           dispatch(industryList()).unwrap(),
           dispatch(educationList()).unwrap(),
+          dispatch(contracTypeList()).unwrap(),
         ]);
 
         if (experienceResult.response?.data) {
@@ -139,6 +148,9 @@ const JobCreationForm: React.FC = () => {
         if (educationResult.response?.data) {
           setEducation(educationResult.response.data);
         }
+        if (contractTypeResult.response?.data) {
+          setContractType(contractTypeResult.response.data);
+        }
       } catch (error) {
         toast.error('Lỗi khi tải dữ liệu. Vui lòng thử lại sau.');
       }
@@ -152,7 +164,7 @@ const JobCreationForm: React.FC = () => {
     const fetchJobData = async () => {
       try {
         if (id) {
-          const result = await dispatch(jobGetWith(id));
+          const result = await dispatch(jobGet(id));
           if (result?.payload?.response?.success) {
             const jobData = result.payload.response.data;
             setFormData({
@@ -163,10 +175,10 @@ const JobCreationForm: React.FC = () => {
               workingTime: denormalizeTextAreaContent(jobData.workingTime),
             });
 
-            // If city exists, fetch districts
-            if (jobData.city) {
-              await fetchDistricts('', jobData.city);
-            }
+            // // If city exists, fetch districts
+            // if (jobData.city) {
+            //   await fetchDistricts('', jobData.city);
+            // }
           }
         }
       } catch (error) {
@@ -252,6 +264,12 @@ const JobCreationForm: React.FC = () => {
         ));
       case 'education':
         return education.map(type => (
+          <option key={type.id} value={type.id}>
+            {type.name}
+          </option>
+        ));
+      case 'contractType':
+        return contractType.map(type => (
           <option key={type.id} value={type.id}>
             {type.name}
           </option>
@@ -355,7 +373,7 @@ const JobCreationForm: React.FC = () => {
               {renderField('jobType', 'Loại hình làm việc', 'select')}
               {renderField('position', 'Vị trí', 'select')}
               {renderField('deadline', 'Hạn nộp hồ sơ', 'date')}
-              {renderField('phone', 'Số điện thoại', 'tel')}
+              {renderField('contractType', 'Loại công việc', 'select')}
               {renderField('education', 'Học vấn', 'select')}
               {renderField('email', 'Email', 'email')}
               {renderField('minSalary', 'Mức lương min', 'tel')}

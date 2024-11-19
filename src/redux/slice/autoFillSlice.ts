@@ -13,12 +13,14 @@ export const fetchAutoFillData = createAsyncThunk(
         industryResponse,
         contractTypesResponse,
         educationResponse,
+        jobTypeResponse,
       ] = await Promise.all([
         axiosIns.get('/auto-fill/year-experience'),
         axiosIns.get('/auto-fill/position'),
         axiosIns.get('/auto-fill/industry'),
         axiosIns.get('/auto-fill/contract-type'),
-        axiosIns.get('/auto-fill/education')
+        axiosIns.get('/auto-fill/education'),
+        axiosIns.get('/auto-fill/job-type')
       ]);
 
       return {
@@ -26,7 +28,8 @@ export const fetchAutoFillData = createAsyncThunk(
         positions: positionsResponse.data,
         industry: industryResponse.data,
         contractTypes: contractTypesResponse.data,
-        education: educationResponse.data
+        education: educationResponse.data,
+        jobType: jobTypeResponse.data
       };
     } catch (error) {
       toast.error('An error occurred while fetching auto-fill data');
@@ -38,12 +41,12 @@ export const fetchAutoFillData = createAsyncThunk(
 const autoFillSlice = createSlice({
   name: 'autoFill',
   initialState: {
-    salaries: [],
     experiences: [],
     positions: [],
     industry: [],
     contractTypes: [],
     education: [],
+    jobType: [],
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -52,7 +55,8 @@ const autoFillSlice = createSlice({
       state.positions = action.payload.positions;
       state.industry = action.payload.industry;
       state.contractTypes = action.payload.contractTypes;
-      state.education = action.payload.education
+      state.education = action.payload.education;
+      state.jobType = action.payload.jobType;
     });
   }
 });
