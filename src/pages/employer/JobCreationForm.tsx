@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useAppDispatch from '../../hooks/useAppDispatch';
-import { experienceList, positionList, jobTypeList, techList, salaryList, contracTypeList } from '../../services/autofillApi';
+import { experienceList, positionList, jobTypeList, industryList, salaryList, educationList } from '../../services/autofillApi';
 import { jobCreate, jobUpdate, jobGetWith } from '../../services/jobApi';
 import { useLocationSelector } from './useLocationSelector';
 import { LocationSelector } from '../../components/registration/LocationSelector';
@@ -24,23 +24,14 @@ interface BasicType {
   name: string;
 }
 
-interface TechType {
+interface IndustryType {
   id: number;
   name: string;
 }
 
-interface ContractType {
+interface Education {
   id: number;
   name: string;
-}
-
-interface JobDetails {
-  description: string[];
-  responsibilities: string[];
-  skills: {
-    required: string[];
-    preferred: string[];
-  };
 }
 
 interface FormData {
@@ -50,44 +41,41 @@ interface FormData {
   district: number | null;
   location: string;
   description: string;
-  tech: number | null;
+  industry: number | null;
   yearExperience: number | null;
   jobType: number | null;
   position: number | null;
   deadline: string;
-  salary: number | null;
-  contractType: number | null;
+  minSalary: number | null;
+  maxSalary: number | null;
+  education: number | null;
   email: string;
   phone: string;
-  jobDetails: JobDetails;
-}
-
-const initialJobDetails: JobDetails = {
-  description: [''],
-  responsibilities: [''],
-  skills: {
-    required: [''],
-    preferred: ['']
-  },
+  requirement: string;
+  benefit: string;
+  workingTime: string;
 }
 
 const initialFormData: FormData = {
   id: null,
   title: '',
+  description: '',
+  location: '',
+  requirement: '',
+  yearExperience: null,
+  minSalary: null,
+  maxSalary: null,
   city: null,
   district: null,
-  location: '',
-  description: '',
-  tech: null,
-  yearExperience: null,
+  industry: null,
   jobType: null,
   position: null,
   deadline: '',
-  salary: null,
-  contractType: null,
+  education: null,
   email: '',
   phone: '',
-  jobDetails: initialJobDetails
+  benefit: '',
+  workingTime: '',
 };
 
 const JobCreationForm: React.FC = () => {
@@ -98,9 +86,9 @@ const JobCreationForm: React.FC = () => {
   const [experiences, setExperiences] = useState<ExperienceType[]>([]);
   const [positions, setPositions] = useState<PositionType[]>([]);
   const [jobTypes, setJobTypes] = useState<BasicType[]>([]);
-  const [techs, setTechs] = useState<TechType[]>([]);
-  const [salarys, setSalarys] = useState<TechType[]>([]);
-  const [contractTypes, setContractTypes] = useState<ContractType[]>([]);
+  const [industrys, setIndustry] = useState<IndustryType[]>([]);
+  const [salarys, setSalarys] = useState<IndustryType[]>([]);
+  const [education, setEducation] = useState<Education[]>([]);
 
   const {
     city,
@@ -113,16 +101,27 @@ const JobCreationForm: React.FC = () => {
     fetchDistricts,
   } = useLocationSelector();
 
+  // Utility functions for text formatting
+  const normalizeTextAreaContent = (content: string): string => {
+    if (!content) return '';
+    return content.replace(/\n/g, '\\n').replace(/\t/g, '\\t');
+  };
+
+  const denormalizeTextAreaContent = (content: string): string => {
+    if (!content) return '';
+    return content.replace(/\\n/g, '\n').replace(/\\t/g, '\t');
+  };
+
+  // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [experienceResult, positionResult, jobTypeResult, techResult, salaryResult, contractResult] = await Promise.all([
+        const [experienceResult, positionResult, jobTypeResult, industryResult, educationResult] = await Promise.all([
           dispatch(experienceList()).unwrap(),
           dispatch(positionList()).unwrap(),
           dispatch(jobTypeList()).unwrap(),
-          dispatch(techList()).unwrap(),
-          dispatch(salaryList()).unwrap(),
-          dispatch(contracTypeList()).unwrap(),
+          dispatch(industryList()).unwrap(),
+          dispatch(educationList()).unwrap(),
         ]);
 
         if (experienceResult.response?.data) {
@@ -134,14 +133,11 @@ const JobCreationForm: React.FC = () => {
         if (jobTypeResult.response?.data) {
           setJobTypes(jobTypeResult.response.data);
         }
-        if (techResult.response?.data) {
-          setTechs(techResult.response.data);
+        if (industryResult.response?.data) {
+          setIndustry(industryResult.response.data);
         }
-        if (salaryResult.response?.data) {
-          setSalarys(salaryResult.response.data);
-        }
-        if (contractResult.response?.data) {
-          setContractTypes(contractResult.response.data);
+        if (educationResult.response?.data) {
+          setEducation(educationResult.response.data);
         }
       } catch (error) {
         toast.error('Lỗi khi tải dữ liệu. Vui lòng thử lại sau.');
@@ -151,6 +147,7 @@ const JobCreationForm: React.FC = () => {
     fetchData();
   }, [dispatch]);
 
+  // Fetch job data if editing
   useEffect(() => {
     const fetchJobData = async () => {
       try {
@@ -160,8 +157,16 @@ const JobCreationForm: React.FC = () => {
             const jobData = result.payload.response.data;
             setFormData({
               ...jobData,
-              jobDetails: jobData.jobDetails || initialJobDetails
+              description: denormalizeTextAreaContent(jobData.description),
+              requirement: denormalizeTextAreaContent(jobData.requirement),
+              benefit: denormalizeTextAreaContent(jobData.benefit),
+              workingTime: denormalizeTextAreaContent(jobData.workingTime),
             });
+
+            // If city exists, fetch districts
+            if (jobData.city) {
+              await fetchDistricts('', jobData.city);
+            }
           }
         }
       } catch (error) {
@@ -177,122 +182,40 @@ const JobCreationForm: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleJobDetailsChange = (
-    section: 'description' | 'responsibilities' | 'required' | 'preferred' | 'note',
-    value: string,
-    index?: number
-  ) => {
-    setFormData(prev => {
-      if (section === 'note') {
-        return {
-          ...prev,
-          jobDetails: {
-            ...prev.jobDetails,
-            note: value
-          }
-        };
-      }
-
-      if (section === 'required' || section === 'preferred') {
-        const newSkills = [...prev.jobDetails.skills[section]];
-        if (index !== undefined) newSkills[index] = value;
-        return {
-          ...prev,
-          jobDetails: {
-            ...prev.jobDetails,
-            skills: {
-              ...prev.jobDetails.skills,
-              [section]: newSkills
-            }
-          }
-        };
-      }
-
-      const newSection = [...prev.jobDetails[section]];
-      if (index !== undefined) newSection[index] = value;
-      return {
-        ...prev,
-        jobDetails: {
-          ...prev.jobDetails,
-          [section]: newSection
-        }
-      };
-    });
-  };
-
-
-  const handleAddField = (section: 'description' | 'responsibilities' | 'required' | 'preferred') => {
-    setFormData(prev => {
-      if (section === 'required' || section === 'preferred') {
-        return {
-          ...prev,
-          jobDetails: {
-            ...prev.jobDetails,
-            skills: {
-              ...prev.jobDetails.skills,
-              [section]: [...prev.jobDetails.skills[section], '']
-            }
-          }
-        };
-      }
-      return {
-        ...prev,
-        jobDetails: {
-          ...prev.jobDetails,
-          [section]: [...prev.jobDetails[section], '']
-        }
-      };
-    });
-  };
-
-  const handleRemoveField = (section: 'description' | 'responsibilities' | 'required' | 'preferred', index: number) => {
-    setFormData(prev => {
-      if (section === 'required' || section === 'preferred') {
-        const newSkills = [...prev.jobDetails.skills[section]];
-        newSkills.splice(index, 1);
-        return {
-          ...prev,
-          jobDetails: {
-            ...prev.jobDetails,
-            skills: {
-              ...prev.jobDetails.skills,
-              [section]: newSkills
-            }
-          }
-        };
-      }
-      const newSection = [...prev.jobDetails[section]];
-      newSection.splice(index, 1);
-      return {
-        ...prev,
-        jobDetails: {
-          ...prev.jobDetails,
-          [section]: newSection
-        }
-      };
-    });
-  };
-
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const jobData = {
+    // Validate mức lương
+    if (formData.minSalary !== null && formData.maxSalary !== null) {
+      if (formData.minSalary > formData.maxSalary) {
+        toast.error('Vui lòng nhập mức lương min nhỏ hơn mức lương max');
+        return; // Dừng quá trình submit
+      }
+    }
+
+    const normalizedData = {
       ...formData,
+      description: normalizeTextAreaContent(formData.description),
+      requirement: normalizeTextAreaContent(formData.requirement),
+      benefit: normalizeTextAreaContent(formData.benefit),
+      workingTime: normalizeTextAreaContent(formData.workingTime),
       city: city?.id,
       district: district?.id,
     };
 
-    if (formData.id) {
-      await dispatch(jobUpdate({ id: formData.id, info: jobData }));
-      toast.success('Cập nhật job thành công!');
-    } else {
-      await dispatch(jobCreate(jobData));
-      toast.success('Tạo job thành công!');
+    try {
+      if (formData.id) {
+        await dispatch(jobUpdate({ id: formData.id, info: normalizedData }));
+        toast.success('Cập nhật job thành công!');
+      } else {
+        await dispatch(jobCreate(normalizedData));
+        toast.success('Tạo job thành công!');
+      }
+      navigate('/job-posts');
+    } catch (error) {
+      toast.error('Có lỗi xảy ra. Vui lòng thử lại sau.');
     }
-    navigate('/job-posts');
-  }
-
+  };
 
   const renderSelectOptions = (fieldName: keyof FormData) => {
     switch (fieldName) {
@@ -314,20 +237,21 @@ const JobCreationForm: React.FC = () => {
             {type.name}
           </option>
         ));
-      case 'tech':
-        return techs.map(type => (
+      case 'industry':
+        return industrys.map(type => (
           <option key={type.id} value={type.id}>
             {type.name}
           </option>
         ));
-      case 'salary':
+      case 'minSalary':
+      case 'maxSalary':
         return salarys.map(type => (
           <option key={type.id} value={type.id}>
             {type.name}
           </option>
         ));
-      case 'contractType':
-        return contractTypes.map(type => (
+      case 'education':
+        return education.map(type => (
           <option key={type.id} value={type.id}>
             {type.name}
           </option>
@@ -360,7 +284,7 @@ const JobCreationForm: React.FC = () => {
             name={name}
             value={formData[name] as string}
             onChange={handleInputChange}
-            className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+            className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm whitespace-pre-wrap"
             rows={4}
           />
         ) : (
@@ -376,51 +300,6 @@ const JobCreationForm: React.FC = () => {
       </div>
     </div>
   );
-  const renderDynamicFields = (
-    section: 'description' | 'responsibilities' | 'required' | 'preferred',
-    title: string,
-    placeholder: string
-  ) => {
-    const values = section === 'required' || section === 'preferred'
-      ? formData.jobDetails.skills[section]
-      : formData.jobDetails[section];
-
-    return (
-      <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <h3 className="text-lg font-semibold mb-4">{title}</h3>
-        <div className="space-y-4">
-          {values.map((value, index) => (
-            <div key={index} className="flex gap-2">
-              <input
-                type="text"
-                value={value}
-                onChange={(e) => handleJobDetailsChange(section, e.target.value, index)}
-                className="flex-1 p-2 border border-gray-300 rounded-md"
-                placeholder={placeholder}
-              />
-              {index > 0 && (
-                <button
-                  type="button"
-                  onClick={() => handleRemoveField(section, index)}
-                  className="p-2 text-red-500 hover:text-red-700"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={() => handleAddField(section)}
-            className="mt-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-          >
-            + Thêm
-          </button>
-        </div>
-      </div>
-    );
-  };
-
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -471,26 +350,29 @@ const JobCreationForm: React.FC = () => {
             {renderField('location', 'Địa chỉ cụ thể')}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {renderField('tech', 'Công nghệ', 'select')}
+              {renderField('industry', 'Ngành nghề', 'select')}
               {renderField('yearExperience', 'Kinh nghiệm làm việc', 'select')}
               {renderField('jobType', 'Loại hình làm việc', 'select')}
-              {renderField('position', 'Cấp bậc', 'select')}
+              {renderField('position', 'Vị trí', 'select')}
               {renderField('deadline', 'Hạn nộp hồ sơ', 'date')}
-              {renderField('salary', 'Mức lương', 'select')}
-              {renderField('contractType', 'Hợp đồng làm việc', 'select')}
-              {renderField('email', 'Email', 'email')}
               {renderField('phone', 'Số điện thoại', 'tel')}
+              {renderField('education', 'Học vấn', 'select')}
+              {renderField('email', 'Email', 'email')}
+              {renderField('minSalary', 'Mức lương min', 'tel')}
+              {renderField('maxSalary', 'Mức lương max', 'tel')}
             </div>
 
-            {renderDynamicFields('description', 'Mô tả công việc', 'Nhập mô tả công việc')}
-            {renderDynamicFields('responsibilities', 'Trách nhiệm công việc', 'Nhập trách nhiệm công việc')}
-
+            {renderField('description', 'Mô tả công việc', 'textarea')}
+            {renderField('requirement', 'Trách nhiệm công việc', 'textarea')}
+            {renderField('benefit', 'Quyền lợi', 'textarea')}
+            {renderField('workingTime', 'Thời gian làm việc', 'textarea')}
 
             <div className="flex justify-end pt-6">
               <button
                 type="submit"
-                className={`px-6 py-3 bg-blue-600 text-white text-base font-medium rounded-lg 
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors`}
+                className="px-6 py-3 bg-blue-600 text-white text-base font-medium rounded-lg 
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
+                    transition-colors hover:bg-blue-700"
               >
                 {formData.id ? 'Cập nhật' : 'Lưu'}
               </button>

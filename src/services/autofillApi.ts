@@ -70,10 +70,19 @@ export const positionList = createAsyncThunk<any>(
     }
 );
 
-export const techList = createAsyncThunk<any>(
-    'tech/list',
+export const industryList = createAsyncThunk<any>(
+    'industry/list',
     async () => {
-        return axiosIns.get('/auto-fill/tech')
+        return axiosIns.get('/auto-fill/industry')
+            .then(response => { return { response: response.data } })
+            .catch(error => { })
+    }
+);
+
+export const educationList = createAsyncThunk<any>(
+    'education/list',
+    async () => {
+        return axiosIns.get('/auto-fill/education')
             .then(response => { return { response: response.data } })
             .catch(error => { })
     }

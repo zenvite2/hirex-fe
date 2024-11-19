@@ -4,7 +4,7 @@ import { FaIndustry, FaLevelUpAlt, FaBriefcase, FaDollarSign, FaGraduationCap, F
 import { JobCard } from '../../components';
 import CheckboxDropdown from '../../components/common/CheckboxDropdown';
 import { jobSearch } from '../../services/jobApi';
-import { experienceList, positionList, jobTypeList, techList, salaryList, contracTypeList } from '../../services/autofillApi';
+import { experienceList, positionList, jobTypeList, industryList, salaryList, contracTypeList, educationList } from '../../services/autofillApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { useLocationSelector } from '../employer/useLocationSelector';
 import { LocationSelector } from './LocationSelector';
@@ -82,6 +82,7 @@ const FindJobs: React.FC = () => {
   const [positionOptions, setPositionOptions] = useState<Option[]>([]);
   const [experienceOptions, setExperienceOptions] = useState<Option[]>([]);
   const [jobTypeOptions, setJobTypeOptions] = useState<Option[]>([]);
+  const [educationOptions, setEducationOptions] = useState<Option[]>([]);
   const [contractTypeOptions, setContractTypeOptions] = useState<Option[]>([]);
 
   const {
@@ -131,13 +132,14 @@ const FindJobs: React.FC = () => {
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const [experienceResult, positionResult, jobTypeResult, techResult, salaryResult, contractResult] = await Promise.all([
+        const [experienceResult, positionResult, jobTypeResult, techResult, salaryResult, contractResult, educationResult] = await Promise.all([
           dispatch(experienceList()).unwrap(),
           dispatch(positionList()).unwrap(),
           dispatch(jobTypeList()).unwrap(),
-          dispatch(techList()).unwrap(),
+          dispatch(industryList()).unwrap(),
           dispatch(salaryList()).unwrap(),
           dispatch(contracTypeList()).unwrap(),
+          dispatch(educationList()).unwrap(),
         ]);
 
         if (experienceResult?.response?.data) {
@@ -158,6 +160,10 @@ const FindJobs: React.FC = () => {
 
         if (contractResult?.response?.data) {
           setContractTypeOptions(contractResult.response.data);
+        }
+
+        if (educationResult?.response?.data) {
+          setEducationOptions(educationResult.response.data);
         }
       } catch (error) {
         console.error('Error fetching dropdown data:', error);
@@ -251,11 +257,11 @@ const FindJobs: React.FC = () => {
 
           {/* Dropdowns */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mt-4">
-            {renderDropdown(FaIndustry, 'Công nghệ', techOptions, selectedJobFieldIds, setSelectedJobFieldIds, openDropdown, setOpenDropdown)}
+            {renderDropdown(FaIndustry, 'Ngành nghề', techOptions, selectedJobFieldIds, setSelectedJobFieldIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaLevelUpAlt, 'Cấp bậc', positionOptions, selectedJobLevelIds, setSelectedJobLevelIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaBriefcase, 'Kinh nghiệm', experienceOptions, selectedExperienceIds, setSelectedExperienceIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaDollarSign, 'Mức lương', salaryOptions, selectedSalaryIds, setSelectedSalaryIds, openDropdown, setOpenDropdown)}
-            {renderDropdown(FaGraduationCap, 'Học vấn', [], selectedEducationIds, setSelectedEducationIds, openDropdown, setOpenDropdown)}
+            {renderDropdown(FaGraduationCap, 'Học vấn', educationOptions , selectedEducationIds, setSelectedEducationIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaBriefcase, 'Loại công việc', jobTypeOptions, selectedJobTypeIds, setSelectedJobTypeIds, openDropdown, setOpenDropdown)}
           </div>
         </div>
