@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import useAppDispatch from '../../hooks/useAppDispatch';
-import { techList } from '../../services/autofillApi';
+import { industryList } from '../../services/autofillApi';
 import { skillCreate, skillUpdate } from '../../services/skillApi';
 import { toast } from 'react-toastify';
 
@@ -36,7 +36,7 @@ const SkillPopup: React.FC<SkillPopupProps> = ({ isOpen, onClose, onSave, skill 
   useEffect(() => {
     const fetchTechList = async () => {
       try {
-        const result = await dispatch(techList()).unwrap();
+        const result = await dispatch(industryList()).unwrap();
         if (result.response?.success) {
           setTechItems(result.response.data);
         }

@@ -115,7 +115,8 @@ const SavedJobsPage = () => {
                     >
                       {savedJob.jobResponse.title}
                     </h3>
-                    <p className="text-gray-600">{savedJob.jobResponse.location}</p>
+                    <br></br>
+                    <p className="text-gray-600">Ngày lưu: {new Date(savedJob.createdAt).toLocaleDateString()}</p>
                   </div>
                   <span className="text-green-600 font-semibold">
                     {savedJob.jobResponse.minSalary.toLocaleString()} - {savedJob.jobResponse.maxSalary.toLocaleString()} VND
