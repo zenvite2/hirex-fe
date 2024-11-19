@@ -141,16 +141,32 @@ const CVPreview = () => {
                             {resumeData.projects.map((project) => (
                                 <div key={project.id} className="mt-2">
                                     <h3 className="font-semibold font-md">{project.name}</h3>
-                                    <p>Mô tả: {project.description}</p>
+
+                                    {(project.startDate || project.endDate) && (
+                                        <p>
+                                            Thời gian: {project.startDate} {project.startDate && project.endDate && '-'} {project.endDate}
+                                        </p>
+                                    )}
+
+                                    {project.position && (
+                                        <p>Vị trí: {project.position}</p>
+                                    )}
+
+                                    {project.description && (
+                                        <p>Mô tả: {project.description}</p>
+                                    )}
+
                                     {project.link && (
-                                        <p>Link: <a
-                                            href={project.link}
-                                            className="text-blue-500"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            {project.link}
-                                        </a></p>
+                                        <p>
+                                            Link: <a
+                                                href={project.link}
+                                                className="text-blue-500"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                {project.link}
+                                            </a>
+                                        </p>
                                     )}
                                 </div>
                             ))}
