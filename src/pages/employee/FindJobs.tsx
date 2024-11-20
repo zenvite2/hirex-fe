@@ -29,7 +29,8 @@ interface Job {
   companyDescription: string | null;
   jobType: string;
   experience: string;
-  salary: string;
+  min_salary: number;
+  max_salary: number;
 }
 
 export const salaryOptions: Option[] = [
@@ -78,7 +79,7 @@ const FindJobs: React.FC = () => {
   const [selectedJobTypeIds, setSelectedJobTypeIds] = useState<number[]>([]);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  const [techOptions, setTechOptions] = useState<Option[]>([]);
+  const [industryOptions, setIndustryOptions] = useState<Option[]>([]);
   const [positionOptions, setPositionOptions] = useState<Option[]>([]);
   const [experienceOptions, setExperienceOptions] = useState<Option[]>([]);
   const [jobTypeOptions, setJobTypeOptions] = useState<Option[]>([]);
@@ -100,7 +101,7 @@ const FindJobs: React.FC = () => {
         const result = await dispatch(jobSearch({
           searchQuery,
           ...(city?.id ? { city: city.id } : {}),
-          techIds: selectedJobFieldIds,
+          industryIds: selectedJobFieldIds,
           positionIds: selectedJobLevelIds,
           experienceIds: selectedExperienceIds,
           salaryOptionsId: selectedSalaryIds,
@@ -132,7 +133,7 @@ const FindJobs: React.FC = () => {
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const [experienceResult, positionResult, jobTypeResult, techResult, salaryResult, contractResult, educationResult] = await Promise.all([
+        const [experienceResult, positionResult, jobTypeResult, industryResult, salaryResult, contractResult, educationResult] = await Promise.all([
           dispatch(experienceList()).unwrap(),
           dispatch(positionList()).unwrap(),
           dispatch(jobTypeList()).unwrap(),
@@ -154,8 +155,8 @@ const FindJobs: React.FC = () => {
           setJobTypeOptions(jobTypeResult.response.data);
         }
 
-        if (techResult?.response?.data) {
-          setTechOptions(techResult.response.data);
+        if (industryResult?.response?.data) {
+          setIndustryOptions(industryResult.response.data);
         }
 
         if (contractResult?.response?.data) {
@@ -198,7 +199,7 @@ const FindJobs: React.FC = () => {
       const result = await dispatch(jobSearch({
         searchQuery,
         ...(city?.id ? { city: city.id } : {}),
-        techIds: selectedJobFieldIds,
+        industryIds: selectedJobFieldIds,
         positionIds: selectedJobLevelIds,
         experienceIds: selectedExperienceIds,
         salaryOptionsId: selectedSalaryIds,
@@ -257,7 +258,7 @@ const FindJobs: React.FC = () => {
 
           {/* Dropdowns */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mt-4">
-            {renderDropdown(FaIndustry, 'Ngành nghề', techOptions, selectedJobFieldIds, setSelectedJobFieldIds, openDropdown, setOpenDropdown)}
+            {renderDropdown(FaIndustry, 'Ngành nghề', industryOptions, selectedJobFieldIds, setSelectedJobFieldIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaLevelUpAlt, 'Cấp bậc', positionOptions, selectedJobLevelIds, setSelectedJobLevelIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaBriefcase, 'Kinh nghiệm', experienceOptions, selectedExperienceIds, setSelectedExperienceIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaDollarSign, 'Mức lương', salaryOptions, selectedSalaryIds, setSelectedSalaryIds, openDropdown, setOpenDropdown)}

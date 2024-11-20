@@ -21,7 +21,8 @@ interface Job {
   companyDescription: string | null;
   jobType: string;
   experience: string;
-  salary: string;
+  min_salary: number;
+  max_salary: number;
 }
 
 interface JobCardProps {
@@ -136,7 +137,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
             </div>
             <div className="flex items-center">
               <FaDollarSign className="text-gray-500 mr-1" />
-              <span className="text-xs text-gray-600">{job.salary}</span>
+              <span className="text-xs text-gray-600">{job.min_salary} - {job.max_salary}</span>
             </div>
           </div>
           <p className="text-gray-700 text-sm mb-4 line-clamp-2">

@@ -5,7 +5,7 @@ import { salaryOptions } from "../pages/employee/FindJobs";
 interface JobSearchRequest {
     searchQuery?: string;
     city?: number;
-    techIds?: number[];
+    industryIds?: number[];
     positionIds?: number[];
     experienceIds?: number[];
     educationIds?: number[];
@@ -98,17 +98,17 @@ export const jobDelete = createAsyncThunk<any, number>(
 export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
     'job/search',
     async (request) => {
-        let techIdsParam;
+        let industryIdsParam;
         let positionIdsParam;
         let experienceIdsParam;
         let jobTypeIdsParam;
         let salaryOptionsParam;
 
         // Map other parameters if needed
-        if (request.techIds.length > 0) {
-            techIdsParam = request.techIds.join(',');
+        if (request.industryIds.length > 0) {
+            industryIdsParam = request.industryIds.join(',');
         } else {
-            techIdsParam = null;
+            industryIdsParam = null;
         }
 
         if (request.positionIds.length > 0) {
@@ -145,7 +145,7 @@ export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
             params: {
                 searchQuery: request.searchQuery,
                 city: request.city,
-                techIds: techIdsParam,
+                industryIds: industryIdsParam,
                 positionIds: positionIdsParam,
                 experienceIds: experienceIdsParam,
                 educationIds: request.educationIds,
