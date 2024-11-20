@@ -1,12 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useAppDispatch from '../../hooks/useAppDispatch';
-import { jobCreate, jobUpdate, jobGetWith } from '../../services/jobApi';
+import { experienceList, positionList, jobTypeList, industryList, contracTypeList, educationList } from '../../services/autofillApi';
+import { jobCreate, jobUpdate, jobGetWith, jobGet } from '../../services/jobApi';
+import { useLocationSelector } from './useLocationSelector';
+import { LocationSelector } from '../../components/registration/LocationSelector';
 import { toast } from 'react-toastify';
 
-interface JobDetails {
-  description: string[];
-  responsibilities: string[];
+interface ExperienceType {
+  id: number;
+  name: string;
+  minYear: number;
+  maxYear: number;
+}
+
+interface PositionType {
+  id: number;
+  name: string;
+}
+
+interface BasicType {
+  id: number;
+  name: string;
+}
+
+interface IndustryType {
+  id: number;
+  name: string;
+}
+
+interface contractType {
+  id: number;
+  name: string;
+}
+
+interface Education {
+  id: number;
+  name: string;
 }
 
 interface FormData {
@@ -16,40 +46,43 @@ interface FormData {
   district: number | null;
   location: string;
   description: string;
-  tech: number | null;
+  industry: number | null;
   yearExperience: number | null;
   jobType: number | null;
+  contractType: number | null;
   position: number | null;
   deadline: string;
-  salary: number | null;
-  contractType: number | null;
+  minSalary: number | null;
+  maxSalary: number | null;
+  education: number | null;
   email: string;
   phone: string;
-  jobDetails: JobDetails;
+  requirement: string;
+  benefit: string;
+  workingTime: string;
 }
-
-const initialJobDetails: JobDetails = {
-  description: [''],
-  responsibilities: [''],
-};
 
 const initialFormData: FormData = {
   id: null,
   title: '',
+  description: '',
+  location: '',
+  requirement: '',
+  yearExperience: null,
+  minSalary: null,
+  maxSalary: null,
   city: null,
   district: null,
-  location: '',
-  description: '',
-  tech: null,
-  yearExperience: null,
+  industry: null,
   jobType: null,
+  contractType: null,
   position: null,
   deadline: '',
-  salary: null,
-  contractType: null,
+  education: null,
   email: '',
   phone: '',
-  jobDetails: initialJobDetails
+  benefit: '',
+  workingTime: '',
 };
 
 const JobCreationForm: React.FC = () => {
@@ -58,17 +91,42 @@ const JobCreationForm: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>(initialFormData);
 
+  const {
+    city,
+    district,
+    cities,
+    districts,
+    handleSelectCity,
+    handleSelectDistrict,
+    fetchCities,
+    fetchDistricts,
+    setCityFromId,
+    setDistrictFromId
+  } = useLocationSelector();
+
+
+
+  // Fetch job data if editing
   useEffect(() => {
     const fetchJobData = async () => {
       try {
         if (id) {
-          const result = await dispatch(jobGetWith(id));
+          const result = await dispatch(jobGet(id));
           if (result?.payload?.response?.success) {
             const jobData = result.payload.response.data;
+            
+            // Set form data
             setFormData({
               ...jobData,
-              jobDetails: jobData.jobDetails || initialJobDetails
             });
+
+            // Set city and district from IDs
+            if (jobData.city) {
+              await setCityFromId(jobData.city);
+              if (jobData.district) {
+                await setDistrictFromId(jobData.district, jobData.city);
+              }
+            }
           }
         }
       } catch (error) {
@@ -79,117 +137,37 @@ const JobCreationForm: React.FC = () => {
     fetchJobData();
   }, [dispatch, id]);
 
-  const handleJobDetailsChange = (
-    section: 'description' | 'responsibilities' | 'note',
-    value: string,
-    index?: number
-  ) => {
-    setFormData(prev => {
-      if (section === 'note') {
-        return {
-          ...prev,
-          jobDetails: {
-            ...prev.jobDetails,
-            note: value
-          }
-        };
-      }
-
-      const newSection = [...prev.jobDetails[section]];
-      if (index !== undefined) newSection[index] = value;
-      return {
-        ...prev,
-        jobDetails: {
-          ...prev.jobDetails,
-          [section]: newSection
-        }
-      };
-    });
-  };
-
-  const handleAddField = (section: 'description' | 'responsibilities') => {
-    setFormData(prev => ({
-      ...prev,
-      jobDetails: {
-        ...prev.jobDetails,
-        [section]: [...prev.jobDetails[section], '']
-      }
-    }));
-  };
-
-  const handleRemoveField = (section: 'description' | 'responsibilities', index: number) => {
-    setFormData(prev => {
-      const newSection = [...prev.jobDetails[section]];
-      newSection.splice(index, 1);
-      return {
-        ...prev,
-        jobDetails: {
-          ...prev.jobDetails,
-          [section]: newSection
-        }
-      };
-    });
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const jobData = {
-      ...formData
+    // Validate mức lương
+    if (formData.minSalary !== null && formData.maxSalary !== null) {
+      if (formData.minSalary > formData.maxSalary) {
+        toast.error('Vui lòng nhập mức lương min nhỏ hơn mức lương max');
+        return; // Dừng quá trình submit
+      }
+    }
+
+    const normalizedData = {
+      ...formData,
+      city: city?.id,
+      district: district?.id,
     };
 
-    if (formData.id) {
-      await dispatch(jobUpdate({ id: formData.id, info: jobData }));
-      toast.success('Cập nhật job thành công!');
-    } else {
-      await dispatch(jobCreate(jobData));
-      toast.success('Tạo job thành công!');
+    try {
+      if (formData.id) {
+        await dispatch(jobUpdate({ id: formData.id, info: normalizedData }));
+        toast.success('Cập nhật job thành công!');
+      } else {
+        await dispatch(jobCreate(normalizedData));
+        toast.success('Tạo job thành công!');
+      }
+      navigate('/job-posts');
+    } catch (error) {
+      toast.error('Có lỗi xảy ra. Vui lòng thử lại sau.');
     }
-    navigate('/job-posts');
   };
 
-  const renderDynamicFields = (
-    section: 'description' | 'responsibilities',
-    title: string,
-    placeholder: string
-  ) => {
-    const values = formData.jobDetails[section];
-
-    return (
-      <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <h3 className="text-lg font-semibold mb-4">{title}</h3>
-        <div className="space-y-4">
-          {values.map((value, index) => (
-            <div key={index} className="flex gap-2">
-              <input
-                type="text"
-                value={value}
-                onChange={(e) => handleJobDetailsChange(section, e.target.value, index)}
-                className="flex-1 p-2 border border-gray-300 rounded-md"
-                placeholder={placeholder}
-              />
-              {index > 0 && (
-                <button
-                  type="button"
-                  onClick={() => handleRemoveField(section, index)}
-                  className="p-2 text-red-500 hover:text-red-700"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={() => handleAddField(section)}
-            className="mt-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-          >
-            + Thêm
-          </button>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -200,14 +178,48 @@ const JobCreationForm: React.FC = () => {
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {renderDynamicFields('description', 'Mô tả công việc', 'Nhập mô tả công việc')}
-            {renderDynamicFields('responsibilities', 'Trách nhiệm công việc', 'Nhập trách nhiệm công việc')}
-            
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <LocationSelector
+                label="Tỉnh / TP"
+                placeholder="Chọn tỉnh thành"
+                locations={cities}
+                value={city?.name || ''}
+                onChange={(selectedCity) => {
+                  handleSelectCity(selectedCity);
+                  setFormData(prev => ({
+                    ...prev,
+                    city: selectedCity?.id || null,
+                    district: null
+                  }));
+                }}
+                onSearch={fetchCities}
+                disabled={false}
+              />
+
+              <LocationSelector
+                label="Quận / Huyện"
+                placeholder="Chọn quận huyện"
+                locations={districts}
+                value={district?.name || ''}
+                onChange={(selectedDistrict) => {
+                  handleSelectDistrict(selectedDistrict);
+                  setFormData(prev => ({
+                    ...prev,
+                    district: selectedDistrict?.id || null
+                  }));
+                }}
+                onSearch={(query) => fetchDistricts(query, city?.id || 0)}
+                disabled={!city}
+              />
+            </div>
+
             <div className="flex justify-end pt-6">
               <button
                 type="submit"
-                className={`px-6 py-3 bg-blue-600 text-white text-base font-medium rounded-lg 
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors`}
+                className="px-6 py-3 bg-blue-600 text-white text-base font-medium rounded-lg 
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
+                    transition-colors hover:bg-blue-700"
               >
                 {formData.id ? 'Cập nhật' : 'Lưu'}
               </button>

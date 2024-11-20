@@ -107,8 +107,9 @@ const JobCreationForm: React.FC = () => {
     handleSelectDistrict,
     fetchCities,
     fetchDistricts,
+    setCityFromId,
+    setDistrictFromId
   } = useLocationSelector();
-
   // Utility functions for text formatting
   const normalizeTextAreaContent = (content: string): string => {
     if (!content) return '';
@@ -167,10 +168,7 @@ const JobCreationForm: React.FC = () => {
           const result = await dispatch(jobGet(id));
           if (result?.payload?.response?.success) {
             const jobData = result.payload.response.data;
-            // If city exists, fetch districts
-            if (jobData.city) {
-              await fetchDistricts('', jobData.city);
-            }
+        
 
             setFormData({
               ...jobData,
@@ -179,6 +177,13 @@ const JobCreationForm: React.FC = () => {
               benefit: denormalizeTextAreaContent(jobData.benefit),
               workingTime: denormalizeTextAreaContent(jobData.workingTime),
             });
+
+            if (jobData.city) {
+              await setCityFromId(jobData.city);
+              if (jobData.district) {
+                await setDistrictFromId(jobData.district, jobData.city);
+              }
+            }
 
           }
         }

@@ -72,6 +72,43 @@ export const useLocationSelector = () => {
     fetchCities('');
   }, [fetchCities]);
 
+  // Di chuyển setCityFromId và setDistrictFromId xuống sau khi đã khai báo fetchDistricts
+  const setCityFromId = useCallback(async (cityId: number) => {
+    try {
+      const result = await dispatch(cityList({ name: '' }));
+      const cityData = result?.payload?.response?.data?.find((city: any) => city.id === cityId);
+      if (cityData) {
+        const cityLocation: Location = {
+          id: cityData.id,
+          name: cityData.name
+        };
+        setCity(cityLocation);
+        await fetchDistricts('', cityId);
+      }
+    } catch (error) {
+      console.error('Error fetching city by id:', error);
+    }
+  }, [dispatch, fetchDistricts]);
+
+  const setDistrictFromId = useCallback(async (districtId: number, cityId: number) => {
+    try {
+      const result = await dispatch(districtList({ 
+        name: '',
+        cityIds: cityId 
+      }));
+      const districtData = result?.payload?.response?.data?.find((district: any) => district.id === districtId);
+      if (districtData) {
+        const districtLocation: Location = {
+          id: districtData.id,
+          name: districtData.name
+        };
+        setDistrict(districtLocation);
+      }
+    } catch (error) {
+      console.error('Error fetching district by id:', error);
+    }
+  }, [dispatch]);
+
   useEffect(() => {
     fetchCities('');
   }, [fetchCities]);
@@ -88,5 +125,7 @@ export const useLocationSelector = () => {
     fetchCities,
     fetchDistricts,
     resetLocations,
+    setCityFromId,
+    setDistrictFromId
   };
 };

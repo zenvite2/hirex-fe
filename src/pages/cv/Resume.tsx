@@ -732,7 +732,7 @@ const ResumeComponent: React.FC = () => {
                                 )}
 
                                 {experience.description && (
-                                    <p className="text-sm text-gray-600">GPA: {experience.description} </p>
+                                    <p className="text-sm text-gray-600">Mô tả: {experience.description} </p>
                                 )}
                             </div>
                             <div className="flex space-x-2">
