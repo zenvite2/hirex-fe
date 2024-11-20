@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Plus, Edit, Trash2, Code, ShieldCheck, Star, Link as LinkIcon } from 'lucide-react';
+import { Briefcase, Plus, Edit, Trash2, Code, ShieldCheck, Star, GraduationCap, ShieldBan, Link as LinkIcon } from 'lucide-react';
 
-import { Project, Resume, Certificate } from './types';
+import { Project, Resume, Certificate, Education, Experience } from './types';
 import { fetchResume, saveResume } from './api';
 import ProjectPopup from './ProjectPopup';
 import GoalPopup from './GoalPopup';
 import HobbyPopup from './HobbyPopup';
 import CertificatePopup from './CertificatePopup';
+import EducationPopup from './EducationPopup';
+import ExperiencePopup from './ExperiencePopup';
 
 const ResumeComponent: React.FC = () => {
     const [resumeData, setResumeData] = useState<Resume>({
         career: undefined,
         hobby: undefined,
         certificates: [],
-        projects: []
+        projects: [],
+        educations: [],
+        experiences: []
     });
 
     const [showProjectPopup, setShowProjectPopup] = useState(false);
@@ -27,12 +31,30 @@ const ResumeComponent: React.FC = () => {
         link: ''
     });
 
-    const [showCertificatePopup, setShowPCertificatePopup] = useState(false);
+    const [showCertificatePopup, setShowCertificatePopup] = useState(false);
     const [editingCertificate, setEditingCertificate] = useState<Certificate>({
         name: '',
         startDate: '',
         endDate: '',
         description: '',
+    });
+
+    const [showEducationPopup, setShowEducationPopup] = useState(false);
+    const [editingEducation, setEditingEducation] = useState<Education>({
+        name: '',
+        major: '',
+        startDate: '',
+        endDate: '',
+        gpa: ''
+    });
+
+    const [showExperiencePopup, setShowExperiencePopup] = useState(false);
+    const [editingExperience, setEditingExperience] = useState<Experience>({
+        company: '',
+        position: '',
+        startDate: '',
+        endDate: '',
+        description: ''
     });
 
     const [showGoalPopup, setShowGoalPopup] = useState(false);
@@ -52,7 +74,9 @@ const ResumeComponent: React.FC = () => {
                         career: fetchedResume.career,
                         hobby: fetchedResume.hobby,
                         certificates: fetchedResume.certificates || [],
-                        projects: fetchedResume.projects || []
+                        projects: fetchedResume.projects || [],
+                        educations: fetchedResume.educations || [],
+                        experiences: fetchedResume.experiences || []
                     });
                 }
                 console.log(fetchedResume)
@@ -135,7 +159,7 @@ const ResumeComponent: React.FC = () => {
             try {
                 const savedResume = await saveResume(updatedResume);
                 setResumeData(savedResume);
-                setShowPCertificatePopup(false);
+                setShowCertificatePopup(false);
                 resetCertificateForm();
             } catch (error) {
                 console.error('Failed to save certificate', error);
@@ -144,23 +168,22 @@ const ResumeComponent: React.FC = () => {
     };
 
     const handleUpdateCertificate = async () => {
-        const updatedProjects = resumeData.projects.map(project =>
-            project.id === editingProject.id ? editingProject : project
+        const updatedCertificates = resumeData.certificates.map(certificate =>
+            certificate.id === editingCertificate.id ? editingCertificate : certificate
         );
 
         try {
             const savedResume = await saveResume({
                 ...resumeData,
-                projects: updatedProjects
+                certificates: updatedCertificates
             });
             setResumeData(savedResume);
-            setShowProjectPopup(false);
-            resetProjectForm();
+            setShowCertificatePopup(false);
+            resetCertificateForm();
         } catch (error) {
             console.error('Failed to update project', error);
         }
     };
-
 
     const handleDeleteCertificate = async (certificateId: number) => {
         const updatedCertificates = resumeData.certificates.filter(p => p.id !== certificateId);
@@ -175,6 +198,118 @@ const ResumeComponent: React.FC = () => {
             console.error('Failed to delete certificate', error);
         }
     };
+
+    const handleAddEducation = async () => {
+        if (editingEducation.name.trim() && editingEducation.major.trim()) {
+            const newEducation = {
+                ...editingEducation,
+                id: Date.now()
+            };
+
+            const updatedResume = {
+                ...resumeData,
+                educations: [...resumeData.educations, newEducation]
+            };
+
+            try {
+                const savedResume = await saveResume(updatedResume);
+                setResumeData(savedResume);
+                setShowEducationPopup(false);
+                resetEducationForm();
+            } catch (error) {
+                console.error('Failed to save education', error);
+            }
+        }
+    };
+
+    const handleUpdateEducation = async () => {
+        const updatedEducation = resumeData.educations.map(education =>
+            education.id === editingEducation.id ? editingEducation : education
+        );
+
+        try {
+            const savedResume = await saveResume({
+                ...resumeData,
+                educations: updatedEducation
+            });
+            setResumeData(savedResume);
+            setShowEducationPopup(false);
+            resetEducationForm();
+        } catch (error) {
+            console.error('Failed to update project', error);
+        }
+    };
+
+    const handleDeleteEducation = async (educationId: number) => {
+        const updatedCertificates = resumeData.certificates.filter(p => p.id !== educationId);
+
+        try {
+            const savedResume = await saveResume({
+                ...resumeData,
+                certificates: updatedCertificates
+            });
+            setResumeData(savedResume);
+        } catch (error) {
+            console.error('Failed to delete certificate', error);
+        }
+    };
+
+
+    const handleAddExperience = async () => {
+        if (editingExperience.company.trim() && editingExperience.position.trim()) {
+            const newExperience = {
+                ...editingExperience,
+                id: Date.now()
+            };
+
+            const updatedResume = {
+                ...resumeData,
+                experiences: [...resumeData.experiences, newExperience]
+            };
+
+            try {
+                const savedResume = await saveResume(updatedResume);
+                setResumeData(savedResume);
+                setShowExperiencePopup(false);
+                resetExperienceForm();
+            } catch (error) {
+                console.error('Failed to save experience', error);
+            }
+        }
+    };
+
+    const handleUpdateExperience = async () => {
+        const updatedExperience = resumeData.experiences.map(experience =>
+            experience.id === editingExperience.id ? editingExperience : experience
+        );
+
+        try {
+            const savedResume = await saveResume({
+                ...resumeData,
+                experiences: updatedExperience
+            });
+            setResumeData(savedResume);
+            setShowEducationPopup(false);
+            resetEducationForm();
+        } catch (error) {
+            console.error('Failed to update experience', error);
+        }
+    };
+
+    const handleDeleteExperience = async (experienceId: number) => {
+        const updatedExperience = resumeData.experiences.filter(p => p.id !== experienceId);
+
+        try {
+            const savedResume = await saveResume({
+                ...resumeData,
+                experiences: updatedExperience
+            });
+            setResumeData(savedResume);
+        } catch (error) {
+            console.error('Failed to delete experience', error);
+        }
+    };
+
 
     const handleSaveGoal = async () => {
         if (editingGoal.trim()) {
@@ -253,6 +388,26 @@ const ResumeComponent: React.FC = () => {
         });
     };
 
+    const resetEducationForm = () => {
+        setEditingEducation({
+            name: '',
+            major: '',
+            startDate: '',
+            endDate: '',
+            gpa: ''
+        });
+    };
+
+    const resetExperienceForm = () => {
+        setEditingExperience({
+            company: '',
+            position: '',
+            startDate: '',
+            endDate: '',
+            description: ''
+        });
+    };
+
     // Popup open methods
     const openEditProjectPopup = (project: Project) => {
         setEditingProject(project);
@@ -261,7 +416,17 @@ const ResumeComponent: React.FC = () => {
 
     const openEditCertificatePopup = (certificate: Certificate) => {
         setEditingCertificate(certificate);
-        setShowProjectPopup(true);
+        setShowCertificatePopup(true);
+    };
+
+    const openEditEducationPopup = (education: Education) => {
+        setEditingEducation(education);
+        setShowEducationPopup(true);
+    };
+
+    const openEditExperiencePopup = (experience: Experience) => {
+        setEditingExperience(experience);
+        setShowExperiencePopup(true);
     };
 
     const openEditGoalPopup = () => {
@@ -360,7 +525,7 @@ const ResumeComponent: React.FC = () => {
                     <button
                         onClick={() => {
                             resetCertificateForm();
-                            setShowPCertificatePopup(true);
+                            setShowCertificatePopup(true);
                         }}
                         className="text-green-600 hover:bg-green-100 p-2 rounded-full"
                     >
@@ -475,6 +640,120 @@ const ResumeComponent: React.FC = () => {
                 ))}
             </section>
 
+            {/* Education Section */}
+            <section>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-2xl font-semibold border-b-2 border-blue-500 pb-2 flex items-center">
+                        <GraduationCap className="mr-2 text-green-600" />
+                        Học vấn
+                    </h2>
+                    <button
+                        onClick={() => {
+                            resetEducationForm();
+                            setShowEducationPopup(true);
+                        }}
+                        className="text-green-600 hover:bg-green-100 p-2 rounded-full"
+                    >
+                        <Plus />
+                    </button>
+                </div>
+
+                {resumeData.educations?.map((education) => (
+                    <div key={education.id} className="mb-6 bg-gray-100 p-4 rounded-lg">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                {education.name && <h3 className="text-xl font-semibold text-gray-800">{education.name}</h3>}
+
+                                {education.major && (
+                                    <p className="text-sm text-gray-600">Ngành học: {education.major}</p>
+                                )}
+
+                                {(education.startDate || education.endDate) && (
+                                    <p className="text-sm text-gray-600">
+                                        {education.startDate} {education.startDate && education.endDate && '-'} {education.endDate}
+                                    </p>
+                                )}
+
+                                {education.gpa && (
+                                    <p className="text-sm text-gray-600">GPA: {education.gpa} </p>
+                                )}
+                            </div>
+                            <div className="flex space-x-2">
+                                <button
+                                    onClick={() => openEditEducationPopup(education)}
+                                    className="text-blue-600 hover:bg-blue-100 p-1 rounded"
+                                >
+                                    <Edit size={18} />
+                                </button>
+                                <button
+                                    onClick={() => handleDeleteEducation(education.id!)}
+                                    className="text-red-600 hover:bg-red-100 p-1 rounded"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </section>
+
+            {/*Experience Section */}
+            <section>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-2xl font-semibold border-b-2 border-blue-500 pb-2 flex items-center">
+                        <ShieldBan className="mr-2 text-green-600" />
+                        Kinh nghiệm
+                    </h2>
+                    <button
+                        onClick={() => {
+                            resetEducationForm();
+                            setShowEducationPopup(true);
+                        }}
+                        className="text-green-600 hover:bg-green-100 p-2 rounded-full"
+                    >
+                        <Plus />
+                    </button>
+                </div>
+
+                {resumeData.experiences?.map((experience) => (
+                    <div key={experience.id} className="mb-6 bg-gray-100 p-4 rounded-lg">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                {experience.company && <h3 className="text-xl font-semibold text-gray-800">{experience.company}</h3>}
+
+                                {experience.position && (
+                                    <p className="text-sm text-gray-600">Vị trí: {experience.position}</p>
+                                )}
+
+                                {(experience.startDate || experience.endDate) && (
+                                    <p className="text-sm text-gray-600">
+                                        {experience.startDate} {experience.startDate && experience.endDate && '-'} {experience.endDate}
+                                    </p>
+                                )}
+
+                                {experience.description && (
+                                    <p className="text-sm text-gray-600">GPA: {experience.description} </p>
+                                )}
+                            </div>
+                            <div className="flex space-x-2">
+                                <button
+                                    onClick={() => openEditExperiencePopup(experience)}
+                                    className="text-blue-600 hover:bg-blue-100 p-1 rounded"
+                                >
+                                    <Edit size={18} />
+                                </button>
+                                <button
+                                    onClick={() => handleDeleteExperience(experience.id!)}
+                                    className="text-red-600 hover:bg-red-100 p-1 rounded"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </section>
+
             {/* Project Popup Component */}
             <ProjectPopup
                 show={showProjectPopup}
@@ -489,10 +768,30 @@ const ResumeComponent: React.FC = () => {
             <CertificatePopup
                 show={showCertificatePopup}
                 editingCertificate={editingCertificate}
-                onClose={() => setShowPCertificatePopup(false)}
-                onSave={editingCertificate.id ? handleUpdateProject : handleAddCertificate}
+                onClose={() => setShowEducationPopup(false)}
+                onSave={editingCertificate.id ? handleUpdateCertificate : handleAddCertificate}
                 onUpdateCertificate={(key, value) =>
                     setEditingCertificate(prev => ({ ...prev, [key]: value }))
+                }
+            />
+
+            <EducationPopup
+                show={showEducationPopup}
+                editingEducation={editingEducation}
+                onClose={() => setShowEducationPopup(false)}
+                onSave={editingEducation.id ? handleUpdateEducation : handleAddEducation}
+                onUpdateEducation={(key, value) =>
+                    setEditingEducation(prev => ({ ...prev, [key]: value }))
+                }
+            />
+
+            <ExperiencePopup
+                show={showExperiencePopup}
+                editingExperience={editingExperience}
+                onClose={() => setShowExperiencePopup(false)}
+                onSave={editingExperience.id ? handleUpdateExperience : handleAddExperience}
+                onUpdateExperience={(key, value) =>
+                    setEditingExperience(prev => ({ ...prev, [key]: value }))
                 }
             />
 
