@@ -259,7 +259,7 @@ const FindJobs: React.FC = () => {
           {/* Dropdowns */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mt-4">
             {renderDropdown(FaIndustry, 'Ngành nghề', industryOptions, selectedJobFieldIds, setSelectedJobFieldIds, openDropdown, setOpenDropdown)}
-            {renderDropdown(FaLevelUpAlt, 'Cấp bậc', positionOptions, selectedJobLevelIds, setSelectedJobLevelIds, openDropdown, setOpenDropdown)}
+            {renderDropdown(FaLevelUpAlt, 'Vị trí', positionOptions, selectedJobLevelIds, setSelectedJobLevelIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaBriefcase, 'Kinh nghiệm', experienceOptions, selectedExperienceIds, setSelectedExperienceIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaDollarSign, 'Mức lương', salaryOptions, selectedSalaryIds, setSelectedSalaryIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaGraduationCap, 'Học vấn', educationOptions , selectedEducationIds, setSelectedEducationIds, openDropdown, setOpenDropdown)}

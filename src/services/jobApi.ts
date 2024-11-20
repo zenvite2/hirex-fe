@@ -103,6 +103,7 @@ export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
         let experienceIdsParam;
         let jobTypeIdsParam;
         let salaryOptionsParam;
+        let educationIdsParam;
 
         // Map other parameters if needed
         if (request.industryIds.length > 0) {
@@ -121,6 +122,12 @@ export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
             experienceIdsParam = request.experienceIds.join(',');
         } else {
             experienceIdsParam = null;
+        }
+
+        if (request.educationIds.length > 0) {
+            educationIdsParam = request.educationIds.join(',');
+        } else {
+            educationIdsParam = null;
         }
 
         if (request.salaryOptionsId && request.salaryOptionsId.length > 0) {
@@ -148,7 +155,7 @@ export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
                 industryIds: industryIdsParam,
                 positionIds: positionIdsParam,
                 experienceIds: experienceIdsParam,
-                educationIds: request.educationIds,
+                educationIds: educationIdsParam,
                 jobTypeIds: jobTypeIdsParam,
                 salaryOptions: salaryOptionsParam && encodeURIComponent(JSON.stringify(salaryOptionsParam))
             },

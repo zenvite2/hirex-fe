@@ -167,6 +167,11 @@ const JobCreationForm: React.FC = () => {
           const result = await dispatch(jobGet(id));
           if (result?.payload?.response?.success) {
             const jobData = result.payload.response.data;
+            // If city exists, fetch districts
+            if (jobData.city) {
+              await fetchDistricts('', jobData.city);
+            }
+
             setFormData({
               ...jobData,
               description: denormalizeTextAreaContent(jobData.description),
@@ -175,10 +180,6 @@ const JobCreationForm: React.FC = () => {
               workingTime: denormalizeTextAreaContent(jobData.workingTime),
             });
 
-            // // If city exists, fetch districts
-            // if (jobData.city) {
-            //   await fetchDistricts('', jobData.city);
-            // }
           }
         }
       } catch (error) {
