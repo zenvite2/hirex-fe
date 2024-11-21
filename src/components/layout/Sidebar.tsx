@@ -2,11 +2,11 @@ import { NavLink } from "react-router-dom";
 import { BarChart2, FileText, Users, Info } from 'lucide-react';
 
 const sidebarItems = [
-  { to: "/dashboard", label: "Bảng tin", icon: <BarChart2 className="mr-4 h-6 w-6" /> },
+  // { to: "/dashboard", label: "Bảng tin", icon: <BarChart2 className="mr-4 h-6 w-6" /> },
   { to: "/company-info", label: "Thông tin công ty", icon: <FileText className="mr-4 h-6 w-6" /> },
   { to: "/job-posts", label: "Tin tuyển dụng", icon: <FileText className="mr-4 h-6 w-6" /> },
   { to: "/applicants", label: "Danh sách ứng tuyển", icon: <Users className="mr-4 h-6 w-6" /> },
-  { to: "/info-page", label: "Xem trang thông tin", icon: <Info className="mr-4 h-6 w-6" /> }
+  // { to: "/info-page", label: "Xem trang thông tin", icon: <Info className="mr-4 h-6 w-6" /> }
 ];
 
 const Sidebar = () => {

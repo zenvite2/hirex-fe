@@ -6,7 +6,9 @@ import axiosIns from "./axiosIns";
 export const resumeGet = createAsyncThunk<any, any>(
     'resume/getResume',
     async (id) => {
-        return axiosIns.get(`/resumes/${id}`)
+        return axiosIns.get(`/resumes`, {
+            includeToken: true
+        })
             .then(response => { return { response: response.data } })
             .catch(error => { });
     }
