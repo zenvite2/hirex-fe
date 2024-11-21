@@ -169,6 +169,6 @@ export const recommendJob = async (id: number) => {
     return axiosIns.get(`/recommend/${id}`, {
         includeToken: true
     })
-        .then(response => { return { response: response.data } })
+        .then(response => { return response.data })
         .catch(error => { });
 }

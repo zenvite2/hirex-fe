@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BsSearch } from 'react-icons/bs';
 import { FaIndustry, FaLevelUpAlt, FaBriefcase, FaDollarSign, FaGraduationCap, FaCalendarAlt } from 'react-icons/fa';
 import { JobCard } from '../../components';
@@ -71,7 +71,7 @@ export const salaryOptions: Option[] = [
 
 const FindJobs: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { isLoggedIn } = useSelector((state: RootState) => state.authReducer);
+  const { isLoggedIn, userId } = useSelector((state: RootState) => state.authReducer);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [recommendJobs, setRecommendJobs] = useState<Job[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -133,9 +133,14 @@ const FindJobs: React.FC = () => {
     selectedJobTypeIds,
   ]);
 
-  // useEffect(() => {
-  //   isLoggedIn && recommendJob()
-  // }, [isLoggedIn])
+  const getRecommendJobs = useCallback(async () => {
+    const lstJobs = await recommendJob(userId);
+    setRecommendJobs(lstJobs ?? []);
+  }, [userId]);
+
+  useEffect(() => {
+    isLoggedIn && getRecommendJobs();
+  }, [isLoggedIn])
 
   useEffect(() => {
     const fetchDropdownData = async () => {
@@ -276,12 +281,17 @@ const FindJobs: React.FC = () => {
       </div>
 
       {/* Job List */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <p className="text-base mb-6">
-          Showing: <span className="font-semibold">{jobs.length}</span> Jobs Available
-        </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="sticky top-0 border-gray-200 py-4">
+          <h2 className="text-3xl font-bold text-gray-600 max-w-7xl mx-auto px-2">
+            Khám phá
+          </h2>
+          <p className="text-base mb-4 mt-2 text-gray-500 px-2">
+            <span className="font-semibold">{jobs.length}</span> công việc đang có sẵn
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center mb-10">
           {jobs.map((job, index) => (
             <div key={index} className="w-full max-w-sm">
               <JobCard job={{ ...job, id: job.id }} />
@@ -289,10 +299,12 @@ const FindJobs: React.FC = () => {
           ))}
         </div>
 
-        {isLoggedIn && <>
-          <p className="text-base mb-6 mt-6">
-            Showing: <span className="font-semibold">{jobs.length}</span> Jobs Available
-          </p>
+        {isLoggedIn && recommendJobs.length > 0 && <>
+          <div className="sticky top-0 border-t-2 border-gray-200 py-4 mt-6">
+            <h2 className="text-2xl font-bold text-gray-600 max-w-7xl mx-auto px-2">
+              Gợi ý cho bạn
+            </h2>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
             {recommendJobs.map((job, index) => (

@@ -31,7 +31,7 @@ const LoginPage = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(startLoading());
-    const result = await dispatch(login({ username, password }))
+    const result = await dispatch(login({ username: username.trim(), password }))
     dispatch(stopLoading());
     if (result?.payload?.response?.success == true) {
       if (result?.payload?.response?.data.role == 'EMPLOYEE') {
