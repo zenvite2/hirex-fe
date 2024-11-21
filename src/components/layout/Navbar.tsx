@@ -62,7 +62,7 @@ const Navbar: React.FC<NavbarProps> = () => {
           </div>
         </div>
       </div>
-      <Link to="/resume" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100">
+      <Link to="" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100">
         <FileText className="mr-3" size={20} />
         <span>Hồ sơ xin việc</span>
       </Link>
@@ -151,7 +151,7 @@ const Navbar: React.FC<NavbarProps> = () => {
                   to={isLoggedIn && role === 'EMPLOYEE' ? '/resume' : '/resume-content'}
                   className={getLinkClassName(['/resume', '/resume-content'])}
                 >
-                  Hồ sơ & CV
+                  Hồ sơ cá nhân
                 </Link>
               </>
             ) : (

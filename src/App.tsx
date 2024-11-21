@@ -35,6 +35,7 @@ import { getUserInfo } from "./services/authApi";
 import { setUserInfo } from "./redux/slice/authSlice";
 import SavedJobsPage from "./pages/employee/SavedJobsPage";
 import TestCV1 from "./pages/cv/Resume";
+import AppliedJob from "./pages/employee/AppliedJobs";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -111,6 +112,7 @@ function App() {
                             <Route path="/company/detail/:id" element={<CompanyDetail />} />
                             <Route path="/test" element={<TestCV1 />} />
                             <Route path="/saved-jobs" element={<SavedJobsPage />} />
+                            <Route path="/applied-jobs" element={<AppliedJob />} />
                         </Route>
 
                         {/* Các route khác */}

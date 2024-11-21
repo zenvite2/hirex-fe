@@ -37,7 +37,7 @@ const Notifications: React.FC = () => {
 
     const interval = setInterval(() => {
       fetchNotifications(); // Gọi liên tục mỗi 30 giây
-    }, 30000); // 30 giây
+    }, 3000); // 30 giây
 
     // Cleanup để hủy setInterval khi component unmount
     return () => clearInterval(interval);

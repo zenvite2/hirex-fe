@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Building2, MapPin, Bookmark } from 'lucide-react';
+import { Building2, MapPin, Bookmark, MessageCircle } from 'lucide-react';
 import { jobGet, jobGetWith } from '../../services/jobApi';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
@@ -108,23 +108,8 @@ const JobDetail = () => {
             }
         };
 
-        const checkSavedJobs = async () => {
-            try {
-                if (!isLoggedIn) return; // Không gọi API nếu người dùng chưa đăng nhập
-                const response = await axiosIns.get(`/saved-job/list`, { includeToken: true });
-                const savedJobs = response.data.data; // Danh sách công việc đã lưu từ backend
-
-                // Kiểm tra job hiện tại có trong danh sách đã lưu không
-                const isJobSaved = savedJobs.some((savedJob: any) => savedJob.jobResponse.id === id);
-                setIsSaved(isJobSaved); // Cập nhật trạng thái
-            } catch (error) {
-                console.error("Lỗi khi kiểm tra danh sách việc làm đã lưu:", error);
-            }
-        };
-
         if (id) {
             fetchJobDetail();
-            checkSavedJobs();
         }
     }, [id]);
 
@@ -135,9 +120,10 @@ const JobDetail = () => {
                 const response = await axiosIns.get(`/saved-job/list`, { includeToken: true });
                 const savedJobs = response.data.data; // Danh sách công việc đã lưu từ backend
 
-                // Kiểm tra job hiện tại có trong danh sách đã lưu không
-                const isJobSaved = savedJobs.some((savedJob: any) => savedJob.jobResponse.id === id);
-                setIsSaved(isJobSaved); // Cập nhật trạng thái
+                if (job) { // Chỉ kiểm tra nếu job đã được tải
+                    const isJobSaved = savedJobs.some((savedJob: any) => savedJob.jobResponse.id === job.id);
+                    setIsSaved(isJobSaved); // Cập nhật trạng thái
+                }
             } catch (error) {
                 console.error("Lỗi khi kiểm tra danh sách việc làm đã lưu:", error);
             }
@@ -146,7 +132,8 @@ const JobDetail = () => {
         if (id) {
             checkSavedJobs();
         }
-    }, [isLoggedIn, id]);
+    }, [isLoggedIn, job, id]);
+
 
     const handleApplyNow = () => {
         if (!isLoggedIn) {
@@ -197,25 +184,6 @@ const JobDetail = () => {
             toast.error("Đã xảy ra lỗi, vui lòng thử lại");
         }
     };
-
-    // // Gọi API để kiểm tra danh sách các công việc đã lưu
-    // useEffect(() => {
-    //     const checkSavedJobs = async () => {
-    //         try {
-    //             if (!isLoggedIn) return; // Không gọi API nếu người dùng chưa đăng nhập
-    //             const response = await axiosIns.get(`/saved-job/list`, { includeToken: true });
-    //             const savedJobs = response.data.data; // Danh sách công việc đã lưu từ backend
-
-    //             // Kiểm tra job hiện tại có trong danh sách đã lưu không
-    //             const isJobSaved = savedJobs.some((savedJob: any) => savedJob.jobResponse.id === job.id);
-    //             setIsSaved(isJobSaved); // Cập nhật trạng thái
-    //         } catch (error) {
-    //             console.error("Lỗi khi kiểm tra danh sách việc làm đã lưu:", error);
-    //         }
-    //     };
-
-    //     checkSavedJobs();
-    // }, [isLoggedIn, job.id]);
 
     if (error) {
         return (
@@ -288,14 +256,21 @@ const JobDetail = () => {
                                 </div>
 
                                 {/* Action Buttons */}
-                                <div className="flex flex-col gap-2 bt-4">
+                                <div className="flex flex-col gap-4">
                                     <button
                                         onClick={handleApplyNow}
-                                        className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium"
+                                        className="w-full px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium"
                                     >
                                         Nộp đơn ngay
                                     </button>
-                                    <br></br>
+
+                                    <button
+                                        onClick={() => { isLoggedIn ? setShowContactModal(true) : navigate('/login') }}
+                                        className="w-full px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium flex items-center justify-center gap-2"
+                                    >
+                                        <MessageCircle className="w-4 h-4" />
+                                        Liên hệ
+                                    </button>
 
                                     <button
                                         onClick={(e) => {
@@ -303,21 +278,14 @@ const JobDetail = () => {
                                             e.preventDefault();
                                             e.stopPropagation();
                                         }}
-                                        className={`px-6 py-2 bg-blue-50 text-blue-500 rounded-lg hover:bg-blue-100 font-medium flex items-center justify-center gap-2 ${isSaved ? "text-blue-600" : "text-gray-600"
+                                        className={`w-full px-6 py-2 bg-blue-50 rounded-lg hover:bg-blue-100 font-medium flex items-center justify-center gap-2 ${isSaved ? "text-blue-600" : "text-gray-600"
                                             }`}
                                     >
                                         <Bookmark className={`w-4 h-4 ${isSaved ? "fill-current" : "stroke-current"}`} />
                                         Đã lưu
                                     </button>
-
-                                    {/* <button
-                                        onClick={handleSaveJob}
-                                        className="px-6 py-2 bg-blue-50 text-blue-500 rounded-lg hover:bg-blue-100 font-medium flex items-center justify-center gap-2"
-                                    >
-                                        <Bookmark className="w-4 h-4" />
-                                        Đã lưu
-                                    </button> */}
                                 </div>
+
                             </div>
                         </div>
 

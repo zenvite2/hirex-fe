@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { applicationCreate } from '../../services/applicayionApi';
+import { applicationCreate } from '../../services/applicationApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { toast } from 'react-toastify';
 
