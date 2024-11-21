@@ -164,3 +164,11 @@ export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
             .catch(error => { console.error(error); });
     }
 );
+
+export const recommendJob = async (id: number) => {
+    return axiosIns.get(`/recommend/${id}`, {
+        includeToken: true
+    })
+        .then(response => { return { response: response.data } })
+        .catch(error => { });
+}

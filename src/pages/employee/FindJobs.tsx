@@ -3,12 +3,14 @@ import { BsSearch } from 'react-icons/bs';
 import { FaIndustry, FaLevelUpAlt, FaBriefcase, FaDollarSign, FaGraduationCap, FaCalendarAlt } from 'react-icons/fa';
 import { JobCard } from '../../components';
 import CheckboxDropdown from '../../components/common/CheckboxDropdown';
-import { jobSearch } from '../../services/jobApi';
+import { jobSearch, recommendJob } from '../../services/jobApi';
 import { experienceList, positionList, jobTypeList, industryList, salaryList, contracTypeList, educationList } from '../../services/autofillApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { useLocationSelector } from '../employer/useLocationSelector';
 import { LocationSelector } from './LocationSelector';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 interface Option {
   id: number;
@@ -69,7 +71,9 @@ export const salaryOptions: Option[] = [
 
 const FindJobs: React.FC = () => {
   const dispatch = useAppDispatch();
+  const { isLoggedIn } = useSelector((state: RootState) => state.authReducer);
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [recommendJobs, setRecommendJobs] = useState<Job[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedJobFieldIds, setSelectedJobFieldIds] = useState<number[]>([]);
   const [selectedJobLevelIds, setSelectedJobLevelIds] = useState<number[]>([]);
@@ -129,6 +133,9 @@ const FindJobs: React.FC = () => {
     selectedJobTypeIds,
   ]);
 
+  // useEffect(() => {
+  //   isLoggedIn && recommendJob()
+  // }, [isLoggedIn])
 
   useEffect(() => {
     const fetchDropdownData = async () => {
@@ -262,7 +269,7 @@ const FindJobs: React.FC = () => {
             {renderDropdown(FaLevelUpAlt, 'Vị trí', positionOptions, selectedJobLevelIds, setSelectedJobLevelIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaBriefcase, 'Kinh nghiệm', experienceOptions, selectedExperienceIds, setSelectedExperienceIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaDollarSign, 'Mức lương', salaryOptions, selectedSalaryIds, setSelectedSalaryIds, openDropdown, setOpenDropdown)}
-            {renderDropdown(FaGraduationCap, 'Học vấn', educationOptions , selectedEducationIds, setSelectedEducationIds, openDropdown, setOpenDropdown)}
+            {renderDropdown(FaGraduationCap, 'Học vấn', educationOptions, selectedEducationIds, setSelectedEducationIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaBriefcase, 'Loại công việc', jobTypeOptions, selectedJobTypeIds, setSelectedJobTypeIds, openDropdown, setOpenDropdown)}
           </div>
         </div>
@@ -281,6 +288,20 @@ const FindJobs: React.FC = () => {
             </div>
           ))}
         </div>
+
+        {isLoggedIn && <>
+          <p className="text-base mb-6 mt-6">
+            Showing: <span className="font-semibold">{jobs.length}</span> Jobs Available
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
+            {recommendJobs.map((job, index) => (
+              <div key={index} className="w-full max-w-sm">
+                <JobCard job={{ ...job, id: job.id }} />
+              </div>
+            ))}
+          </div>
+        </>}
       </div>
     </div>
   );
