@@ -62,7 +62,7 @@ const Navbar: React.FC<NavbarProps> = () => {
           </div>
         </div>
       </div>
-      <Link to="" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100">
+      <Link to="list-cv" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100">
         <FileText className="mr-3" size={20} />
         <span>Hồ sơ xin việc</span>
       </Link>
