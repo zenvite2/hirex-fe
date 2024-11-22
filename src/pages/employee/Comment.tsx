@@ -239,9 +239,9 @@ const CommentCard = ({ companyId, userId }: { companyId: number; userId: number 
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="bg-white rounded-xl shadow-sm">
-                <div className="p-6">
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+            <div className="bg-white rounded-xl shadow-sm flex flex-col flex-grow">
+                <div className="p-6 flex-grow">
                     <h2 className="text-xl font-semibold text-gray-800">Bình luận</h2>
 
                     {error && (
@@ -251,7 +251,7 @@ const CommentCard = ({ companyId, userId }: { companyId: number; userId: number 
                     )}
 
                     {/* Cố định chiều cao và thêm thuộc tính cuộn cho danh sách bình luận */}
-                    <div className="mt-6 space-y-4 h-96 overflow-y-scroll">
+                    <div className="mt-6 space-y-4 max-h-[400px] overflow-y-auto flex-grow">
                         {comments.map((comment) => (
                             <Comment
                                 key={comment.id}
@@ -282,6 +282,7 @@ const CommentCard = ({ companyId, userId }: { companyId: number; userId: number 
                 </div>
             </div>
         </div>
+
     );
 };
 
