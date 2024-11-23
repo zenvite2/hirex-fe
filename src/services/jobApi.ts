@@ -172,3 +172,9 @@ export const recommendJob = async (id: number) => {
         .then(response => { return response.data })
         .catch(error => { });
 }
+
+export const getSimilarJobs = async (id: string) => {
+    return axiosIns.get(`/similar/${id}`)
+        .then(response => { return response.data })
+        .catch(error => { });
+}

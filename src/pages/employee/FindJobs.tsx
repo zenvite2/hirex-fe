@@ -18,7 +18,7 @@ interface Option {
   value?: any;
 }
 
-interface Job {
+export interface Job {
   id: number;
   title: string;
   location: string;
@@ -93,7 +93,6 @@ const FindJobs: React.FC = () => {
   const {
     city,
     cities,
-    isLoadingCities,
     handleSelectCity,
     fetchCities,
   } = useLocationSelector();

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Building2, MapPin, Bookmark, MessageCircle } from 'lucide-react';
-import { jobGet, jobGetWith } from '../../services/jobApi';
+import { Building2, MapPin, Bookmark, MessageCircle, CalendarCheck, Navigation, BriefcaseConveyorBelt } from 'lucide-react';
+import { getSimilarJobs, jobGetWith } from '../../services/jobApi';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { Link } from "react-router-dom";
@@ -12,6 +12,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import axiosIns from '../../services/axiosIns';
+import { Job } from './FindJobs';
+import { formatDateToDDMMYYYY } from '../../utils/utils';
 
 interface JobData {
     id: number;
@@ -57,33 +59,6 @@ interface Employer {
     avatar: string | null
 }
 
-const SIMILAR_JOBS = [
-    {
-        id: 1,
-        title: "Lead UI Designer",
-        company: "Gojek",
-        location: "Jakarta, Indonesia",
-        type: "Fulltime",
-        workplace: "Onsite",
-        experience: "3-5 Years",
-        time: "2 days ago",
-        applicants: "521 Aplicants",
-        letter: "G"
-    },
-    {
-        id: 2,
-        title: "Sr. UX Designer",
-        company: "GoPay",
-        location: "Jakarta, Indonesia",
-        type: "Fulltime",
-        workplace: "Onsite",
-        experience: "3-5 Years",
-        time: "2 days ago",
-        applicants: "210 Aplicants",
-        letter: "G"
-    }
-];
-
 const JobDetail = () => {
     const { id } = useParams<{ id: string }>();
     const [job, setJob] = useState<JobData | null>(null);
@@ -94,6 +69,7 @@ const JobDetail = () => {
     const { isLoggedIn, userId } = useSelector((state: RootState) => state.authReducer);
     const navigate = useNavigate();
     const [isSaved, setIsSaved] = useState(false);
+    const [similarJobs, setSimilarJobs] = useState<Job[]>([]);
 
     useEffect(() => {
         const fetchJobDetail = async () => {
@@ -108,10 +84,18 @@ const JobDetail = () => {
             }
         };
 
+        const fetchSimilarJobs = async () => {
+            const result = await getSimilarJobs(id);
+            setSimilarJobs(result ?? []);
+        };
+
         if (id) {
             fetchJobDetail();
+            fetchSimilarJobs();
         }
     }, [id]);
+
+
 
     useEffect(() => {
         const checkSavedJobs = async () => {
@@ -371,33 +355,48 @@ const JobDetail = () => {
                         <section className="sticky top-6">
                             <h2 className="text-lg font-semibold text-gray-900 mb-3">Việc làm tương tự</h2>
                             <div className="space-y-4">
-                                {SIMILAR_JOBS.map((similarJob) => (
-                                    <div key={similarJob.id} className="p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300">
+                                {similarJobs?.map((similarJob) => (
+                                    <div
+                                        key={similarJob.id}
+                                        className="p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer group"
+                                        onClick={() => {
+                                            similarJob.id && navigate(`/job-detail/${similarJob.id}`);
+                                        }}
+                                    >
                                         <div className="flex items-start justify-between">
-                                            <div className="flex gap-3">
-                                                <div className="w-11 h-11 bg-gray-50 rounded-lg flex items-center justify-center">
-                                                    <span className="font-semibold text-gray-800">{similarJob.letter}</span>
+                                            <div className="flex gap-4 items-center">
+                                                <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
+                                                    <img
+                                                        src={similarJob.companyLogo}
+                                                        alt="Company Logo"
+                                                        className="w-full h-full object-contain p-2"
+                                                    />
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-semibold text-gray-900 mb-1">{similarJob.title}</h3>
-                                                    <div className="text-[15px] text-gray-600">
-                                                        {similarJob.company} - {similarJob.location}
+                                                    <h3 className="font-bold text-gray-800 text-[16px] mb-1 group-hover:text-blue-600 transition-colors">
+                                                        {similarJob.title}
+                                                    </h3>
+                                                    <div className="flex items-center gap-2 text-[14px] text-gray-500 mb-1.5">
+                                                        <MapPin className="w-4 h-4 text-gray-500" />
+                                                        <span className="font-medium">{similarJob.district} - {similarJob.city}</span>
                                                     </div>
-                                                    <div className="flex gap-6 mt-1 text-[15px] text-gray-500">
-                                                        <span>{similarJob.type}</span>
-                                                        <span>{similarJob.workplace}</span>
-                                                        <span>{similarJob.experience}</span>
+                                                    <div className="flex items-center gap-2 text-[13px] text-gray-500 mb-1.5">
+                                                        <div className="flex items-center gap-1.5">
+                                                            <BriefcaseConveyorBelt className="w-4 h-4 text-gray-500" />
+                                                            <span>{similarJob.jobType ?? '...'}</span>
+                                                        </div>
                                                     </div>
-                                                    <div className="text-sm text-gray-500 mt-2">
-                                                        {similarJob.time} - {similarJob.applicants}
+                                                    <div className="flex items-center gap-2 text-[13px] text-gray-500">
+                                                        <CalendarCheck className="w-4 h-4 text-gray-500" />
+                                                        <span>Hết hạn {formatDateToDDMMYYYY(similarJob.deadline)}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                             <button
                                                 onClick={handleSaveJob}
-                                                className="p-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600"
+                                                className="p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors group-hover:border-blue-200"
                                             >
-                                                <Bookmark className="w-4 h-4" />
+                                                <Bookmark className="w-5 h-5 text-gray-500 group-hover:text-blue-500 transition-colors" />
                                             </button>
                                         </div>
                                     </div>

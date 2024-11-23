@@ -9,9 +9,8 @@ import { RootState } from "../../redux/store";
 import { openMessenger } from "../../redux/slice/messageSlice";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import Notifications from "../../pages/Notifications";
-interface NavbarProps { }
 
-const Navbar: React.FC<NavbarProps> = () => {
+const Navbar: React.FC<{}> = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isEmployerPage = location.pathname.startsWith('/employer');
@@ -171,9 +170,8 @@ const Navbar: React.FC<NavbarProps> = () => {
           </div>
         </div>
 
-
         <div className="hidden lg:flex items-center space-x-2">
-        {isLoggedIn && <Notifications />}
+          {isLoggedIn && <Notifications />}
           {isLoggedIn ? (
             <div className="relative group">
               <div className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-[#0069DB] transition duration-300 border rounded-full px-2 py-1 hover:border-[#0069DB]">
@@ -202,13 +200,13 @@ const Navbar: React.FC<NavbarProps> = () => {
           <div className="ml-4 px-2 flex flex-col text-sm cursor-pointer"
             onClick={() => {
               let url = window.location.origin;
-              role !== 'EMPLOYER' ? url += '/employer' : url += '/find-jobs'
+              !isEmployerPage ? url += '/employer' : url += '/find-jobs'
               window.open(url, '_blank', 'noopener,noreferrer');
             }}
           >
-            <span className="text-gray-500">{role !== 'EMPLOYER' ? 'Bạn là nhà tuyển dụng?' : 'Bạn muốn xin việc?'}</span>
+            <span className="text-gray-500">{!isEmployerPage ? 'Bạn là nhà tuyển dụng?' : 'Bạn muốn xin việc?'}</span>
             <div className="text-blue-800 font-semibold hover:underline">
-              {role !== 'EMPLOYER' ? 'Đăng tuyển ngay' : 'Ứng tuyển ngay'} &raquo;
+              {!isEmployerPage ? 'Đăng tuyển ngay' : 'Ứng tuyển ngay'} &raquo;
             </div>
           </div>
         </div>
