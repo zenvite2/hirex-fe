@@ -33,6 +33,7 @@ export interface Job {
   experience: string;
   min_salary: number;
   max_salary: number;
+  contractType: string;
 }
 
 export const salaryOptions: Option[] = [

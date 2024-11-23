@@ -7,23 +7,8 @@ import axiosIns from "../../services/axiosIns";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { useState, useEffect } from "react";
+import { Job } from "../../pages/employee/FindJobs";
 
-interface Job {
-  id: number;
-  title: string;
-  location: string;
-  district: string;
-  city: string;
-  deadline: string;
-  createdAt: string;
-  companyName: string;
-  companyLogo: string | null;
-  companyDescription: string | null;
-  jobType: string;
-  experience: string;
-  min_salary: number;
-  max_salary: number;
-}
 
 interface JobCardProps {
   job: Job;
@@ -131,8 +116,16 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
           </div>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center">
-              <span className="bg-[#26d81d26] text-[#26d81d] py-1 px-2 rounded-md text-xs font-semibold">
-                Full-Time
+              <span
+                className={`
+                  py-1 px-2 rounded-md text-xs font-semibold
+                  ${job.contractType === 'Fulltime' ? 'bg-[#26d81d26] text-[#26d81d]' :
+                    job.contractType === 'Parttime' ? 'bg-[#1d87d826] text-[#1d87d8]' :
+                      job.contractType === 'Freelance' ? 'bg-[#ffa50026] text-[#ffa500]' :
+                        'bg-gray-100 text-gray-600'
+                  }`}
+              >
+                {job.contractType}
               </span>
             </div>
             <div className="flex items-center">

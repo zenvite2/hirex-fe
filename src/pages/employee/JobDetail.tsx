@@ -380,13 +380,13 @@ const JobDetail = () => {
                                                         <MapPin className="w-4 h-4 text-gray-500" />
                                                         <span className="font-medium">{similarJob.district} - {similarJob.city}</span>
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-[13px] text-gray-500 mb-1.5">
+                                                    <div className="flex items-center gap-2 text-[14px] text-gray-500 mb-1.5">
                                                         <div className="flex items-center gap-1.5">
                                                             <BriefcaseConveyorBelt className="w-4 h-4 text-gray-500" />
                                                             <span>{similarJob.jobType ?? '...'}</span>
                                                         </div>
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-[13px] text-gray-500">
+                                                    <div className="flex items-center gap-2 text-[14px] text-gray-500">
                                                         <CalendarCheck className="w-4 h-4 text-gray-500" />
                                                         <span>Hết hạn {formatDateToDDMMYYYY(similarJob.deadline)}</span>
                                                     </div>
