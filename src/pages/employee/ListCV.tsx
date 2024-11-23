@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, Pencil, Trash } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { resumeGet } from '../../services/resumeApi';
+import { resumeGet, deleteResume, resumeCreate } from '../../services/resumeApi';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
 
 const ListCV = () => {
-    const [jobs, setJobs] = useState([]);
+    const [resume, setResume] = useState([]);
     const [loading, setLoading] = useState(false);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -17,7 +17,7 @@ const ListCV = () => {
             try {
                 const result = await dispatch(resumeGet({}));
                 if (result?.payload?.response?.success == true) {
-                    setJobs(result.payload.response.data);
+                    setResume(result.payload.response.data);
                 }
             } catch (error) {
                 toast.error('Có lỗi xảy ra khi tải danh sách công việc');
@@ -42,15 +42,32 @@ const ListCV = () => {
         });
     };
 
-    // const handleDelete = async (jobId) => {
-    //     try {
-    //         await dispatch(jobDelete(jobId));
-    //         setJobs(jobs.filter((job) => job.id !== jobId));
-    //         toast.success('Xóa công việc thành công!');
-    //     } catch (error) {
-    //         toast.error('Có lỗi xảy ra khi xóa công việc');
-    //     }
-    // };
+    const handleDelete = async (resumeId) => {
+        try {
+            await dispatch(deleteResume(resumeId));
+            setResume(resume.filter((resume) => resume.id !== resumeId));
+            toast.success('Xóa công việc thành công!');
+        } catch (error) {
+            toast.error('Có lỗi xảy ra khi xóa công việc');
+        }
+    };
+
+    const handleCreate = async () => {
+        try {
+        const result: any = await dispatch(resumeCreate());
+    
+            if (result?.payload?.response?.success) {
+                const createdResume = result.payload.response.data;
+                toast.success('Thêm CV thành công!');
+                navigate(`/test/${createdResume.id}`); // Điều chỉnh cách gọi navigate
+            } else {
+                toast.error('Không thể tạo CV, hãy thử lại.');
+            }
+        } catch (error) {
+            toast.error('Có lỗi xảy ra khi thêm CV');
+            console.error('Error in handleCreate:', error);
+        }
+    };
 
     if (loading) {
         return (
@@ -81,11 +98,10 @@ const ListCV = () => {
             <div className="p-4">
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-xl font-bold">Danh sách CV đã tạo</h1>
-                    <Link to="/test">
-                        <button className="bg-[#0069DB] text-white px-3 py-2 rounded-md hover:bg-[#0050B3] transition duration-300">
-                            Tạo CV mới
-                        </button>
-                    </Link>
+                    <button className="bg-[#0069DB] text-white px-3 py-2 rounded-md hover:bg-[#0050B3] transition duration-300"
+                        onClick={() => handleCreate()}>
+                        Tạo CV mới
+                    </button>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -99,35 +115,31 @@ const ListCV = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {jobs.map((job, index) => (
+                            {resume.map((resume, index) => (
                                 <tr key={index} className="border-b hover:bg-gray-50">
                                     <td className="py-4">
-                                        <div className="font-medium">{job.title}</div>
-                                        <div className="text-gray-500 text-sm mt-1">
-                                            {job.location}
-                                        </div>
+                                        <div className="font-medium">{resume.title}</div>
                                     </td>
                                     <td className="py-4">
-                                        <div className="text-sm text-gray-600">{formatDate(job.createdAt)}</div>
-                                        <div className="text-sm text-gray-600 mt-1">{formatDate(job.deadline)}</div>
+                                        <div className="text-sm text-gray-600">{formatDate(resume.createdAt)}</div>
                                     </td>
                                     <td className="py-4">
-                                        <span className={`px-2 py-1 rounded-full text-sm ${job.status === 'Đã duyệt'
+                                        <span className={`px-2 py-1 rounded-full text-sm ${resume.status === 'Đã duyệt'
                                             ? 'bg-green-100 text-green-800'
                                             : 'bg-yellow-100 text-yellow-800'
                                             }`}>
-                                            {job.status || 'Chờ duyệt'}
+                                            {resume.status || 'Chờ duyệt'}
                                         </span>
                                     </td>
                                     <td className="py-4">
                                         <div className="flex gap-3">
                                             <button
-                                                onClick={() => navigate(`/jobs/edit/${job.id}`)}
+                                                onClick={() => navigate(`/jobs/edit/${resume.id}`)}
                                                 className="hover:text-yellow-600 transition-colors"
                                             >                      <Pencil size={18} />
                                             </button>
                                             <button
-                                                // onClick={() => handleDelete(job.id)}
+                                                onClick={() => handleDelete(resume.id)}
                                                 className="hover:text-red-600 transition-colors">
                                                 <Trash size={18} />
                                             </button>
@@ -139,7 +151,7 @@ const ListCV = () => {
                     </table>
                 </div>
 
-                {jobs.length === 0 && !loading && (
+                {resume.length === 0 && !loading && (
                     <div className="text-center py-8 text-gray-500">
                         Chưa có CV nào được tạo
                     </div>
