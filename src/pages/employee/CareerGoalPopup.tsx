@@ -109,10 +109,6 @@ const CareerGoalPopup: React.FC<CareerGoalPopups> = ({ isOpen, onClose, onSave, 
                 jobType: Number(formData.jobType)
             };
 
-
-            // Log để debug
-            console.log('Submitting data:', careergoalData);
-
             let result;
             if (careergoal?.id) {
                 result = await dispatch(careergoalUpdate({

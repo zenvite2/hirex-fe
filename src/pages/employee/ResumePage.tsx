@@ -11,6 +11,7 @@ import { RiAccountBoxFill } from "react-icons/ri";
 import { educationDelete, educationGetAll } from '../../services/educationApi';
 import { experienceDelete, experienceGetAll } from '../../services/experienceApi';
 import { careergoalGet } from '../../services/careergoalApi';
+import { jobTypeList, positionList } from '../../services/autofillApi';
 import { toast } from 'react-toastify';
 
 interface Experience {
@@ -55,6 +56,11 @@ interface CareerGoal {
   jobType: number;
 }
 
+interface Type {
+  id: number;
+  name: string;
+}
+
 const ResumePage: React.FC = () => {
 
   const dispatch = useAppDispatch();
@@ -85,6 +91,8 @@ const ResumePage: React.FC = () => {
 
   const [isCareerGoalEditPopupOpen, setIsCareerGoalEditPopupOpen] = useState(false);
   const [careerGoalData, setCareerGoalData] = useState<CareerGoal | null>(null);
+  const [positions, setPositions] = useState<Type[]>([]);
+  const [jobTypes, setJobTypes] = useState<Type[]>([]);
 
   const handleSaveHeaderData = (newData: HeaderData) => {
     setHeaderData(newData);
@@ -237,11 +245,10 @@ const ResumePage: React.FC = () => {
     setIsSkillPopupOpen(false);
   };
 
-
   useEffect(() => {
     fetchCareerGoalData();
+    fetchLookupData();
   }, []);
-
   const fetchCareerGoalData = async () => {
     try {
       const result = await dispatch(careergoalGet());
@@ -254,8 +261,25 @@ const ResumePage: React.FC = () => {
     } catch (error) {
       toast.error('Đã có lỗi xảy ra khi tải thông tin mục tiêu nghề nghiệp');
     }
-  };
 
+  };
+  const fetchLookupData = async () => {
+    try {
+      const [positionResult, jobTypeResult] = await Promise.all([
+        dispatch(positionList()).unwrap(),
+        dispatch(jobTypeList()).unwrap(),
+      ]);
+
+      if (positionResult.response?.data) {
+        setPositions(positionResult.response.data);
+      }
+      if (jobTypeResult.response?.data) {
+        setJobTypes(jobTypeResult.response.data);
+      }
+    } catch (error) {
+      toast.error('Đã có lỗi xảy ra khi tải dữ liệu tham chiếu');
+    }
+  };
   const handleSaveCareerGoalData = (updatedCareerGoal: CareerGoal) => {
     setCareerGoalData(updatedCareerGoal);
   };
@@ -266,6 +290,17 @@ const ResumePage: React.FC = () => {
       currency: 'VND'
     }).format(salary);
   };
+
+  const getPositionName = (positionId: number): string => {
+    const position = positions.find(p => p.id === positionId);
+    return position?.name || 'Không xác định';
+  };
+
+  const getJobTypeName = (jobTypeId: number): string => {
+    const jobType = jobTypes.find(j => j.id === jobTypeId);
+    return jobType?.name || 'Không xác định';
+  };
+
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">
@@ -430,7 +465,6 @@ const ResumePage: React.FC = () => {
           )}
         </section>
 
-
         <Divider />
 
         <header className="mb-8 flex items-start">
@@ -445,9 +479,18 @@ const ResumePage: React.FC = () => {
               </button>
             </div>
             <div className="grid grid-cols-1 gap-4">
-              <p><span className="font-semibold">Vị trí mong muốn: </span> {careerGoalData?.position}</p>
-              <p><span className="font-semibold">Mức lương mong muốn: </span> {careerGoalData?.salary ? formatSalary(careerGoalData.salary) : ''}</p>
-              <p><span className="font-semibold">Loại công việc: </span> {careerGoalData?.jobType}</p>
+              <p>
+                <span className="font-semibold">Vị trí mong muốn: </span>
+                {careerGoalData?.position ? getPositionName(careerGoalData.position) : ''}
+              </p>
+              <p>
+                <span className="font-semibold">Mức lương mong muốn: </span>
+                {careerGoalData?.salary ? formatSalary(careerGoalData.salary) : ''}
+              </p>
+              <p>
+                <span className="font-semibold">Loại công việc: </span>
+                {careerGoalData?.jobType ? getJobTypeName(careerGoalData.jobType) : ''}
+              </p>
             </div>
           </div>
         </header>
