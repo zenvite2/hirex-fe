@@ -1,5 +1,4 @@
 import Navbar from "./layout/Navbar";
-import Footer from "./layout/Footer";
 import CustomButton from "./common/CustomButton";
 import TextInput from "./common/TextInput";
 import Header from "./layout/Header";
@@ -15,7 +14,6 @@ import Sidebar from "./layout/Sidebar";
 
 export {
   Navbar,
-  Footer,
   CustomButton,
   TextInput,
   Header,

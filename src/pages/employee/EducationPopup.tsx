@@ -3,11 +3,11 @@ import { X } from 'lucide-react';
 import { educationCreate, educationUpdate } from '../../services/educationApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { toast } from 'react-toastify';
+import { educationList } from '../../services/autofillApi';
 
-// Định nghĩa interface cho Education
 interface Education {
   id?: number;
-  level: string;
+  educationLevelId: number;
   universityName: string;
   expertise: string;
   startDate: string;
@@ -15,31 +15,26 @@ interface Education {
   description: string;
 }
 
-// Định nghĩa interface cho API request data
 interface EducationRequestData {
   universityName: string;
-  level: string;
+  educationLevelId: number;
   expertise: string;
   startDate: string;
   endDate: string;
   description: string;
 }
 
-// Định nghĩa interface cho component props
 interface EducationFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (education: Education) => void;  // Giữ nguyên kiểu này để khớp với handleSaveEducation
+  onSave: (education: Education) => void;
   education: Education | null;
 }
 
-const EDUCATION_LEVELS = [
-  { value: 'UNIVERSITY', label: 'Đại học' },
-  { value: 'MASTER', label: 'Thạc sĩ' },
-  { value: 'PHD', label: 'Tiến sĩ' },
-  { value: 'COLLEGE', label: 'Cao đẳng' },
-  { value: 'HIGH_SCHOOL', label: 'Trung học phổ thông' },
-];
+interface EducationLevel {
+  id: number;
+  name: string;
+}
 
 const EducationForm: React.FC<EducationFormProps> = ({
   isOpen,
@@ -49,9 +44,10 @@ const EducationForm: React.FC<EducationFormProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [educationLevels, setEducationLevels] = useState<EducationLevel[]>([]);
 
   const [formData, setFormData] = useState<Education>({
-    level: '',
+    educationLevelId: 0,
     universityName: '',
     expertise: '',
     startDate: '',
@@ -62,11 +58,27 @@ const EducationForm: React.FC<EducationFormProps> = ({
   const [errors, setErrors] = useState<Partial<Record<keyof Education, string>>>({});
 
   useEffect(() => {
+    const fetchEducationLevels = async () => {
+      try {
+        const result = await dispatch(educationList());
+        if (result.payload?.response?.success) {
+          setEducationLevels(result.payload.response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch education levels:', error);
+        toast.error('Không thể tải danh sách trình độ học vấn');
+      }
+    };
+
+    fetchEducationLevels();
+  }, [dispatch]);
+
+  useEffect(() => {
     if (education) {
       setFormData(education);
     } else {
       setFormData({
-        level: '',
+        educationLevelId: 0,
         universityName: '',
         expertise: '',
         startDate: '',
@@ -74,15 +86,38 @@ const EducationForm: React.FC<EducationFormProps> = ({
         description: '',
       });
     }
-    // Reset errors when form is opened/closed
     setErrors({});
   }, [education, isOpen]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+
+    if (name === 'educationLevelId') {
+      const levelId = parseInt(value);
+      setFormData(prev => ({
+        ...prev,
+        educationLevelId: levelId
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+
+    // Clear error when field is changed
+    if (errors[name as keyof Education]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof Education, string>> = {};
 
-    if (!formData.level) {
-      newErrors.level = 'Vui lòng chọn trình độ học vấn';
+    if (!formData.educationLevelId) {
+      newErrors.educationLevelId = 'Vui lòng chọn trình độ học vấn';
     }
     if (!formData.universityName.trim()) {
       newErrors.universityName = 'Vui lòng nhập tên trường';
@@ -104,17 +139,6 @@ const EducationForm: React.FC<EducationFormProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when field is changed
-    if (errors[name as keyof Education]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -127,7 +151,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
     try {
       const educationData: EducationRequestData = {
         universityName: formData.universityName,
-        level: formData.level,
+        educationLevelId: formData.educationLevelId,
         expertise: formData.expertise,
         startDate: formData.startDate,
         endDate: formData.endDate,
@@ -155,10 +179,9 @@ const EducationForm: React.FC<EducationFormProps> = ({
             : 'Thêm thông tin học vấn thành công!'
         );
 
-        // Gọi onSave với dữ liệu education đã được cập nhật
         const updatedEducation: Education = {
           id: education?.id || result.payload.response.data.id,
-          level: formData.level,
+          educationLevelId: formData.educationLevelId,
           universityName: formData.universityName,
           expertise: formData.expertise,
           startDate: formData.startDate,
@@ -181,6 +204,35 @@ const EducationForm: React.FC<EducationFormProps> = ({
       setIsSubmitting(false);
     }
   };
+  const renderEducationLevelSelect = () => {
+    return (
+      <div className="mb-4">
+        <label className="block mb-2 text-sm font-medium text-gray-700">
+          Trình độ học vấn <span className="text-red-500">*</span>
+        </label>
+        <select
+          name="educationLevelId"
+          value={formData.educationLevelId || ''}
+          onChange={handleChange}
+          disabled={isSubmitting}
+          className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.educationLevelId ? 'border-red-500' : 'border-gray-300'
+            }`}
+        >
+          <option value="">Vui lòng chọn</option>
+          {educationLevels.map((level) => (
+            <option key={level.id} value={level.id}>
+              {level.name}
+            </option>
+          ))}
+        </select>
+        {errors.educationLevelId && (
+          <p className="mt-1 text-sm text-red-500">{errors.educationLevelId}</p>
+        )}
+      </div>
+    );
+  };
+
+
   if (!isOpen) return null;
 
   return (
@@ -200,29 +252,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6">
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Trình độ học vấn <span className="text-red-500">*</span>
-            </label>
-            <select
-              name="level"
-              value={formData.level}
-              onChange={handleChange}
-              disabled={isSubmitting}
-              className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.level ? 'border-red-500' : 'border-gray-300'
-                }`}
-            >
-              <option value="">Vui lòng chọn</option>
-              {EDUCATION_LEVELS.map((level) => (
-                <option key={level.value} value={level.value}>
-                  {level.label}
-                </option>
-              ))}
-            </select>
-            {errors.level && (
-              <p className="mt-1 text-sm text-red-500">{errors.level}</p>
-            )}
-          </div>
+          {renderEducationLevelSelect()}
 
           <div className="mb-4">
             <label className="block mb-2 text-sm font-medium text-gray-700">
