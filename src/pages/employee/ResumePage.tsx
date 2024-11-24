@@ -383,7 +383,7 @@ const ResumePage: React.FC = () => {
               <Plus size={20} />
             </button>
           </div>
-          {experiences.map((exp) => (
+          {experiences?.length > 0 ? experiences.map((exp) => (
             <div key={exp.id} className="mb-4 p-4 bg-gray-50 rounded-lg">
               <div className="flex justify-between items-start">
                 <div>
@@ -410,7 +410,7 @@ const ResumePage: React.FC = () => {
                 </div>
               </div>
             </div>
-          ))}
+          )) : <h2 className='text-gray-500'>Chưa có thông tin kinh nghiệm</h2>}
         </section>
 
         <Divider />

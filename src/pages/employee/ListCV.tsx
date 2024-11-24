@@ -4,16 +4,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { resumeGet, deleteResume, resumeCreate } from '../../services/resumeApi';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
+import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 
 const ListCV = () => {
     const [resume, setResume] = useState([]);
-    const [loading, setLoading] = useState(false);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchJobs = async () => {
-            setLoading(true);
+            dispatch(startLoading());
             try {
                 const result = await dispatch(resumeGet({}));
                 if (result?.payload?.response?.success == true) {
@@ -22,7 +22,7 @@ const ListCV = () => {
             } catch (error) {
                 toast.error('Có lỗi xảy ra khi tải danh sách công việc');
             } finally {
-                setLoading(false);
+                dispatch(stopLoading());
             }
         };
 
@@ -54,8 +54,8 @@ const ListCV = () => {
 
     const handleCreate = async () => {
         try {
-        const result: any = await dispatch(resumeCreate());
-    
+            const result: any = await dispatch(resumeCreate());
+
             if (result?.payload?.response?.success) {
                 const createdResume = result.payload.response.data;
                 toast.success('Thêm CV thành công!');
@@ -68,14 +68,6 @@ const ListCV = () => {
             console.error('Error in handleCreate:', error);
         }
     };
-
-    if (loading) {
-        return (
-            <div className="p-4 text-center">
-                Đang tải dữ liệu...
-            </div>
-        );
-    }
 
     return (
         <div className="max-w-4xl mx-auto p-4">
@@ -121,14 +113,14 @@ const ListCV = () => {
                                         <div className="font-medium">{resume.title}</div>
                                     </td>
                                     <td className="py-4">
-                                        <div className="text-sm text-gray-600">{formatDate(resume.createdAt)}</div>
+                                        <div className="text-sm text-gray-600">{formatDate(resume.updatedAt)}</div>
                                     </td>
                                     <td className="py-4">
-                                        <span className={`px-2 py-1 rounded-full text-sm ${resume.status === 'Đã duyệt'
+                                        <span className={`px-2 py-1 rounded-full text-sm ${resume.status
                                             ? 'bg-green-100 text-green-800'
                                             : 'bg-yellow-100 text-yellow-800'
                                             }`}>
-                                            {resume.status || 'Chờ duyệt'}
+                                            {resume.status ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
                                     <td className="py-4">
@@ -151,7 +143,7 @@ const ListCV = () => {
                     </table>
                 </div>
 
-                {resume.length === 0 && !loading && (
+                {resume.length === 0 && (
                     <div className="text-center py-8 text-gray-500">
                         Chưa có CV nào được tạo
                     </div>

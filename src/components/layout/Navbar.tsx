@@ -54,7 +54,7 @@ const Navbar: React.FC<{}> = () => {
     <div className="absolute right-0 w-72 bg-white rounded-md shadow-lg hidden group-hover:block">
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <img src={avatar ? avatar : Logo} alt="My CareerLink Logo" className="w-12 h-12" />
+          <img src={avatar ? avatar : Logo} alt="Avatar user" className="w-12 h-12" />
           <div>
             <h3 className="font-semibold text-lg">{fullName}</h3>
             <p className="text-gray-500">Tài khoản</p>
@@ -97,10 +97,10 @@ const Navbar: React.FC<{}> = () => {
     <div className="absolute right-0 w-72 bg-white rounded-md shadow-lg hidden group-hover:block">
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <img src={Logo} alt="TinaSoft Logo" className="w-12 h-12" />
+          <img src={avatar ? avatar : Logo} alt="Avatar user" className="w-12 h-12" />
           <div>
-            <h3 className="font-semibold text-lg">TinaSoft</h3>
-            <p className="text-gray-500">Chỉnh sửa hồ sơ của bạn</p>
+            <h3 className="font-semibold text-lg">{fullName}</h3>
+            <p className="text-gray-500">Tài khoản</p>
           </div>
         </div>
       </div>

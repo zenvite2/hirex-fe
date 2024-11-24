@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { useState, useEffect } from "react";
 import { Job } from "../../pages/employee/FindJobs";
+import { convertNumberToLocaleString, formatNumberToVietnameseShort } from "../../utils/utils";
 
 
 interface JobCardProps {
@@ -129,8 +130,8 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
               </span>
             </div>
             <div className="flex items-center">
-              <FaDollarSign className="text-gray-500 mr-1" />
-              <span className="text-xs text-gray-600">{job.min_salary} - {job.max_salary}</span>
+              {/* <FaDollarSign className="text-gray-500 mr-1" /> */}
+              <span className="text-xs text-gray-600">{formatNumberToVietnameseShort(job.minSalary)} - {formatNumberToVietnameseShort(job.maxSalary)}</span>
             </div>
           </div>
           <p className="text-gray-700 text-sm mb-4 line-clamp-2">

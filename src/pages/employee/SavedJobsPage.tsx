@@ -4,6 +4,8 @@ import { Trash2 } from 'lucide-react';
 import axiosIns from '../../services/axiosIns';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
+import useAppDispatch from '../../hooks/useAppDispatch';
+import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 
 interface JobResponse {
   id: number;
@@ -32,14 +34,15 @@ const SavedJobsPage = () => {
   const navigate = useNavigate();
   const [filterOption, setFilterOption] = useState<'recent' | 'urgent' | 'salary'>('recent');
   const [savedJobs, setSavedJobs] = useState<SavedJob[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { isLoggedIn } = useSelector((state: RootState) => state.authReducer);
+  const dispatch = useAppDispatch();
 
   // Fetch saved jobs
   useEffect(() => {
     const fetchSavedJobs = async () => {
       try {
+        dispatch(startLoading());
         const response = await axiosIns.get<ApiResponse>('/saved-job/list', { includeToken: true });
         if (response.data.success) {
           setSavedJobs(response.data.data);
@@ -50,7 +53,7 @@ const SavedJobsPage = () => {
         setError('Không thể tải danh sách việc làm đã lưu');
         console.error(err);
       } finally {
-        setLoading(false);
+        dispatch(stopLoading());
       }
     };
 
@@ -78,7 +81,6 @@ const SavedJobsPage = () => {
     navigate(`/job-detail/${jobId}`);
   };
 
-  if (loading) return <div>Đang tải...</div>;
   if (error) return <div>Lỗi: {error}</div>;
 
   return (
@@ -95,7 +97,7 @@ const SavedJobsPage = () => {
       >
         <h1 className="text-2xl font-bold mb-2">Việc làm đã lưu</h1>
         <p className="text-sm">
-        Xem lại danh sách những việc làm mà bạn đã lưu trước đó. Ứng tuyển ngay để không bỏ lỡ cơ hội nghề nghiệp dành cho bạn.
+          Xem lại danh sách những việc làm mà bạn đã lưu trước đó. Ứng tuyển ngay để không bỏ lỡ cơ hội nghề nghiệp dành cho bạn.
         </p>
       </div>
 
@@ -117,7 +119,7 @@ const SavedJobsPage = () => {
               <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 
+                    <h3
                       className="text-lg font-semibold text-black cursor-pointer hover:underline"
                       onClick={() => handleJobDetail(savedJob.jobResponse.id)}
                     >
@@ -137,13 +139,13 @@ const SavedJobsPage = () => {
                     <span>Hạn nộp: {new Date(savedJob.jobResponse.deadline).toLocaleDateString()}</span>
                   </div>
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-500"
                       onClick={() => handleJobDetail(savedJob.jobResponse.id)}
                     >
                       Ứng tuyển
                     </button>
-                    <button 
+                    <button
                       className="p-2 text-gray-500 hover:text-gray-700"
                       onClick={() => handleDeleteSavedJob(savedJob.jobResponse.id, savedJob.id)}
                     >

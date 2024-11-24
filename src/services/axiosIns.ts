@@ -47,7 +47,7 @@ const addInterceptors = (instance: AxiosInstance) => {
             logMessage += `url: ${config.url}\n`;
             logMessage += `headers: ${JSON.stringify(config.headers, null, 2)}\n`;
             logMessage += `payload: ${config.data ? JSON.stringify(config.data, null, 2) : '{}'}\n`;
-            console.log(logMessage);
+            // console.log(logMessage);
             return config;
         },
         (error) => {
@@ -61,7 +61,7 @@ const addInterceptors = (instance: AxiosInstance) => {
             let logMessage = '==============RESPONSE==============\n';
             logMessage += `statusCode: ${response.status}\n`;
             logMessage += `data: ${JSON.stringify(response.data, null, 2)}\n`;
-            console.log(logMessage);
+            // console.log(logMessage);
             return response;
         },
         (error) => {

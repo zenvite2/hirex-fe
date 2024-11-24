@@ -4,12 +4,12 @@ import { applicationLists, applicationUpdate, deleteApplication, ApplicationStat
 import moment from 'moment';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { toast } from 'react-toastify';
+import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 
 const ApplicantsList = () => {
   const dispatch = useAppDispatch();
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
 
@@ -18,7 +18,7 @@ const ApplicantsList = () => {
 
   // Lấy danh sách ứng dụng
   const fetchJobDetail = async () => {
-    setIsLoading(true);
+    dispatch(startLoading());
     setError(null);
     try {
       const result = await dispatch(applicationLists());
@@ -28,7 +28,7 @@ const ApplicantsList = () => {
     } catch (err) {
       setError(err.message || 'Không thể tải danh sách ứng viên');
     } finally {
-      setIsLoading(false);
+      dispatch(stopLoading());
     }
   };
 
@@ -96,15 +96,6 @@ const ApplicantsList = () => {
     setFilteredApplications(filtered);
   }, [searchQuery, statusFilter, applications]);
 
-  // Hiển thị trạng thái tải
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center p-8">
-        <div className="text-gray-500">Đang tải dữ liệu...</div>
-      </div>
-    );
-  }
-
   // Hiển thị lỗi
   if (error) {
     return (
@@ -145,7 +136,7 @@ const ApplicantsList = () => {
 
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded flex items-center"
-          // onClick={() => fetchJobDetail()}
+        // onClick={() => fetchJobDetail()}
         >
           <Search className="w-4 h-4 mr-2" />
           Tìm kiếm
@@ -205,8 +196,8 @@ const ApplicantsList = () => {
                       application.status === 'ACCEPTED'
                         ? 'text-green-500'
                         : application.status === 'REJECTED'
-                        ? 'text-red-500'
-                        : 'text-yellow-500'
+                          ? 'text-red-500'
+                          : 'text-yellow-500'
                     }
                   >
                     {application.status}
@@ -214,18 +205,16 @@ const ApplicantsList = () => {
                 </td>
                 <td className="py-2">
                   <Trash
-                    className={`inline-block mr-2 text-gray-500 cursor-pointer ${
-                      updatingId === application.id ? 'opacity-50 pointer-events-none' : ''
-                    }`}
+                    className={`inline-block mr-2 text-gray-500 cursor-pointer ${updatingId === application.id ? 'opacity-50 pointer-events-none' : ''
+                      }`}
                     size={18}
                     onClick={() => handleDeleteApplication(application.id)}
                   />
                   <CheckCircle
-                    className={`inline-block mr-2 cursor-pointer ${
-                      application.status === ApplicationStatus.ACCEPTED
+                    className={`inline-block mr-2 cursor-pointer ${application.status === ApplicationStatus.ACCEPTED
                         ? 'text-green-500'
                         : 'text-gray-500 hover:text-green-500'
-                    } ${updatingId === application.id ? 'opacity-50' : ''}`}
+                      } ${updatingId === application.id ? 'opacity-50' : ''}`}
                     size={18}
                     onClick={() => {
                       if (application.status !== ApplicationStatus.ACCEPTED) {
@@ -234,11 +223,10 @@ const ApplicantsList = () => {
                     }}
                   />
                   <XCircle
-                    className={`inline-block cursor-pointer ${
-                      application.status === ApplicationStatus.REJECTED
+                    className={`inline-block cursor-pointer ${application.status === ApplicationStatus.REJECTED
                         ? 'text-red-500'
                         : 'text-gray-500 hover:text-red-500'
-                    } ${updatingId === application.id ? 'opacity-50' : ''}`}
+                      } ${updatingId === application.id ? 'opacity-50' : ''}`}
                     size={18}
                     onClick={() => {
                       if (application.status !== ApplicationStatus.REJECTED) {

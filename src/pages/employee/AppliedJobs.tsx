@@ -6,22 +6,21 @@ import useAppDispatch from '../../hooks/useAppDispatch';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
+import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 
 const AppliedJob = () => {
   const { userId } = useSelector((state: RootState) => state.authReducer);
   const dispatch = useAppDispatch();
   const [applications, setApplications] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
-
   // Bộ lọc trạng thái và tìm kiếm
   const [filterStatus, setFilterStatus] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Hàm lấy danh sách ứng dụng
   const fetchJobDetail = async () => {
-    setIsLoading(true);
+    dispatch(startLoading());
     setError(null);
     try {
       const result = await dispatch(appliedJob({ userId }));
@@ -29,7 +28,7 @@ const AppliedJob = () => {
     } catch (err) {
       setError(err.message || 'Không thể tải danh sách ứng viên');
     } finally {
-      setIsLoading(false);
+      dispatch(stopLoading());
     }
   };
 
@@ -54,15 +53,6 @@ const AppliedJob = () => {
       setUpdatingId(null);
     }
   };
-
-  // Hiển thị trạng thái tải
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center p-8">
-        <div className="text-gray-500">Đang tải dữ liệu...</div>
-      </div>
-    );
-  }
 
   // Hiển thị lỗi
   if (error) {
@@ -105,7 +95,7 @@ const AppliedJob = () => {
 
 
       {/* Bộ lọc và tìm kiếm */}
-      <div className="p-4">
+      <div>
         <div className="flex mb-4 items-center">
           <input
             type="text"
@@ -139,54 +129,56 @@ const AppliedJob = () => {
             <div className="text-gray-500">Không có dữ liệu ứng tuyển</div>
           </div>
         ) : (
-          <table className="w-full bg-rose-50">
-            <thead>
-              <tr className="text-left text-pink-500">
-                <th>Job</th>
-                <th>Ngày ứng tuyển</th>
-                <th>Trạng thái</th>
-                <th>Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredApplications.map((application) => (
-                <tr key={application.id} className="border-b">
-                  <td className="py-2">
-                    <div className="font-bold">{application.jobTitle}</div>
-                    <div className="text-gray-500">📍 {application.address}</div>
-                  </td>
-                  <td className="py-2">
-                    {application.createdAt
-                      ? moment(application.createdAt).format('YYYY-MM-DD HH:mm')
-                      : 'Chưa có thời gian'}
-                  </td>
-                  <td className="py-2">
-                    <span
-                      className={
-                        application.status === 'ACCEPTED'
-                          ? 'text-green-500'
-                          : application.status === 'REJECTED'
-                            ? 'text-red-500'
-                            : 'text-yellow-500'
-                      }
-                    >
-                      {application.status}
-                    </span>
-                  </td>
-                  <td className="py-2 text-center align-middle">
-                    <Trash
-                      className={`inline-block mr-2 text-gray-500 cursor-pointer ${updatingId === application.id
+          <div className='p-5 bg-rose-50 rounded-lg'>
+            <table className="w-full">
+              <thead>
+                <tr className="text-left text-pink-500">
+                  <th>Job</th>
+                  <th>Ngày ứng tuyển</th>
+                  <th>Trạng thái</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredApplications.map((application) => (
+                  <tr key={application.id} className="border-b">
+                    <td className="py-2">
+                      <div className="font-bold">{application.jobTitle}</div>
+                      <div className="text-gray-500">📍 {application.address}</div>
+                    </td>
+                    <td className="py-2">
+                      {application.createdAt
+                        ? moment(application.createdAt).format('YYYY-MM-DD HH:mm')
+                        : 'Chưa có thời gian'}
+                    </td>
+                    <td className="py-2">
+                      <span
+                        className={
+                          application.status === 'ACCEPTED'
+                            ? 'text-green-500'
+                            : application.status === 'REJECTED'
+                              ? 'text-red-500'
+                              : 'text-yellow-500'
+                        }
+                      >
+                        {application.status}
+                      </span>
+                    </td>
+                    <td className="py-2 text-center align-middle">
+                      <Trash
+                        className={`inline-block mr-2 text-gray-500 cursor-pointer ${updatingId === application.id
                           ? 'opacity-50 pointer-events-none'
                           : ''
-                        }`}
-                      size={18}
-                      onClick={() => handleDeleteApplication(application.id)}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                          }`}
+                        size={18}
+                        onClick={() => handleDeleteApplication(application.id)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

@@ -37,7 +37,7 @@ const Notifications: React.FC = () => {
 
     const interval = setInterval(() => {
       fetchNotifications(); // Gọi liên tục mỗi 30 giây
-    }, 3000); // 30 giây
+    }, 3000000); // 30 giây
 
     // Cleanup để hủy setInterval khi component unmount
     return () => clearInterval(interval);
@@ -90,9 +90,8 @@ const Notifications: React.FC = () => {
               {notifications.map((notification) => (
                 <li
                   key={notification.id}
-                  className={`text-gray-700 p-2 rounded-md cursor-pointer ${
-                    !notification.read ? 'bg-blue-50 font-semibold' : 'hover:bg-gray-100'
-                  }`}
+                  className={`text-gray-700 p-2 rounded-md cursor-pointer ${!notification.read ? 'bg-blue-50 font-semibold' : 'hover:bg-gray-100'
+                    }`}
                   onClick={() => handleNotificationClick(notification.id)}
                 >
                   <div className="font-bold text-sm">{notification.title}</div>

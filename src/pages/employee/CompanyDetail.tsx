@@ -126,7 +126,7 @@ const CompanyDetail = () => {
 
             <div className="flex items-center gap-2 text-gray-600">
               <Users className="w-5 h-5" />
-              <span>{company?.scale}</span>
+              <span>{company?.scale ? `${company.scale} nhân viên` : `Không có thông tin`}</span>
             </div>
           </div>
         </div>
@@ -159,7 +159,7 @@ const CompanyDetail = () => {
                 <div className="p-6">
                   <h2 className="text-xl font-semibold text-gray-800">Việc đang tuyển</h2>
                   <div className="mt-4 space-y-4">
-                    {company?.jobs.map((job) => (
+                    {company?.jobs.length > 0 ? company?.jobs.map((job) => (
                       <Link
                         key={job.id}
                         to={`/job-detail/${job.id}`}
@@ -175,7 +175,7 @@ const CompanyDetail = () => {
                           </span>
                         </div>
                       </Link>
-                    ))}
+                    )) : <h2 className='text-gray-400 text-xs'>Không tìm thấy công việc</h2>}
                   </div>
                 </div>
               </div>

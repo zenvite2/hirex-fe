@@ -31,8 +31,8 @@ export interface Job {
   companyDescription: string | null;
   jobType: string;
   experience: string;
-  min_salary: number;
-  max_salary: number;
+  minSalary: number;
+  maxSalary: number;
   contractType: string;
 }
 
@@ -145,12 +145,12 @@ const FindJobs: React.FC = () => {
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const [experienceResult, positionResult, jobTypeResult, industryResult, salaryResult, contractResult, educationResult] = await Promise.all([
+        const [experienceResult, positionResult, jobTypeResult, industryResult, contractResult, educationResult] = await Promise.all([
           dispatch(experienceList()).unwrap(),
           dispatch(positionList()).unwrap(),
           dispatch(jobTypeList()).unwrap(),
           dispatch(industryList()).unwrap(),
-          dispatch(salaryList()).unwrap(),
+          // dispatch(salaryList()).unwrap(),
           dispatch(contracTypeList()).unwrap(),
           dispatch(educationList()).unwrap(),
         ]);

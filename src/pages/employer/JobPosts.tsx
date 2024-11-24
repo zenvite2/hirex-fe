@@ -4,16 +4,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { jobGetAll, jobDelete } from '../../services/jobApi';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
+import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 
 const JobListings = () => {
   const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchJobs = async () => {
-      setLoading(true);
+      dispatch(startLoading());
       try {
         const result = await dispatch(jobGetAll());
         if (result?.payload?.response?.success == true) {
@@ -22,7 +22,7 @@ const JobListings = () => {
       } catch (error) {
         toast.error('Có lỗi xảy ra khi tải danh sách công việc');
       } finally {
-        setLoading(false);
+        dispatch(stopLoading());
       }
     };
 
@@ -51,14 +51,6 @@ const JobListings = () => {
       toast.error('Có lỗi xảy ra khi xóa công việc');
     }
   };
-
-  if (loading) {
-    return (
-      <div className="p-4 text-center">
-        Đang tải dữ liệu...
-      </div>
-    );
-  }
 
   return (
     <div className="p-4">
@@ -122,7 +114,7 @@ const JobListings = () => {
         </table>
       </div>
 
-      {jobs.length === 0 && !loading && (
+      {jobs.length === 0 && (
         <div className="text-center py-8 text-gray-500">
           Chưa có công việc nào được đăng tải
         </div>

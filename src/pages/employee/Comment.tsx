@@ -239,9 +239,9 @@ const CommentCard = ({ companyId, userId }: { companyId: number; userId: number 
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="bg-gray-50 flex flex-col">
             <div className="bg-white rounded-xl shadow-sm flex flex-col flex-grow">
-                <div className="p-6 flex-grow">
+                <div className="flex-grow">
                     <h2 className="text-xl font-semibold text-gray-800">Bình luận</h2>
 
                     {error && (
@@ -252,14 +252,16 @@ const CommentCard = ({ companyId, userId }: { companyId: number; userId: number 
 
                     {/* Cố định chiều cao và thêm thuộc tính cuộn cho danh sách bình luận */}
                     <div className="mt-6 space-y-4 max-h-[400px] overflow-y-auto flex-grow">
-                        {comments.map((comment) => (
-                            <Comment
-                                key={comment.id}
-                                comment={comment}
-                                onAddReply={handleAddReply}
-                                userId={userId}
-                            />
-                        ))}
+                        {comments.length > 0 ?
+                            comments.map((comment) => (
+                                <Comment
+                                    key={comment.id}
+                                    comment={comment}
+                                    onAddReply={handleAddReply}
+                                    userId={userId}
+                                />
+                            ))
+                            : <h2 className='text-xs text-gray-500'>Chưa có bình luận nào.</h2>}
                     </div>
 
                     <form onSubmit={handleSubmitComment} className="mt-6">
