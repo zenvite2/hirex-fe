@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { X, ChevronDown } from 'lucide-react';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { skillList } from '../../services/autofillApi';
+import { updateSkill } from '../../services/employeeApi';
 import { toast } from 'react-toastify';
 
 interface Skill {
@@ -12,14 +13,12 @@ interface Skill {
 interface SkillPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (skills: Skill[]) => void;
   initialSkills?: Skill[];
 }
 
 const SkillPopup: React.FC<SkillPopupProps> = ({
   isOpen,
   onClose,
-  onSave,
   initialSkills = []
 }) => {
   const dispatch = useAppDispatch();
@@ -40,18 +39,14 @@ const SkillPopup: React.FC<SkillPopupProps> = ({
       setIsLoading(true);
       try {
         const result = await dispatch(skillList({ name })).unwrap();
-        // Ensure we're setting an array
         if (result?.response) {
           setAvailableSkills(result?.response?.data);
-
-          console.log(result?.payload?.response)
         } else {
-          setAvailableSkills([]); // Set empty array if response is invalid
-          console.error('Invalid skills response:', result);
+          setAvailableSkills([]);
         }
       } catch (error) {
         console.error('Error fetching skills:', error);
-        setAvailableSkills([]); // Set empty array on error
+        setAvailableSkills([]);
         toast.error('Có lỗi khi tải danh sách kỹ năng');
       } finally {
         setIsLoading(false);
@@ -59,11 +54,10 @@ const SkillPopup: React.FC<SkillPopupProps> = ({
     }, 300);
   };
 
-  // Ensure we're working with arrays before filtering
-  const filteredSkills = Array.isArray(availableSkills) 
+  const filteredSkills = Array.isArray(availableSkills)
     ? availableSkills.filter(
-        skill => !selectedSkills.some(selected => selected.id === skill.id)
-      )
+      skill => !selectedSkills.some(selected => selected.id === skill.id)
+    )
     : [];
 
   const handleAddSkill = (skill: Skill) => {
@@ -77,8 +71,16 @@ const SkillPopup: React.FC<SkillPopupProps> = ({
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
-      await onSave(selectedSkills);
+      // Chỉ lấy các id của skill và loại bỏ những skill không có id
+      const skillIds = selectedSkills
+        .map(skill => skill.id)
+        .filter((id): id is number => id !== undefined);
+
+      // Gửi request với body chỉ chứa mảng id
+      const result = await dispatch(updateSkill({ skillIds })).unwrap();
+      toast.success('Cập nhật kỹ năng thành công');
       onClose();
+
     } catch (error) {
       console.error('Error saving skills:', error);
       toast.error('Có lỗi xảy ra khi lưu kỹ năng');
@@ -121,7 +123,7 @@ const SkillPopup: React.FC<SkillPopupProps> = ({
               placeholder="Nhập mới hoặc chọn trong danh sách dưới đây"
               className="w-full p-2 pr-8 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            <ChevronDown 
+            <ChevronDown
               className={`absolute right-2 top-3 text-gray-400 transition-transform ${isDropdownOpen ? 'transform rotate-180' : ''}`}
               size={20}
               onClick={() => {
@@ -129,7 +131,7 @@ const SkillPopup: React.FC<SkillPopupProps> = ({
                 if (!isDropdownOpen) fetchSkills('');
               }}
             />
-            
+
             {isDropdownOpen && (
               <div className="absolute w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto z-10">
                 {isLoading ? (

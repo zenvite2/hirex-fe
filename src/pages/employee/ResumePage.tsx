@@ -6,11 +6,10 @@ import SkillPopup from './SkillPopup';
 import HeaderEditPopup from './HeaderEditPopup';
 import CareerGoalPopup from './CareerGoalPopup';
 import useAppDispatch from '../../hooks/useAppDispatch';
-import { getEmployees } from '../../services/employeeApi';
+import { getEmployees, getSkills } from '../../services/employeeApi';
 import { RiAccountBoxFill } from "react-icons/ri";
 import { educationDelete, educationGetAll } from '../../services/educationApi';
 import { experienceDelete, experienceGetAll } from '../../services/experienceApi';
-import { skillGetAll, skillDelete } from '../../services/skillApi';
 import { careergoalGet } from '../../services/careergoalApi';
 import { toast } from 'react-toastify';
 
@@ -51,7 +50,7 @@ interface HeaderData {
 
 interface CareerGoal {
   id?: number;
-  position: string;
+  position: number;
   salary: number;
   jobType: number;
 }
@@ -214,8 +213,8 @@ const ResumePage: React.FC = () => {
 
   const fetchSkills = async () => {
     try {
-      const result = await dispatch(skillGetAll());
-      if (skillGetAll.fulfilled.match(result)) {
+      const result = await dispatch(getSkills());
+      if (getSkills.fulfilled.match(result)) {
         const skillsData = result.payload.response.data.map((item: any) => ({
           id: item.id,
           name: item.name,
@@ -408,29 +407,21 @@ const ResumePage: React.FC = () => {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-orange-600">Kỹ năng</h2>
             <button
-              onClick={() => handleOpenPopup()}
+              onClick={() => setIsSkillPopupOpen(true)}
               className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
             >
-              <Plus size={20} />
+              <Pencil size={20} />
             </button>
           </div>
 
           {skills.length > 0 ? (
-            <div className="space-y-3">
+            <div className="flex flex-wrap gap-2">
               {skills.map((skill) => (
                 <div
                   key={skill.id}
-                  className="p-4 bg-gray-50 rounded-lg flex justify-between items-center hover:bg-gray-100 transition-colors duration-200"
+                  className="bg-blue-100 text-blue-800 rounded-full px-4 py-1 text-sm"
                 >
-                  <div>
-                    <p className="font-semibold">{skill.name}</p>
-                  </div>
-                  <button
-                    onClick={() => handleOpenPopup([skill])}
-                    className="text-blue-500 hover:text-blue-700 transition-colors duration-200 p-1 rounded"
-                  >
-                    <Pencil size={16} />
-                  </button>
+                  {skill.name}
                 </div>
               ))}
             </div>
@@ -438,6 +429,7 @@ const ResumePage: React.FC = () => {
             <p className="text-gray-500 text-center py-4">Chưa có thông tin kỹ năng</p>
           )}
         </section>
+
 
         <Divider />
 
@@ -476,7 +468,6 @@ const ResumePage: React.FC = () => {
         <SkillPopup
           isOpen={isSkillPopupOpen}
           onClose={() => setIsSkillPopupOpen(false)}
-          onSave={handleSaveSkills}
           initialSkills={selectedSkills}
         />
         <HeaderEditPopup
