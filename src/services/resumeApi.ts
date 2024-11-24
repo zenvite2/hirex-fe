@@ -1,28 +1,43 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axiosIns from "./axiosIns";
+import { Resume } from '../pages/cv/types';
 
+export const fetchResume = async (resumeId) => {
+    try {
+        const response = await axiosIns.get(`/resumes/${resumeId}`, { includeToken: true });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching resume:', error);
+        throw error;
+    }
+};
 
 // Get resume
-export const resumeGet = createAsyncThunk<any, any>(
+export const resumeGet = createAsyncThunk<any>(
     'resume/getResume',
     async (id) => {
-        return axiosIns.get(`/resumes`, {
-            includeToken: true
-        })
+        return axiosIns.get(`/resumes`, { includeToken: true })
             .then(response => { return { response: response.data } })
             .catch(error => { });
     }
 );
 
 // Create resume
-export const resumeCreate = createAsyncThunk<any, void>(
-    'resume/getResume',
-    async () => {
-        return axiosIns.post(`/resumes`, {
-            includeToken: true
-        })
-            .then(response => { return { response: response.data } })
-            .catch(error => { });
+export const resumeCreate = createAsyncThunk<any>(
+    'resume/create',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axiosIns.post('/resumes', {}, 
+                { includeToken: true }
+            );
+            
+            return { response: response.data };
+        } catch (error: any) {
+            console.error('Resume create error:', error);
+            return rejectWithValue(
+                error.response?.data?.message || 'Có lỗi xảy ra khi tạo CV'
+            );
+        }
     }
 );
 
@@ -41,3 +56,22 @@ export const deleteResume = createAsyncThunk<any, number>(
         }
     }
 );
+
+export const saveResume = async (resumeData: Resume) => {
+    try {
+        let response;
+
+        if (resumeData.id) {
+            // Update existing resume
+            response = await axiosIns.put(
+                `/resumes/${resumeData.id}`,
+                resumeData,
+                { includeToken: true }
+            );
+        } 
+        return response.data;
+    } catch (error) {
+        console.error('Error saving resume:', error);
+        throw error;
+    }
+};

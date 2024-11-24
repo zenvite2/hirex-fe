@@ -6,7 +6,7 @@ const API_BASE_URL = 'http://localhost:8080/resumes';
 
 export const fetchResume = async () => {
     try {
-        const response = await axiosIns.get('/resumes/2', { includeToken: true });
+        const response = await axiosIns.get('/resumes/3', { includeToken: true });
 
         // Ensure we have a valid response structure
         return response.data;
@@ -26,7 +26,8 @@ export const saveResume = async (resumeData: Resume) => {
             // Update existing resume
             response = await axios.put(
                 `${API_BASE_URL}/${resumeData.id}`,
-                resumeData
+                resumeData,
+                { includeToken: true }
             );
         } else {
             // Create new resume

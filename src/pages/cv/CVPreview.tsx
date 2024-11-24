@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import {useParams } from 'react-router-dom';
 import '../../styles/cv.css'
 import useAppDispatch from '../../hooks/useAppDispatch';
-import { resumeGet } from '../../services/resumeApi';
+import { fetchResume } from '../../services/resumeApi';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
 
-const CVPreview = () => {
+interface CVPreviewProps {
+    passedId?: number;
+}
+
+const CVPreview: React.FC<CVPreviewProps> = ({ passedId }) => {
+    const { id } = useParams();
     const dispatch = useAppDispatch();
     const [resumeData, setResumeData] = useState(null);
 
@@ -16,9 +22,9 @@ const CVPreview = () => {
         const fetchResumeDetail = async () => {
             try {
                 dispatch(startLoading());
-                const result = await dispatch(resumeGet(1));
+                const fetchedResume = await fetchResume(passedId);
                 dispatch(stopLoading());
-                setResumeData(result?.payload?.response);
+                setResumeData(fetchedResume);
             } catch (err) {
                 toast.error('Error loading job details');
             }

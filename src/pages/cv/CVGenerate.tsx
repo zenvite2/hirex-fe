@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import {useParams } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import CVPreview from './CVPreview';
@@ -6,6 +7,9 @@ import CVPreview from './CVPreview';
 const CVGenerate: React.FC = () => {
     const componentRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { id } = useParams();
+
+    const numericId = id ? parseInt(id) : undefined;
 
     const handleExportPdf = async () => {
         if (!componentRef.current) return;
@@ -79,7 +83,7 @@ const CVGenerate: React.FC = () => {
                 ref={componentRef}
                 className="flex flex-col items-center"
             >
-                <CVPreview />
+                <CVPreview passedId={numericId} />
             </div>
         </div>
     );

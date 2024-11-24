@@ -96,3 +96,18 @@ export const contracTypeList = createAsyncThunk<any>(
             .catch(error => { })
     }
 );
+
+export const skillList = createAsyncThunk<any, { name: string }>(
+    'skill/list',
+    async (payload) => {
+        try {
+            const response = await axiosIns.get('/auto-fill/skill', {
+                params: { name: payload.name }
+            });
+            return { response: response.data }; 
+        } catch (error: any) {
+            
+            toast.error("An error occurred");
+        }
+    }
+);

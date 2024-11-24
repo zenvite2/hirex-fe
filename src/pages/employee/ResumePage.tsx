@@ -26,7 +26,7 @@ interface Experience {
 
 interface Education {
   id?: number;
-  level: string;
+  educationLevelId: number;
   universityName: string;
   expertise: string;
   startDate: string;
@@ -37,8 +37,6 @@ interface Education {
 interface Skill {
   id?: number;
   name: string;
-  level: string;
-  description?: string;
 }
 
 interface HeaderData {
@@ -71,7 +69,7 @@ const ResumePage: React.FC = () => {
 
   const [skills, setSkills] = useState<Skill[]>([]);
   const [isSkillPopupOpen, setIsSkillPopupOpen] = useState(false);
-  const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
+  const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
 
   const Divider = () => <hr className="my-8 border-t border-gray-300" />;
 
@@ -210,45 +208,35 @@ const ResumePage: React.FC = () => {
     fetchEmployeeData();
   }, [dispatch]);
 
+  useEffect(() => {
+    fetchSkills();
+  }, []);
+
   const fetchSkills = async () => {
     try {
       const result = await dispatch(skillGetAll());
       if (skillGetAll.fulfilled.match(result)) {
         const skillsData = result.payload.response.data.map((item: any) => ({
           id: item.id,
-          name: item.techName,
-          level: item.level,
-          description: item.description
+          name: item.name,
         }));
         setSkills(skillsData);
       }
     } catch (error) {
       console.error('Failed to fetch skills:', error);
-      toast.error('Failed to fetch skills. Please try again.');
+      toast.error('Không thể tải danh sách kỹ năng. Vui lòng thử lại.');
     }
   };
 
-  const handleSaveSkill = async (skill: Skill) => {
-    await fetchSkills();
-    setEditingSkill(null);
+  const handleOpenPopup = (existingSkills?: Skill[]) => {
+    setSelectedSkills(existingSkills || []);
+    setIsSkillPopupOpen(true);
+  };
+
+  const handleSaveSkills = async (updatedSkills: Skill[]) => {
+    await fetchSkills(); // Refresh the skills list after saving
     setIsSkillPopupOpen(false);
   };
-
-  const handleDeleteSkill = async (id: number) => {
-    try {
-      const action = await dispatch(skillDelete(id));
-      if (action?.payload?.response?.success === true) {
-        await fetchSkills();
-        toast.success('Skill deleted successfully');
-      }
-    } catch (error) {
-      toast.error('Failed to delete skill. Please try again.');
-    }
-  };
-
-  useEffect(() => {
-    fetchSkills();
-  }, [dispatch]);
 
 
   useEffect(() => {
@@ -420,46 +408,34 @@ const ResumePage: React.FC = () => {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-orange-600">Kỹ năng</h2>
             <button
-              onClick={() => {
-                setEditingSkill(null);
-                setIsSkillPopupOpen(true);
-              }}
+              onClick={() => handleOpenPopup()}
               className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
             >
               <Plus size={20} />
             </button>
           </div>
+
           {skills.length > 0 ? (
-            skills.map((skill) => (
-              <div key={skill.id} className="p-4 bg-gray-50 rounded-lg flex justify-between items-center">
-                <div>
-                  <p className="font-semibold">{skill.name}</p>
-                  <p className="text-sm text-gray-600">{skill.level}</p>
-                  {skill.description && (
-                    <p className="text-sm text-gray-500 mt-1">{skill.description}</p>
-                  )}
-                </div>
-                <div className="flex gap-2">
+            <div className="space-y-3">
+              {skills.map((skill) => (
+                <div
+                  key={skill.id}
+                  className="p-4 bg-gray-50 rounded-lg flex justify-between items-center hover:bg-gray-100 transition-colors duration-200"
+                >
+                  <div>
+                    <p className="font-semibold">{skill.name}</p>
+                  </div>
                   <button
-                    onClick={() => {
-                      setEditingSkill(skill);
-                      setIsSkillPopupOpen(true);
-                    }}
-                    className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
+                    onClick={() => handleOpenPopup([skill])}
+                    className="text-blue-500 hover:text-blue-700 transition-colors duration-200 p-1 rounded"
                   >
                     <Pencil size={16} />
                   </button>
-                  <button
-                    onClick={() => handleDeleteSkill(skill.id!)}
-                    className="text-red-500 hover:text-red-700 transition-colors duration-200"
-                  >
-                    <Trash2 size={16} />
-                  </button>
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           ) : (
-            <p className="text-gray-500">Chưa có thông tin kỹ năng</p>
+            <p className="text-gray-500 text-center py-4">Chưa có thông tin kỹ năng</p>
           )}
         </section>
 
@@ -500,8 +476,8 @@ const ResumePage: React.FC = () => {
         <SkillPopup
           isOpen={isSkillPopupOpen}
           onClose={() => setIsSkillPopupOpen(false)}
-          onSave={handleSaveSkill}
-          skill={editingSkill}
+          onSave={handleSaveSkills}
+          initialSkills={selectedSkills}
         />
         <HeaderEditPopup
           isOpen={isHeaderEditPopupOpen}

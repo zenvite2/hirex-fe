@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Plus, Edit, Trash2, Code, ShieldCheck, Star, GraduationCap, ShieldBan, Link as LinkIcon } from 'lucide-react';
-
+import { useNavigate, useParams } from 'react-router-dom';
+import { Briefcase, Plus, Edit, Trash2, Code, ShieldCheck, Star, GraduationCap, ShieldBan, Link as LinkIcon, FileDown } from 'lucide-react';
 import { Project, Resume, Certificate, Education, Experience } from './types';
-import { fetchResume, saveResume } from './api';
 import ProjectPopup from './ProjectPopup';
 import GoalPopup from './GoalPopup';
 import HobbyPopup from './HobbyPopup';
 import CertificatePopup from './CertificatePopup';
 import EducationPopup from './EducationPopup';
 import ExperiencePopup from './ExperiencePopup';
+import { fetchResume, saveResume } from '../../services/resumeApi';
+
 
 const ResumeComponent: React.FC = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
     const [resumeData, setResumeData] = useState<Resume>({
         career: undefined,
         hobby: undefined,
@@ -67,7 +70,7 @@ const ResumeComponent: React.FC = () => {
     useEffect(() => {
         const loadResume = async () => {
             try {
-                const fetchedResume = await fetchResume();
+                const fetchedResume = await fetchResume(id);
                 if (fetchedResume) {
                     setResumeData({
                         id: fetchedResume.id,
@@ -441,6 +444,17 @@ const ResumeComponent: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg">
+
+            <div className="fixed bottom-8 right-8 z-50">
+                <button
+                    onClick={() => navigate(`/generate-cv/${id}`)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105"
+                >
+                    <FileDown size={20} />
+                    <span>Xuất báo cáo</span>
+                </button>
+            </div>
+
             {/* Career Goals Section */}
             <section className="mb-8">
                 <div className="flex justify-between items-center mb-4">

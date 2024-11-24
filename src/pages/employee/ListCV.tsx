@@ -15,7 +15,7 @@ const ListCV = () => {
         const fetchJobs = async () => {
             setLoading(true);
             try {
-                const result = await dispatch(resumeGet({}));
+                const result = await dispatch(resumeGet());
                 if (result?.payload?.response?.success == true) {
                     setResume(result.payload.response.data);
                 }
@@ -54,12 +54,12 @@ const ListCV = () => {
 
     const handleCreate = async () => {
         try {
-        const result: any = await dispatch(resumeCreate());
+        const result = await dispatch(resumeCreate());
     
             if (result?.payload?.response?.success) {
                 const createdResume = result.payload.response.data;
                 toast.success('Thêm CV thành công!');
-                navigate(`/test/${createdResume.id}`); // Điều chỉnh cách gọi navigate
+                navigate(`/resume/${createdResume.id}`); // Điều chỉnh cách gọi navigate
             } else {
                 toast.error('Không thể tạo CV, hãy thử lại.');
             }
@@ -115,7 +115,7 @@ const ListCV = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {resume.map((resume, index) => (
+                            {resume?.map((resume, index) => (
                                 <tr key={index} className="border-b hover:bg-gray-50">
                                     <td className="py-4">
                                         <div className="font-medium">{resume.title}</div>
@@ -134,7 +134,7 @@ const ListCV = () => {
                                     <td className="py-4">
                                         <div className="flex gap-3">
                                             <button
-                                                onClick={() => navigate(`/jobs/edit/${resume.id}`)}
+                                                onClick={() => navigate(`/resume/${resume.id}`)}
                                                 className="hover:text-yellow-600 transition-colors"
                                             >                      <Pencil size={18} />
                                             </button>
@@ -150,12 +150,6 @@ const ListCV = () => {
                         </tbody>
                     </table>
                 </div>
-
-                {resume.length === 0 && !loading && (
-                    <div className="text-center py-8 text-gray-500">
-                        Chưa có CV nào được tạo
-                    </div>
-                )}
             </div>
         </div>
     );

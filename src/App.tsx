@@ -26,7 +26,6 @@ import { RootState } from "./redux/store";
 import CustomModal from "./components/common/CustomModal";
 import { closeMessenger } from "./redux/slice/messageSlice";
 import useAppDispatch from "./hooks/useAppDispatch";
-import TestCV from "./pages/cv/CVGenerate";
 import CVPreview from "./pages/cv/CVPreview";
 import CVGenerate from "./pages/cv/CVGenerate";
 import { useCallback, useEffect } from "react";
@@ -34,7 +33,7 @@ import { getConversations } from "./services/messageApi";
 import { getUserInfo } from "./services/authApi";
 import { setUserInfo } from "./redux/slice/authSlice";
 import SavedJobsPage from "./pages/employee/SavedJobsPage";
-import TestCV1 from "./pages/cv/Resume";
+import Resume from "./pages/cv/Resume";
 import AppliedJob from "./pages/employee/AppliedJobs";
 import ListCV from "./pages/employee/ListCV";
 
@@ -111,7 +110,7 @@ function App() {
                             <Route path="/apply-job" element={<JobForm />} />
                             <Route path="/jobs/edit/:id" element={<JobForm />} />
                             <Route path="/company/detail/:id" element={<CompanyDetail />} />
-                            <Route path="/test" element={<TestCV1 />} />
+                            <Route path="/resume/:id" element={<Resume />} />
                             <Route path="/saved-jobs" element={<SavedJobsPage />} />
                             <Route path="/applied-jobs" element={<AppliedJob />} />
                             <Route path="/list-cv" element={<ListCV />} />
@@ -119,7 +118,7 @@ function App() {
 
                         {/* Các route khác */}
                         {/* <Route path='/messenger' element={<Messenger />} /> */}
-                        <Route path='/generate-cv' element={<CVGenerate />} />
+                        <Route path='/generate-cv/:id' element={<CVGenerate />} />
                         <Route path='/cv-preview' element={<CVPreview />} />
                         <Route path="/register-employee" element={<RegisterEmployee />} />
                         <Route path="/register-employer" element={<RegisterEmployer />} />
