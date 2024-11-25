@@ -41,6 +41,7 @@ import websocketService from './utils/WebSocketService';
 import { ChatMessage, Status, VIDEO_CALL_RESPONSE } from "./pages/chat/Messenger";
 import { Client, Message as MessageStompjs, over } from 'stompjs';
 import OTPInput from "./pages/OTP";
+import { NotificationType, setNotifications, setUnreadCount } from "./redux/slice/notificationSlice";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -78,6 +79,7 @@ function App() {
     const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer" || location.pathname === "/otp";
     const wsUrl = process.env.REACT_APP_BASE_WS_URL;
     const [showCallRqModal, setShowCallRqModal] = useState(false);
+    const { notifications, unreadCount } = useSelector((state: RootState) => state.notificationReducer);
 
     const fetchUserInfo = useCallback(async () => {
         if (userId) {
@@ -100,9 +102,11 @@ function App() {
 
     useEffect(() => {
         websocketService.subscribe('messenger', onReceive);
+        websocketService.subscribe('notification', onNotificationReceive);
 
         return () => {
             websocketService.unsubscribe('messenger');
+            websocketService.unsubscribe('notification');
         };
     }, []);
 
@@ -129,6 +133,20 @@ function App() {
                 id: msgReceived.sender,
                 fullname: msgReceived.senderName
             }))
+        }
+    };
+
+    const onNotificationReceive = (payload: MessageStompjs) => {
+        const notificationReceived: NotificationType = { ...JSON.parse(payload.body) };
+        const currentNotifications = [...notifications];
+
+        const notificationExists = currentNotifications.some(
+            notification => notification.id === notificationReceived.id
+        );
+
+        if (!notificationExists) {
+            dispatch(setNotifications([notificationReceived, ...currentNotifications]));
+            dispatch(setUnreadCount(unreadCount + 1));
         }
     };
 

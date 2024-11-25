@@ -4,13 +4,15 @@ import loadingReducer from './slice/loadingSlice';
 import authReducer from './slice/authSlice';
 import messageReducer from './slice/messageSlice';
 import autoFillReducer from './slice/autoFillSlice';
+import notificationReducer from './slice/notificationSlice';
 
 const store = configureStore({
     reducer: {
         loadingReducer,
         authReducer,
         messageReducer,
-        autoFillReducer
+        autoFillReducer,
+        notificationReducer
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(thunk),
