@@ -18,9 +18,8 @@ import ResumePage from "./employee/ResumePage";
 import JobForm from "./employer/JobCreationForm";
 import ResumeContent from "./employee/ResumeContent";
 import CompanyDetail from "./employee/CompanyDetail";
-import CVPage from "./employee/CVPage";
-import AddCV from "./employee/AddCV";
 import SavedJobsPage from "./employee/SavedJobsPage";
+import PasswordChangeForm from "./auth/PasswordChangeForm";
 
 export {
   FindJobs,
@@ -44,4 +43,5 @@ export {
   ResumeContent,
   CompanyDetail,
   SavedJobsPage,
+  PasswordChangeForm
 };

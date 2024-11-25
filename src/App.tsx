@@ -18,6 +18,7 @@ import {
     ResumeContent,
     CompanyDetail,
     VideoCallRequest,
+    PasswordChangeForm
 } from "./pages";
 import { ToastContainer } from 'react-toastify';
 import Loading from './components/common/Loading';
@@ -178,6 +179,8 @@ function App() {
                             <Route path="/saved-jobs" element={<SavedJobsPage />} />
                             <Route path="/applied-jobs" element={<AppliedJob />} />
                             <Route path="/list-cv" element={<ListCV />} />
+                            <Route path="/change-password" element={<PasswordChangeForm />} />
+
                         </Route>
 
                         {/* Các route khác */}
