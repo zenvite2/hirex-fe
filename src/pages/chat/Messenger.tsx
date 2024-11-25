@@ -25,14 +25,15 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import CustomModal from '../../components/common/CustomModal';
 import VideoCallRequest from './VideoCallRequest';
-import { addMessage, selectCurrentConver, setCurrentIndex } from '../../redux/slice/messageSlice';
+import { addMessage, selectCurrentConver, setCurrentIndex, setToCaller } from '../../redux/slice/messageSlice';
 import { getConversations } from '../../services/messageApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { uploadFile } from '../../services/fileUploadApi';
 import { Inbox } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import websocketService from '../../utils/WebSocketService'
 
-const VIDEO_CALL_RESPONSE = {
+export const VIDEO_CALL_RESPONSE = {
     ACCEPT: 'VIDEO_CALL_RESPONSE_ACCEPT',
     REFUSE: 'VIDEO_CALL_RESPONSE_REFUSE'
 } as const;
@@ -56,6 +57,7 @@ export interface ChatMessage extends MessageModel {
     status: StatusType;
     fileUrl?: string;
     id: string;
+    senderName: string;
 }
 
 export interface Conversation {
@@ -66,81 +68,22 @@ export interface Conversation {
 }
 
 const wsUrl = process.env.REACT_APP_BASE_WS_URL;
-let stompClient: Client | null = null;
-let isConnected: Boolean = false;
 
 const Messenger: React.FC = () => {
-    const { userId, username } = useSelector((state: RootState) => state.authReducer);
+    const { userId, username, fullName } = useSelector((state: RootState) => state.authReducer);
     const dispatch = useAppDispatch();
-    const [toCaller, setToCaller] = useState<string>(null);
     const currentConver = useSelector(selectCurrentConver);
     const [msgInput, setMsgInput] = useState<string>("");
-    const [showCallRqModal, setShowCallRqModal] = useState(false);
+
     const fileInputRef = useRef(null);
     const { lstConvers } = useSelector((state: RootState) => state.messageReducer);
 
     useEffect(() => {
-        if (!isConnected) {
-            dispatch(startLoading());
-            connect();
-        }
+        userId != null && lstConvers.length == 0 && dispatch(getConversations());
     }, []);
-
-    useEffect(() => {
-        isConnected && userId != null && lstConvers.length == 0 && dispatch(getConversations());
-    }, []);
-
-    const connect = () => {
-        if (!isConnected) {
-            const sock = new SockJS(wsUrl + '/ws');
-            stompClient = over(sock);
-            isConnected = true;
-            stompClient.connect({}, onConnected, (e) => {
-                isConnected = false;
-                dispatch(stopLoading());
-                toast.error('Mất kết nối tới máy chủ, vui lòng thử lại.');
-            });
-
-            sock.onerror = () => {
-                isConnected = false;
-                toast.error('Có lỗi khi kết nối tới máy chủ, vui lòng thử lại.');
-            }
-        }
-    };
-
-    const onConnected = () => {
-        dispatch(stopLoading());
-        stompClient.subscribe('/user/' + userId + '/private', onReceive);
-        const chatMessage: ChatMessage = {
-            sender: userId + '',
-            message: `${userId} connected to server.`,
-            sentTime: new Date().toISOString(),
-            receiver: '...',
-            status: Status.JOIN,
-            type: 'custom',
-            direction: 'outgoing',
-            position: 'normal',
-            id: uuidv4()
-        };
-        stompClient.send("/app/private-message", {}, JSON.stringify(chatMessage));
-    };
-
-    const onReceive = (payload: MessageStompjs) => {
-        const msgReceived: ChatMessage = { ...JSON.parse(payload.body), position: 'normal', direction: 'incoming' };
-        updateLstConvers(msgReceived);
-        if (msgReceived.status == Status.VIDEO_CALL_REQUEST) {
-            setShowCallRqModal(true);
-            setToCaller(msgReceived.sender);
-        }
-    };
-
-    const updateLstConvers = useCallback((chatMessage: ChatMessage) => {
-        const converUserIdReceived = Number(Number(chatMessage.sender) === userId ? chatMessage.receiver : chatMessage.sender);
-        dispatch(addMessage({ converId: converUserIdReceived, msg: chatMessage }));
-    }, [userId]);
 
     const handleSendMessage = useCallback((type: MessageType, fileUrl?: string) => {
-        if (stompClient && (msgInput.trim() || fileUrl) && currentConver) {
+        if ((msgInput.trim() || fileUrl) && currentConver) {
             const chatMessage: ChatMessage = {
                 sender: String(userId),
                 receiver: String(currentConver.userId),
@@ -151,16 +94,20 @@ const Messenger: React.FC = () => {
                 position: 'normal',
                 type,
                 fileUrl,
-                id: uuidv4()
+                id: uuidv4(),
+                senderName: fullName ?? username
             };
 
             updateLstConvers(chatMessage);
-            stompClient.send("/app/private-message", {}, JSON.stringify(chatMessage));
+            websocketService.sendMessage(chatMessage);
             setMsgInput("");
-        } else {
-            toast.error("Mất kết nối tới máy chủ, vui lòng tải lại trang");
         }
     }, [currentConver, msgInput, userId]);
+
+    const updateLstConvers = useCallback((chatMessage: ChatMessage) => {
+        const converUserIdReceived = Number(Number(chatMessage.sender) === userId ? chatMessage.receiver : chatMessage.sender);
+        dispatch(addMessage({ converId: converUserIdReceived, msg: chatMessage }));
+    }, [userId]);
 
     const handleVideoCall = () => {
         const windowFeatures = `menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes,width=${window.screen.width},height=${window.screen.height}`;
@@ -179,19 +126,11 @@ const Messenger: React.FC = () => {
             direction: 'outgoing',
             position: 'normal',
             type: 'text',
-            id: uuidv4()
+            id: uuidv4(),
+            senderName: fullName ?? username
         };
-        stompClient.send("/app/private-message", {}, JSON.stringify(chatMessage));
+        websocketService.sendMessage(chatMessage);
     };
-
-    const handleRefuseCall = () => {
-        const acceptPayload = {
-            fromUser: userId,
-            toUser: toCaller,
-            status: VIDEO_CALL_RESPONSE.REFUSE,
-        };
-        stompClient.send("/app/accept", {}, JSON.stringify(acceptPayload));
-    }
 
     const handleFileChosen = (event) => {
         const file: File = event.target.files[0];
@@ -223,7 +162,10 @@ const Messenger: React.FC = () => {
                                     active={currentConver?.userId === conversation.userId}
                                     onClick={() => {
                                         dispatch(setCurrentIndex(conversation.userId));
-                                        setToCaller(conversation.userId + '');
+                                        setToCaller({
+                                            id: conversation.userId + '',
+                                            fullname: conversation.name
+                                        });
                                     }}
                                 >
                                     <Avatar src={conversation.avtUrl} name={conversation.name} />
@@ -292,11 +234,9 @@ const Messenger: React.FC = () => {
                 <div className="flex items-center mb-4">
                     <Inbox color="gray" className="mr-3" size={50} />
                 </div>
-                <p className="text-gray-400 text-lg font-medium">You don’t have any conversations</p>
+                <p className="text-gray-400 text-lg font-medium">Hãy kết nối với người khác.</p>
             </div>}
-            {showCallRqModal && <CustomModal isOpen={showCallRqModal} onClose={() => setShowCallRqModal(false)} width='large' height='large'>
-                <VideoCallRequest fromUser={toCaller} toUser={userId + ''} setShowCallRequestModal={setShowCallRqModal} handleRefuseCall={handleRefuseCall} />
-            </CustomModal>}
+
             <input
                 type="file"
                 accept="image/*,application/pdf"

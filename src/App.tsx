@@ -17,6 +17,7 @@ import {
     JobForm,
     ResumeContent,
     CompanyDetail,
+    VideoCallRequest,
 } from "./pages";
 import { ToastContainer } from 'react-toastify';
 import Loading from './components/common/Loading';
@@ -24,11 +25,11 @@ import LoginPage from "./pages/auth/Login";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./redux/store";
 import CustomModal from "./components/common/CustomModal";
-import { closeMessenger } from "./redux/slice/messageSlice";
+import { addMessage, closeMessenger, setToCaller } from "./redux/slice/messageSlice";
 import useAppDispatch from "./hooks/useAppDispatch";
 import CVPreview from "./pages/cv/CVPreview";
 import CVGenerate from "./pages/cv/CVGenerate";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getConversations } from "./services/messageApi";
 import { getUserInfo } from "./services/authApi";
 import { setUserInfo } from "./redux/slice/authSlice";
@@ -36,6 +37,9 @@ import SavedJobsPage from "./pages/employee/SavedJobsPage";
 import Resume from "./pages/cv/Resume";
 import AppliedJob from "./pages/employee/AppliedJobs";
 import ListCV from "./pages/employee/ListCV";
+import websocketService from './utils/WebSocketService';
+import { ChatMessage, Status, VIDEO_CALL_RESPONSE } from "./pages/chat/Messenger";
+import { Client, Message as MessageStompjs, over } from 'stompjs';
 
 function SidebarLayout() {
     const location = useLocation();
@@ -66,11 +70,13 @@ function SidebarLayout() {
 
 function App() {
     const location = useLocation();
-    const { showMessenger } = useSelector((state: RootState) => state.messageReducer);
+    const { showMessenger, toCaller } = useSelector((state: RootState) => state.messageReducer);
     const dispatch = useAppDispatch();
     const { userId, isLoggedIn } = useSelector((state: RootState) => state.authReducer);
     // Không hiển thị Navbar trên trang login và register-employee  
     const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer";
+    const wsUrl = process.env.REACT_APP_BASE_WS_URL;
+    const [showCallRqModal, setShowCallRqModal] = useState(false);
 
     const fetchUserInfo = useCallback(async () => {
         if (userId) {
@@ -84,7 +90,46 @@ function App() {
 
     useEffect(() => {
         isLoggedIn && fetchUserInfo();
+
+        if (userId && wsUrl) {
+            websocketService.connect(userId.toString(), wsUrl);
+        }
+
     }, [userId]);
+
+    useEffect(() => {
+        websocketService.subscribe('messenger', onReceive);
+
+        return () => {
+            websocketService.unsubscribe('messenger');
+        };
+    }, []);
+
+    const handleRefuseCall = () => {
+        const acceptPayload = {
+            fromUser: userId,
+            toUser: toCaller,
+            status: VIDEO_CALL_RESPONSE.REFUSE,
+        };
+        websocketService.sendMessage(acceptPayload, '/app/accept');
+    };
+
+    const updateLstConvers = useCallback((chatMessage: ChatMessage) => {
+        const converUserIdReceived = Number(Number(chatMessage.sender) === userId ? chatMessage.receiver : chatMessage.sender);
+        dispatch(addMessage({ converId: converUserIdReceived, msg: chatMessage }));
+    }, [userId]);
+
+    const onReceive = (payload: MessageStompjs) => {
+        const msgReceived: ChatMessage = { ...JSON.parse(payload.body), position: 'normal', direction: 'incoming' };
+        updateLstConvers(msgReceived);
+        if (msgReceived.status == Status.VIDEO_CALL_REQUEST) {
+            setShowCallRqModal(true);
+            dispatch(setToCaller({
+                id: msgReceived.sender,
+                fullname: msgReceived.senderName
+            }))
+        }
+    };
 
     return (
         <>
@@ -143,6 +188,9 @@ function App() {
             />
             <CustomModal isOpen={showMessenger} width='large' height='large' onClose={() => { dispatch(closeMessenger()); }} children={<Messenger />} />
             <Loading />
+            {showCallRqModal && <CustomModal isOpen={showCallRqModal} onClose={() => setShowCallRqModal(false)} width='small' height='small'>
+                <VideoCallRequest fromUser={toCaller.id} toUser={userId + ''} fromUserFullname={toCaller.fullname} setShowCallRequestModal={setShowCallRqModal} handleRefuseCall={handleRefuseCall} />
+            </CustomModal>}
         </>
     );
 }

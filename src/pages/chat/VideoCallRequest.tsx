@@ -4,13 +4,14 @@ import React, { useEffect } from 'react';
 interface VideoCallRequestProps {
     fromUser: string;
     toUser: string;
+    fromUserFullname: string;
     setShowCallRequestModal: any;
     handleRefuseCall: any;
 }
 
 const wsUrl = process.env.REACT_APP_BASE_WS_URL;
 
-const VideoCallRequest: React.FC<VideoCallRequestProps> = ({ fromUser, toUser, setShowCallRequestModal, handleRefuseCall }) => {
+const VideoCallRequest: React.FC<VideoCallRequestProps> = ({ fromUser, toUser, fromUserFullname, setShowCallRequestModal, handleRefuseCall }) => {
 
     const acceptCallRequest = () => {
         setShowCallRequestModal(false);
@@ -27,27 +28,26 @@ const VideoCallRequest: React.FC<VideoCallRequestProps> = ({ fromUser, toUser, s
         handleRefuseCall();
     };
 
-    useEffect(() => {
-
-    });
-
     return (
-        <div className="flex items-center justify-center h-full w-full fixed inset-0 bg-black bg-opacity-50">
-            <div className="flex flex-col items-center justify-center bg-white shadow-lg rounded-lg p-6 w-80 max-w-full text-center">
-                <h2 className="text-lg font-semibold mb-2">{fromUser}</h2>
-                <p className="text-md text-gray-700 mb-6">Bạn đang có cuộc gọi video</p>
-                <div className="flex space-x-4">
+        <div className="flex flex-col items-center justify-center w-full h-full">
+            <div className="w-full max-w-sm mx-auto animate-fade-in">
+                <div className="mb-6 items-center justify-center text-center">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-2">{fromUserFullname}</h2>
+                    <p className="text-gray-600">Bạn đang có cuộc gọi video</p>
+                </div>
+
+                <div className="flex items-center justify-center space-x-6">
                     <button
                         onClick={acceptCallRequest}
-                        className="flex items-center justify-center bg-green-500 text-white p-3 rounded-full hover:bg-green-600 transition duration-300"
+                        className="flex items-center justify-center bg-green-500 text-white p-4 rounded-full hover:bg-green-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
                     >
-                        <PhoneCall className="w-6 h-6" />
+                        <PhoneCall className="w-7 h-7" />
                     </button>
                     <button
                         onClick={refuseCallRequest}
-                        className="flex items-center justify-center bg-red-500 text-white p-3 rounded-full hover:bg-red-600 transition duration-300"
+                        className="flex items-center justify-center bg-red-500 text-white p-4 rounded-full hover:bg-red-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
                     >
-                        <X className="w-6 h-6" />
+                        <X className="w-7 h-7" />
                     </button>
                 </div>
             </div>

@@ -7,12 +7,17 @@ interface MessagesState {
   lstConvers: Conversation[];
   showMessenger: boolean;
   currentIndex: number;
+  toCaller: {
+    id: string;
+    fullname: string;
+  };
 }
 
 const initialState: MessagesState = {
   lstConvers: [],
   showMessenger: false,
   currentIndex: 0,
+  toCaller: null
 };
 
 const messagesSlice = createSlice({
@@ -62,6 +67,9 @@ const messagesSlice = createSlice({
     closeMessenger: (state) => {
       state.showMessenger = false;
     },
+    setToCaller: (state, action: PayloadAction<{ id: string, fullname: string }>) => {
+      state.toCaller = { ...state.toCaller, ...action.payload };
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -90,6 +98,7 @@ export const {
   setCurrentIndex,
   openMessenger,
   closeMessenger,
+  setToCaller
 } = messagesSlice.actions;
 
 export default messagesSlice.reducer;

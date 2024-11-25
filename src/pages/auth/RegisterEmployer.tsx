@@ -7,7 +7,7 @@ import { getListCompany } from '../../services/companyApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface Company {
   id: number;
@@ -21,6 +21,7 @@ const RegistrationForm: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(null);
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
+  const navigate = useNavigate();
 
   const {
     formData,
@@ -137,6 +138,7 @@ const RegistrationForm: React.FC = () => {
       const result = await dispatch(registerEmployer(submissionData));
       if (result?.payload?.response?.success === true) {
         toast.success('Đăng ký thành công');
+        navigate("/employer")
       } else {
         toast.error('Đăng ký thất bại');
       }
