@@ -36,6 +36,7 @@ import SavedJobsPage from "./pages/employee/SavedJobsPage";
 import Resume from "./pages/cv/Resume";
 import AppliedJob from "./pages/employee/AppliedJobs";
 import ListCV from "./pages/employee/ListCV";
+import OTPInput from "./pages/OTP";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -70,7 +71,7 @@ function App() {
     const dispatch = useAppDispatch();
     const { userId, isLoggedIn } = useSelector((state: RootState) => state.authReducer);
     // Không hiển thị Navbar trên trang login và register-employee  
-    const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer";
+    const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer" || location.pathname === "/otp";
 
     const fetchUserInfo = useCallback(async () => {
         if (userId) {
@@ -126,6 +127,7 @@ function App() {
                         <Route path="/about-us" element={<About />} />
                         <Route path="/resume" element={<ResumePage />} />
                         <Route path="/resume-content" element={<ResumeContent />} />
+                        <Route path="/otp" element={<OTPInput />} />
 
                     </Routes>
                 </div>

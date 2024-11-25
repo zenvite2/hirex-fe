@@ -7,7 +7,8 @@ import { getListCompany } from '../../services/companyApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axiosIns from '../../services/axiosIns';
 
 interface Company {
   id: number;
@@ -21,6 +22,17 @@ const RegistrationForm: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(null);
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
+  const navigate = useNavigate();
+
+  const generateOTP = async (email) => {
+    try {
+      await axiosIns.post('/otp/generate', { email });
+      console.log('OTP generated successfully');
+    } catch (error) {
+      console.error('Error generating OTP:', error);
+    }
+  };
+  
 
   const {
     formData,
@@ -110,41 +122,54 @@ const RegistrationForm: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   const submissionData = {
+  //     username: formData.username,
+  //     email: formData.email,
+  //     password: formData.password,
+  //     retryPassword: formData.confirmPassword,
+  //     fullName: formData.fullName,
+  //     gender: formData.gender,
+  //     phoneNumber: formData.phone,
+  //     nameCompany: formData.company,
+  //     companyId: selectedCompanyId, // Include company ID if selected
+  //     city: formData.workLocation,
+  //     district: formData.district
+  //   };
+
+  //   // Remove companyId if it's null (when company wasn't selected from dropdown)
+  //   if (submissionData.companyId === null) {
+  //     delete submissionData.companyId;
+  //   }
+
+  //   dispatch(startLoading());
+  //   try {
+  //     const result = await dispatch(registerEmployer(submissionData));
+  //     if (result?.payload?.response?.success === true) {
+  //       toast.success('Đăng ký thành công');
+  //     } else {
+  //       toast.error('Đăng ký thất bại');
+  //     }
+  //   } catch (error) {
+  //     toast.error('Có lỗi xảy ra khi đăng ký');
+  //   } finally {
+  //     dispatch(stopLoading());
+  //   }
+  // };
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     const submissionData = {
-      username: formData.username,
-      email: formData.email,
-      password: formData.password,
-      retryPassword: formData.confirmPassword,
-      fullName: formData.fullName,
-      gender: formData.gender,
-      phoneNumber: formData.phone,
-      nameCompany: formData.company,
-      companyId: selectedCompanyId, // Include company ID if selected
-      city: formData.workLocation,
-      district: formData.district
+      ...formData,
+      companyId: selectedCompanyId,
     };
+    if (!selectedCompanyId) delete submissionData.companyId;
 
-    // Remove companyId if it's null (when company wasn't selected from dropdown)
-    if (submissionData.companyId === null) {
-      delete submissionData.companyId;
-    }
+    generateOTP(submissionData.email)
 
-    dispatch(startLoading());
-    try {
-      const result = await dispatch(registerEmployer(submissionData));
-      if (result?.payload?.response?.success === true) {
-        toast.success('Đăng ký thành công');
-      } else {
-        toast.error('Đăng ký thất bại');
-      }
-    } catch (error) {
-      toast.error('Có lỗi xảy ra khi đăng ký');
-    } finally {
-      dispatch(stopLoading());
-    }
+    // Navigate to OTP page with state
+    navigate('/otp', { state: { registrationType: 'employer', formData: submissionData } });
   };
 
   const toggleDropdown = () => {
