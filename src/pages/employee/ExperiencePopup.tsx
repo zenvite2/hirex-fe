@@ -60,15 +60,50 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
     }
   }, [experience]);
 
-
-  
+  const [errors, setErrors] = useState<Partial<Record<keyof Experience, string>>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (errors[name as keyof Experience]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+
   };
+
+  const validateForm = (): boolean => {
+    const newErrors: Partial<Record<keyof Experience, string>> = {};
+
+    if (!formData.companyName) {
+      newErrors.companyName = 'Vui lòng nhập tên công ty';
+    }
+    if (!formData.position.trim()) {
+      newErrors.position = 'Vui lòng nhập vị trí';
+    }
+    if (!formData.yearExperience) {
+      newErrors.yearExperience = 'Vui lòng nhập năm kinh nhiệm';
+    }
+    if (!formData.startDate) {
+      newErrors.startDate = 'Vui lòng chọn ngày bắt đầu';
+    }
+    if (!formData.endDate) {
+      newErrors.endDate = 'Vui lòng chọn ngày kết thúc';
+    }
+    if (formData.startDate && formData.endDate && new Date(formData.startDate) > new Date(formData.endDate)) {
+      newErrors.endDate = 'Ngày kết thúc phải sau ngày bắt đầu';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -153,7 +188,7 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
 
           <div className="mb-4">
             <label className="block mb-2 text-sm font-medium text-gray-700">
-            Tên công ty <span className="text-red-500">*</span>
+              Tên công ty <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -162,6 +197,9 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {errors.companyName && (
+              <p className="mt-1 text-sm text-red-500">{errors.companyName}</p>
+            )}
           </div>
 
           <div className="mb-4">
@@ -171,9 +209,11 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
               name="position"
               value={formData.position}
               onChange={handleChange}
-              required
               className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {errors.position && (
+              <p className="mt-1 text-sm text-red-500">{errors.position}</p>
+            )}
           </div>
 
           <div className="mb-4 flex justify-between">
@@ -189,6 +229,9 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
                 disabled={isSubmitting}
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              {errors.startDate && (
+                <p className="mt-1 text-sm text-red-500">{errors.startDate}</p>
+              )}
             </div>
             <div className="w-1/2 pl-2">
               <label className="block mb-2 text-sm font-medium text-gray-700">
@@ -202,6 +245,9 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
                 disabled={isSubmitting}
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              {errors.endDate && (
+                <p className="mt-1 text-sm text-red-500">{errors.endDate}</p>
+              )}
             </div>
           </div>
 

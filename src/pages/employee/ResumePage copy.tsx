@@ -44,11 +44,6 @@ const ResumePage: React.FC = () => {
     }
   };
 
-  const handleOpenPopup = (existingSkills?: Skill[]) => {
-    setSelectedSkills(existingSkills || []);
-    setIsSkillPopupOpen(true);
-  };
-
   return (
     <div className="bg-gray-100 min-h-screen py-8">
       <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-3xl">
@@ -60,29 +55,21 @@ const ResumePage: React.FC = () => {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-orange-600">Kỹ năng</h2>
             <button
-              onClick={() => handleOpenPopup()}
+              onClick={() => setIsSkillPopupOpen(true)}
               className="text-blue-500 hover:text-blue-700 transition-colors duration-200"
             >
-              <Plus size={20} />
+              <Pencil size={20} />
             </button>
           </div>
 
           {skills.length > 0 ? (
-            <div className="space-y-3">
+            <div className="flex flex-wrap gap-2">
               {skills.map((skill) => (
                 <div
                   key={skill.id}
-                  className="p-4 bg-gray-50 rounded-lg flex justify-between items-center hover:bg-gray-100 transition-colors duration-200"
+                  className="bg-blue-100 text-blue-800 rounded-full px-4 py-1 text-sm"
                 >
-                  <div>
-                    <p className="font-semibold">{skill.name}</p>
-                  </div>
-                  <button
-                    onClick={() => handleOpenPopup([skill])}
-                    className="text-blue-500 hover:text-blue-700 transition-colors duration-200 p-1 rounded"
-                  >
-                    <Pencil size={16} />
-                  </button>
+                  {skill.name}
                 </div>
               ))}
             </div>
@@ -90,7 +77,6 @@ const ResumePage: React.FC = () => {
             <p className="text-gray-500 text-center py-4">Chưa có thông tin kỹ năng</p>
           )}
         </section>
-
 
         <SkillPopup
           isOpen={isSkillPopupOpen}

@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Image } from 'lucide-react';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { toast } from 'react-toastify';
 import { useLocationSelector } from './useLocationSelector';
 import { LocationSelector } from '../../components/registration/LocationSelector';
-import { updateCompany } from '../../services/companyApi';
+import { updateCompany, getCompany } from '../../services/companyApi';
 
 interface CompanyInfo {
   companyName: string;
   address: string;
   city: number | null;
   district: number | null;
-  companySize: string;
+  scale: number | null;
   website?: string;
   logo?: File;
+  logoUrl: string
   description?: string;
 }
 
@@ -25,8 +26,9 @@ const CompanyInfoForm: React.FC = () => {
     address: '',
     city: null,
     district: null,
-    companySize: '',
+    scale: null,
     website: '',
+    logoUrl: '',
     description: ''
   });
 
@@ -38,7 +40,9 @@ const CompanyInfoForm: React.FC = () => {
     handleSelectCity,
     handleSelectDistrict,
     fetchCities,
-    fetchDistricts
+    fetchDistricts,
+    setCityFromId,
+    setDistrictFromId
   } = useLocationSelector();
 
   const [selectedFile, setSelectedFile] = React.useState<string>('');
@@ -63,6 +67,34 @@ const CompanyInfoForm: React.FC = () => {
     };
   }, [previewUrl]);
 
+  useEffect(() => {
+    const fetchEmployeeData = async () => {
+      try {
+        const action = await dispatch(getCompany());
+        if (getCompany.fulfilled.match(action)) {
+          const companyData = action.payload.response?.data;
+          if (companyData) {
+            setFormData({
+              ...companyData
+            });
+
+            if (companyData.city) {
+              await setCityFromId(companyData.city);
+              if (companyData.district) {
+                await setDistrictFromId(companyData.district, companyData.city);
+              }
+            }
+
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch employee data:', error);
+      }
+    };
+
+    fetchEmployeeData();
+  }, [dispatch]);
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -81,7 +113,7 @@ const CompanyInfoForm: React.FC = () => {
     if (formData.website) submitFormData.append('website', formData.website);
     if (formData.description) submitFormData.append('description', formData.description);
     if (logoFile) submitFormData.append('logo', logoFile);
-    if (formData.companySize) submitFormData.append('companySize', formData.companySize);
+    if (formData.scale) submitFormData.append('scale', formData.scale.toString());
 
     const result = await dispatch(updateCompany(submitFormData));
     if (result?.payload?.response?.success === true) {
@@ -182,20 +214,18 @@ const CompanyInfoForm: React.FC = () => {
               <label htmlFor="companySize" className="block mb-1 font-medium">
                 Quy mô công ty
               </label>
-              <select
-                id="companySize"
+              <input
+                id="scale"
+                type="number"
+                min="1"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.companySize}
-                onChange={(e) => setFormData({ ...formData, companySize: e.target.value })}
-              >
-                <option value="">Chọn quy mô</option>
-                <option value="1-10">1-10 nhân viên</option>
-                <option value="11-50">11-50 nhân viên</option>
-                <option value="51-200">51-200 nhân viên</option>
-                <option value="201-500">201-500 nhân viên</option>
-                <option value="501-1000">501-1000 nhân viên</option>
-                <option value="1000+">1000+ nhân viên</option>
-              </select>
+                placeholder="Nhập số lượng nhân viên"
+                value={formData.scale || ''}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  scale: e.target.value ? parseInt(e.target.value) : null
+                })}
+              />
             </div>
           </div>
 
@@ -208,6 +238,12 @@ const CompanyInfoForm: React.FC = () => {
                     <img
                       src={previewUrl}
                       alt="Logo preview"
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  ) : formData.logoUrl ? (
+                    <img
+                      src={formData.logoUrl}
+                      alt="Company logo"
                       className="max-w-full max-h-full object-contain"
                     />
                   ) : (
