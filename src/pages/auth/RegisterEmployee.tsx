@@ -6,36 +6,64 @@ import { registerEmployee } from '../../services/authApi';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
 import { Link, useNavigate } from "react-router-dom";
+import axiosIns from '../../services/axiosIns';
 
 const RegistrationForm = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [retryPassword, setRetryPassword] = useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    retryPassword: ''
+  });
+  
   const [passwordError, setPasswordError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showRetryPassword, setShowRetryPassword] = useState(false);
-  const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const generateOTP = async (email) => {
+    try {
+      await axiosIns.post('/otp/generate', { email });
+      console.log('OTP generated successfully');
+    } catch (error) {
+      console.error('Error generating OTP:', error);
+    }
+  };
+  
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== retryPassword) {
+    
+    // Kiểm tra password match
+    if (formData.password !== formData.retryPassword) {
       setPasswordError('Passwords do not match');
       return;
     }
-    dispatch(startLoading());
-    const result = await dispatch(registerEmployee({ username, email, password, retryPassword }));
-    dispatch(stopLoading());
 
-    if (result?.payload?.response?.success == true) {
-      navigate("/login");
-      toast.success('Đăng ký thành công');
-    } else {
-      toast.error('Đăng ký thất bại');
-    }
+    generateOTP(formData.email)
 
+    // Chuyển tới trang OTP với formData và registrationType
+    navigate('/otp', { 
+      state: {
+        registrationType: 'employee', // hoặc có thể nhận từ props nếu form này được tái sử dụng
+        formData: {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          retryPassword: formData.retryPassword
+        }
+      }
+    });
   };
 
   return (
@@ -53,8 +81,8 @@ const RegistrationForm = () => {
               type="text"
               id="username"
               name="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={formData.username}
+              onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
               placeholder="username"
               required
@@ -68,8 +96,8 @@ const RegistrationForm = () => {
               type="email"
               id="email"
               name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
               placeholder="Nhập email"
               required
@@ -84,8 +112,8 @@ const RegistrationForm = () => {
                 type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={formData.password}
+                onChange={handleChange}
                 className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
                 placeholder="Nhập mật khẩu"
                 required
@@ -110,8 +138,8 @@ const RegistrationForm = () => {
                 type={showRetryPassword ? "text" : "password"}
                 id="retryPassword"
                 name="retryPassword"
-                value={retryPassword}
-                onChange={(e) => setRetryPassword(e.target.value)}
+                value={formData.retryPassword}
+                onChange={handleChange}
                 className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
                 placeholder="Nhập lại mật khẩu"
                 required

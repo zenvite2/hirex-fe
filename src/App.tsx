@@ -40,6 +40,7 @@ import ListCV from "./pages/employee/ListCV";
 import websocketService from './utils/WebSocketService';
 import { ChatMessage, Status, VIDEO_CALL_RESPONSE } from "./pages/chat/Messenger";
 import { Client, Message as MessageStompjs, over } from 'stompjs';
+import OTPInput from "./pages/OTP";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -74,7 +75,7 @@ function App() {
     const dispatch = useAppDispatch();
     const { userId, isLoggedIn } = useSelector((state: RootState) => state.authReducer);
     // Không hiển thị Navbar trên trang login và register-employee  
-    const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer";
+    const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer" || location.pathname === "/otp";
     const wsUrl = process.env.REACT_APP_BASE_WS_URL;
     const [showCallRqModal, setShowCallRqModal] = useState(false);
 
@@ -171,6 +172,7 @@ function App() {
                         <Route path="/about-us" element={<About />} />
                         <Route path="/resume" element={<ResumePage />} />
                         <Route path="/resume-content" element={<ResumeContent />} />
+                        <Route path="/otp" element={<OTPInput />} />
 
                     </Routes>
                 </div>

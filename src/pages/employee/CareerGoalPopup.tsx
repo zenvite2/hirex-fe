@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { careergoalCreate, careergoalUpdate } from '../../services/careergoalApi';
-import { jobTypeList } from '../../services/autofillApi';
+import { jobTypeList, positionList } from '../../services/autofillApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { toast } from 'react-toastify';
 
 interface CareerGoal {
     id?: number;
-    position: string;
+    position: number;
     salary: number;
     jobType: number;
 }
@@ -19,17 +19,18 @@ interface CareerGoalPopups {
     careergoal: CareerGoal | null;
 }
 
-interface JobType {
+interface Type {
     id: number;
     name: string;
 }
 
 const CareerGoalPopup: React.FC<CareerGoalPopups> = ({ isOpen, onClose, onSave, careergoal }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [jobTypes, setJobTypes] = useState<JobType[]>([]);
+    const [jobTypes, setJobTypes] = useState<Type[]>([]);
+    const [positionType, setPositions] = useState<Type[]>([]);
     const dispatch = useAppDispatch();
     const [formData, setFormData] = useState<CareerGoal>({
-        position: '',
+        position: 1,
         salary: 0,
         jobType: 1,
     });
@@ -37,10 +38,20 @@ const CareerGoalPopup: React.FC<CareerGoalPopups> = ({ isOpen, onClose, onSave, 
     useEffect(() => {
         const fetchJobTypes = async () => {
             try {
-                const result = await dispatch(jobTypeList());
-                if (result?.payload?.response?.data) {
-                    setJobTypes(result.payload.response.data);
-                }
+                const [positionResult, jobTypeResult] = await Promise.all([
+                    dispatch(positionList()).unwrap(),
+                    dispatch(jobTypeList()).unwrap(),
+     
+                  ]);
+          
+   
+                  if (positionResult.response?.data) {
+                    setPositions(positionResult.response.data);
+                  }
+                  if (jobTypeResult.response?.data) {
+                    setJobTypes(jobTypeResult.response.data);
+                  }
+
             } catch (error) {
                 toast.error('Lỗi khi tải dữ liệu. Vui lòng thử lại sau.');
             }
@@ -50,13 +61,12 @@ const CareerGoalPopup: React.FC<CareerGoalPopups> = ({ isOpen, onClose, onSave, 
     }, []);
 
     useEffect(() => {
-        // Reset form khi mở popup
         if (isOpen) {
             if (careergoal) {
                 setFormData(careergoal);
             } else {
                 setFormData({
-                    position: '',
+                    position: jobTypes.length > 0 ? jobTypes[0].id : 1,
                     salary: 0,
                     jobType: jobTypes.length > 0 ? jobTypes[0].id : 1,
                 });
@@ -94,14 +104,10 @@ const CareerGoalPopup: React.FC<CareerGoalPopups> = ({ isOpen, onClose, onSave, 
         try {
             // Đảm bảo dữ liệu được format đúng trước khi gửi
             const careergoalData = {
-                position: formData.position.trim(),
+                position: Number(formData.jobType),
                 salary: Number(formData.salary),
                 jobType: Number(formData.jobType)
             };
-
-
-            // Log để debug
-            console.log('Submitting data:', careergoalData);
 
             let result;
             if (careergoal?.id) {
@@ -154,15 +160,20 @@ const CareerGoalPopup: React.FC<CareerGoalPopups> = ({ isOpen, onClose, onSave, 
 
                 <form onSubmit={handleSubmit} className="p-6">
                     <div className="mb-4">
-                        <label className="block mb-2 text-sm font-medium">Vị trí <span className="text-red-500">*</span></label>
-                        <input
-                            type="text"
-                            name="position"
+                    <label className="block mb-2 text-sm font-medium">Vị trí <span className="text-red-500">*</span></label>
+                        <select
+                            name="positionType"
                             value={formData.position}
                             onChange={handleChange}
                             required
                             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
+                        >
+                            {positionType.map(type => (
+                                <option key={type.id} value={type.id}>
+                                    {type.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="mb-4">
