@@ -18,6 +18,7 @@ import {
     ResumeContent,
     CompanyDetail,
     VideoCallRequest,
+    PasswordChangeForm
 } from "./pages";
 import { ToastContainer } from 'react-toastify';
 import Loading from './components/common/Loading';
@@ -175,8 +176,8 @@ function App() {
                             <Route path="/jobs/edit/:id" element={<JobForm />} />
                             <Route path="/company/detail/:id" element={<CompanyDetail />} />
                             <Route path="/resume/:id" element={<Resume />} />
-                            <Route path="/saved-jobs" element={<SavedJobsPage />} />
-                            <Route path="/applied-jobs" element={<AppliedJob />} />
+                            <Route path="/change-password" element={<PasswordChangeForm />} />
+
                         </Route>
 
                         <Route path="/register-employee" element={<RegisterEmployee />} />
@@ -185,6 +186,9 @@ function App() {
                         <Route path="/otp" element={<OTPInput />} />
 
                         <Route element={<EmployeeRoute />}>
+
+                            <Route path="/applied-jobs" element={<AppliedJob />} />
+                            <Route path="/saved-jobs" element={<SavedJobsPage />} />
                             <Route path="/list-cv" element={<ListCV />} />
                             <Route path="/resume" element={<ResumePage />} />
                             <Route path="/resume-content" element={<ResumeContent />} />
@@ -194,8 +198,11 @@ function App() {
                         </Route>
 
                         <Route element={<EmployerRoute />}>
-                            <Route path="/applicants" element={<ApplicantsList />} />
-                            <Route path="/job-posts" element={<JobPosts />} />
+                            <Route element={<SidebarLayout />}>
+                                <Route path="/applicants" element={<ApplicantsList />} />
+                                <Route path="/job-posts" element={<JobPosts />} />
+                            </Route>
+
                             <Route path="/employer" element={<EmployerLanding />} />
 
                         </Route>

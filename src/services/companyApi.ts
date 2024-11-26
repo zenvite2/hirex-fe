@@ -23,3 +23,14 @@ export const getListCompany = createAsyncThunk<any>(
       .catch(error => { })
   }
 );
+
+export const getCompany = createAsyncThunk<any>(
+  'company/get',
+  async () => {
+    return axiosIns.get('/company', {
+      includeToken: true,
+    })
+      .then(response => { return { response: response.data } })
+      .catch(error => { })
+  }
+);

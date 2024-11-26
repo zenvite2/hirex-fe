@@ -8,7 +8,7 @@ function EmployeeRoute(props) {
 
     const { isLoggedIn, role } = useSelector((state: RootState) => state.authReducer);
 
-    if (!isLoggedIn || role !== 'EMPLOYEE') {
+    if (role == 'EMPLOYER') {
         return <Navigate to="/login" replace />;
     }
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import ReusableModal from "../common/ReusableModal";
 import { Logo } from "../../assets";
-import { ChevronDown, FileText, Heart, Send, Bell, LogOut, Settings, HelpCircle, Inbox } from "lucide-react";
+import { ChevronDown, FileText, Heart, Send, Bell, LogOut, Settings, HelpCircle, Inbox, LockKeyhole } from "lucide-react";
 import { useSelector } from 'react-redux';
 import { logout } from '../../redux/slice/authSlice';
 import { RootState } from "../../redux/store";
@@ -73,9 +73,9 @@ const Navbar: React.FC<{}> = () => {
         <Send className="mr-3" size={20} />
         <span>Việc đã ứng tuyển</span>
       </Link>
-      <Link to="/job-alerts" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100">
-        <Bell className="mr-3" size={20} />
-        <span>Thông báo việc làm</span>
+      <Link to="/change-password" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100">
+        <LockKeyhole className="mr-3" size={20} />
+        <span>Đổi mật khẩu</span>
       </Link>
       <div className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={() => { dispatch(openMessenger()) }}>
         <Inbox className="mr-3" size={20} />
@@ -104,7 +104,7 @@ const Navbar: React.FC<{}> = () => {
           </div>
         </div>
       </div>
-      <Link to="/account-settings" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100">
+      <Link to="/change-password" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100">
         <Settings className="mr-3" size={20} />
         <span>Cài đặt tài khoản</span>
       </Link>

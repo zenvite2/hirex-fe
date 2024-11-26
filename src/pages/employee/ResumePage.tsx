@@ -240,9 +240,9 @@ const ResumePage: React.FC = () => {
     setIsSkillPopupOpen(true);
   };
 
-  const handleSaveSkills = async (updatedSkills: Skill[]) => {
-    await fetchSkills(); // Refresh the skills list after saving
+  const handleSkillPopupClose = () => {
     setIsSkillPopupOpen(false);
+    fetchSkills();
   };
 
   useEffect(() => {
@@ -300,7 +300,6 @@ const ResumePage: React.FC = () => {
     const jobType = jobTypes.find(j => j.id === jobTypeId);
     return jobType?.name || 'Không xác định';
   };
-
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">
@@ -510,7 +509,7 @@ const ResumePage: React.FC = () => {
         />
         <SkillPopup
           isOpen={isSkillPopupOpen}
-          onClose={() => setIsSkillPopupOpen(false)}
+          onClose={handleSkillPopupClose} // Use the new method
           initialSkills={selectedSkills}
         />
         <HeaderEditPopup

@@ -1,9 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, ChevronDown } from 'lucide-react';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { skillList } from '../../services/autofillApi';
 import { updateSkill } from '../../services/employeeApi';
 import { toast } from 'react-toastify';
+import { getSkills } from '../../services/employeeApi';
 
 interface Skill {
   id?: number;
@@ -66,6 +67,28 @@ const SkillPopup: React.FC<SkillPopupProps> = ({
     }
     setSearchTerm('');
     setIsDropdownOpen(false);
+  };
+
+  useEffect(() => {
+    if (isOpen) {  
+      fetchListSkill();
+    }
+  }, [isOpen]); 
+  
+  const fetchListSkill = async () => {
+    try {
+      const result = await dispatch(getSkills());
+      if (getSkills.fulfilled.match(result)) {
+        const skillsData = result.payload.response.data.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+        }));
+        setSelectedSkills(skillsData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch skills:', error);
+      toast.error('Không thể tải danh sách kỹ năng. Vui lòng thử lại.');
+    }
   };
 
   const handleSubmit = async () => {

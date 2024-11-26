@@ -60,6 +60,8 @@ const ResumeComponent: React.FC = () => {
         description: ''
     });
 
+    const Divider = () => <hr className="my-8 border-t border-gray-300" />;
+
     const [showGoalPopup, setShowGoalPopup] = useState(false);
     const [editingGoal, setEditingGoal] = useState('');
 
@@ -471,8 +473,7 @@ const ResumeComponent: React.FC = () => {
                         </button>
                     )}
                 </div>
-
-                {resumeData.career && (
+                {resumeData.career ? (
                     <div className="flex justify-between items-center bg-gray-100 p-3 rounded">
                         <span>{resumeData.career}</span>
                         <div className="flex items-center space-x-2">
@@ -489,6 +490,10 @@ const ResumeComponent: React.FC = () => {
                                 <Trash2 size={18} />
                             </button>
                         </div>
+                    </div>
+                ) : (
+                    <div>
+                        <span className="text-gray-400">Giới thiệu bản thân và mục tiêu nghề nghiệp</span>
                     </div>
                 )}
             </section>
@@ -509,7 +514,7 @@ const ResumeComponent: React.FC = () => {
                     )}
                 </div>
 
-                {resumeData.hobby && (
+                {resumeData.hobby ? (
                     <div className="flex justify-between items-center bg-gray-100 p-3 rounded">
                         <span>{resumeData.hobby}</span>
                         <div className="flex items-center space-x-2">
@@ -526,6 +531,10 @@ const ResumeComponent: React.FC = () => {
                                 <Trash2 size={18} />
                             </button>
                         </div>
+                    </div>
+                ) : (
+                    <div >
+                        <span className="text-gray-400">Sở thích</span>
                     </div>
                 )}
             </section>
@@ -547,47 +556,57 @@ const ResumeComponent: React.FC = () => {
                     </button>
                 </div>
 
-                {resumeData.certificates?.map((certificate) => (
-                    <div key={certificate.id} className="mb-6 bg-gray-100 p-4 rounded-lg">
-                        <div className="flex justify-between items-center">
-                            <div>
-                                {certificate.name && <h3 className="text-xl font-semibold text-gray-800">{certificate.name}</h3>}
-
-                                {(certificate.startDate || certificate.endDate) && (
-                                    <p className="text-sm text-gray-600">
-                                        {certificate.startDate} {certificate.startDate && certificate.endDate && '-'} {certificate.endDate}
-                                    </p>
-                                )}
+                {resumeData.certificates?.length > 0 ? (
+                    resumeData.certificates.map((certificate) => (
+                        <div key={certificate.id} className="mb-6 bg-gray-100 p-4 rounded-lg">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    {certificate.name && (
+                                        <h3 className="text-xl font-semibold text-gray-800">{certificate.name}</h3>
+                                    )}
+                                    {(certificate.startDate || certificate.endDate) && (
+                                        <p className="text-sm text-gray-600">
+                                            {certificate.startDate} {certificate.startDate && certificate.endDate && '-'} {certificate.endDate}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => openEditCertificatePopup(certificate)}
+                                        className="text-blue-600 hover:bg-blue-100 p-1 rounded"
+                                    >
+                                        <Edit size={18} />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteCertificate(certificate.id!)}
+                                        className="text-red-600 hover:bg-red-100 p-1 rounded"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
                             </div>
-                            <div className="flex space-x-2">
-                                <button
-                                    onClick={() => openEditCertificatePopup(certificate)}
-                                    className="text-blue-600 hover:bg-blue-100 p-1 rounded"
-                                >
-                                    <Edit size={18} />
-                                </button>
-                                <button
-                                    onClick={() => handleDeleteCertificate(certificate.id!)}
-                                    className="text-red-600 hover:bg-red-100 p-1 rounded"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
-                            </div>
+                            {certificate.description && (
+                                <p className="text-gray-700 mt-2 mb-2">{certificate.description}</p>
+                            )}
                         </div>
-
-                        {certificate.description && (
-                            <p className="text-gray-700 mt-2 mb-2">{certificate.description}</p>
-                        )}
+                    ))
+                ) : (
+                    <div className="text-gray-400">
+                        <p>Tên khoá học/Chứng chỉ</p>
+                        <p>Ngày bắt đầu - Ngày kết thúc</p>
+                        <p><span className="font-semibold text-gray-700">Mô tả: </span> <span>Mô tả về khoá học của bạn</span></p>
                     </div>
-                ))}
+                )}
             </section>
+
+            <Divider />
 
             {/* Projects Section */}
             <section>
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-semibold border-b-2 border-blue-500 pb-2 flex items-center">
                         <Code className="mr-2 text-green-600" />
-                        Dự Án
+                        Dự án
                     </h2>
                     <button
                         onClick={() => {
@@ -599,60 +618,71 @@ const ResumeComponent: React.FC = () => {
                         <Plus />
                     </button>
                 </div>
+                {resumeData.projects?.length > 0 ? (
+                    resumeData.projects?.map((project) => (
+                        <div key={project.id} className="mb-6 bg-gray-100 p-4 rounded-lg">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    {project.name && <h3 className="text-xl font-semibold text-gray-800">{project.name}</h3>}
 
-                {resumeData.projects?.map((project) => (
-                    <div key={project.id} className="mb-6 bg-gray-100 p-4 rounded-lg">
-                        <div className="flex justify-between items-center">
-                            <div>
-                                {project.name && <h3 className="text-xl font-semibold text-gray-800">{project.name}</h3>}
+                                    {(project.startDate || project.endDate) && (
+                                        <p className="text-sm text-gray-600">
+                                            {project.startDate} {project.startDate && project.endDate && '-'} {project.endDate}
+                                        </p>
+                                    )}
 
-                                {(project.startDate || project.endDate) && (
-                                    <p className="text-sm text-gray-600">
-                                        {project.startDate} {project.startDate && project.endDate && '-'} {project.endDate}
-                                    </p>
-                                )}
+                                    {project.position && (
+                                        <p className="text-sm text-gray-600">Vị trí: {project.position}</p>
+                                    )}
 
-                                {project.position && (
-                                    <p className="text-sm text-gray-600">Vị trí: {project.position}</p>
-                                )}
-
-                                {project.teamSize && (
-                                    <p className="text-sm text-gray-600">Số lượng: {project.teamSize} người</p>
-                                )}
+                                    {project.teamSize && (
+                                        <p className="text-sm text-gray-600">Số lượng: {project.teamSize} người</p>
+                                    )}
+                                </div>
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => openEditProjectPopup(project)}
+                                        className="text-blue-600 hover:bg-blue-100 p-1 rounded"
+                                    >
+                                        <Edit size={18} />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteProject(project.id!)}
+                                        className="text-red-600 hover:bg-red-100 p-1 rounded"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
                             </div>
-                            <div className="flex space-x-2">
-                                <button
-                                    onClick={() => openEditProjectPopup(project)}
-                                    className="text-blue-600 hover:bg-blue-100 p-1 rounded"
+
+                            {project.description && (
+                                <p className="text-gray-700 mt-2 mb-2">{project.description}</p>
+                            )}
+
+                            {project.link && (
+                                <a
+                                    href={project.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 hover:underline flex items-center mb-2"
                                 >
-                                    <Edit size={18} />
-                                </button>
-                                <button
-                                    onClick={() => handleDeleteProject(project.id!)}
-                                    className="text-red-600 hover:bg-red-100 p-1 rounded"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
-                            </div>
+                                    <LinkIcon size={16} className="mr-1" /> {project.link}
+                                </a>
+                            )}
                         </div>
-
-                        {project.description && (
-                            <p className="text-gray-700 mt-2 mb-2">{project.description}</p>
-                        )}
-
-                        {project.link && (
-                            <a
-                                href={project.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline flex items-center mb-2"
-                            >
-                                <LinkIcon size={16} className="mr-1" /> {project.link}
-                            </a>
-                        )}
+                    ))
+                ) : (
+                    <div className="text-gray-400">
+                        <p>Tên dự án</p>
+                        <p>Ngày bắt đầu - Ngày kết thúc</p>
+                        <p><span className="font-semibold text-gray-700">Số lượng người tham gia: </span> <span>Số lượng người trong dự án</span></p>
+                        <p><span className="font-semibold text-gray-700">Vị trí: </span> <span>Vị trí công việc</span></p>
+                        <p><span className="font-semibold text-gray-700">Mô tả: </span> <span>Mô tả vai trò,trách nhiệm của bạn trong dự án</span></p>
                     </div>
-                ))}
+                )}
             </section>
+
+            <Divider />
 
             {/* Education Section */}
             <section>
@@ -671,45 +701,55 @@ const ResumeComponent: React.FC = () => {
                         <Plus />
                     </button>
                 </div>
+                {resumeData.educations?.length > 0 ? (
+                    resumeData.educations?.map((education) => (
+                        <div key={education.id} className="mb-6 bg-gray-100 p-4 rounded-lg">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    {education.name && <h3 className="text-xl font-semibold text-gray-800">{education.name}</h3>}
 
-                {resumeData.educations?.map((education) => (
-                    <div key={education.id} className="mb-6 bg-gray-100 p-4 rounded-lg">
-                        <div className="flex justify-between items-center">
-                            <div>
-                                {education.name && <h3 className="text-xl font-semibold text-gray-800">{education.name}</h3>}
+                                    {education.major && (
+                                        <p className="text-sm text-gray-600">Ngành học: {education.major}</p>
+                                    )}
 
-                                {education.major && (
-                                    <p className="text-sm text-gray-600">Ngành học: {education.major}</p>
-                                )}
+                                    {(education.startDate || education.endDate) && (
+                                        <p className="text-sm text-gray-600">
+                                            {education.startDate} {education.startDate && education.endDate && '-'} {education.endDate}
+                                        </p>
+                                    )}
 
-                                {(education.startDate || education.endDate) && (
-                                    <p className="text-sm text-gray-600">
-                                        {education.startDate} {education.startDate && education.endDate && '-'} {education.endDate}
-                                    </p>
-                                )}
-
-                                {education.gpa && (
-                                    <p className="text-sm text-gray-600">GPA: {education.gpa} </p>
-                                )}
-                            </div>
-                            <div className="flex space-x-2">
-                                <button
-                                    onClick={() => openEditEducationPopup(education)}
-                                    className="text-blue-600 hover:bg-blue-100 p-1 rounded"
-                                >
-                                    <Edit size={18} />
-                                </button>
-                                <button
-                                    onClick={() => handleDeleteEducation(education.id!)}
-                                    className="text-red-600 hover:bg-red-100 p-1 rounded"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
+                                    {education.gpa && (
+                                        <p className="text-sm text-gray-600">GPA: {education.gpa} </p>
+                                    )}
+                                </div>
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => openEditEducationPopup(education)}
+                                        className="text-blue-600 hover:bg-blue-100 p-1 rounded"
+                                    >
+                                        <Edit size={18} />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteEducation(education.id!)}
+                                        className="text-red-600 hover:bg-red-100 p-1 rounded"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
+                    ))
+                ) : (
+                    <div className="text-gray-400">
+                        <p>Tên trường</p>
+                        <p><span className="font-semibold text-gray-700">Ngành học: </span> <span>Số lượng người trong dự án</span></p>
+                        <p>Ngày bắt đầu - Ngày kết thúc</p>
+                        <p><span className="font-semibold text-gray-700">Mô tả: </span> <span>Mô tả chung</span></p>
                     </div>
-                ))}
+                )}
             </section>
+
+            <Divider />
 
             {/*Experience Section */}
             <section>
@@ -729,7 +769,8 @@ const ResumeComponent: React.FC = () => {
                     </button>
                 </div>
 
-                {resumeData.experiences?.map((experience) => (
+                {resumeData.experiences?.length > 0 ? (
+                    resumeData.experiences?.map((experience) => (
                     <div key={experience.id} className="mb-6 bg-gray-100 p-4 rounded-lg">
                         <div className="flex justify-between items-center">
                             <div>
@@ -765,7 +806,16 @@ const ResumeComponent: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                ))}
+                 ))
+                ) : (
+                    <div className="text-gray-400">
+                        <p>Tên công ty</p>
+                        <p>Ngày bắt đầu - Ngày kết thúc</p>
+                        <p><span className="font-semibold text-gray-700">Vị trí công việc: </span> <span>Vị trí công việc</span></p>
+                        <p><span className="font-semibold text-gray-700">Hình thức làm việc: </span> <span>Hình thức làm việc</span></p>
+                        <p><span className="font-semibold text-gray-700">Mô tả: </span> <span>Mô tả về kinh nghiệm làm việc của bạn</span></p>
+                    </div>
+                )}
             </section>
 
             {/* Project Popup Component */}
@@ -782,7 +832,7 @@ const ResumeComponent: React.FC = () => {
             <CertificatePopup
                 show={showCertificatePopup}
                 editingCertificate={editingCertificate}
-                onClose={() => setShowEducationPopup(false)}
+                onClose={() => setShowCertificatePopup(false)}
                 onSave={editingCertificate.id ? handleUpdateCertificate : handleAddCertificate}
                 onUpdateCertificate={(key, value) =>
                     setEditingCertificate(prev => ({ ...prev, [key]: value }))
