@@ -14,7 +14,8 @@ export const useRegistrationForm = () => {
     phone: '',
     company: '',
     workLocation: 0,
-    district: 0
+    district: 0,
+    city: 0
   });
   const dispatch = useAppDispatch();
  

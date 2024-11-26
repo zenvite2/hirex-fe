@@ -40,6 +40,10 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
     checkSavedJobs();
   }, [isLoggedIn, job.id]);
 
+  const convertString = (input: string): string => {
+    return input.replace(`\n`, '.');
+  };
+
   const handleSaveJob = async () => {
     if (!isLoggedIn) {
       toast.error("Vui lòng đăng nhập để lưu việc làm");
@@ -85,11 +89,11 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
                 className="h-12 w-12 object-contain mr-3"
               />
             ) : (
-              <Building2 className="h-24 w-24 text-gray-400 mr-3" />
+              <Building2 className="h-12 w-12 text-gray-400 mr-3" />
             )}
             <div>
               <h3 className="text-lg font-semibold truncate">{job.title}</h3>
-              <p className="text-gray-500 text-sm">{job.companyName}</p>
+              <p className="text-gray-500 text-sm truncate">{job.companyName}</p>
             </div>
             {/* <button
               onClick={(e) => {
@@ -120,9 +124,9 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
               <span
                 className={`
                   py-1 px-2 rounded-md text-xs font-semibold
-                  ${job.contractType === 'Fulltime' ? 'bg-[#26d81d26] text-[#26d81d]' :
-                    job.contractType === 'Parttime' ? 'bg-[#1d87d826] text-[#1d87d8]' :
-                      job.contractType === 'Freelance' ? 'bg-[#ffa50026] text-[#ffa500]' :
+                  ${job.contractType === 'Toàn thời gian' ? 'bg-[#26d81d26] text-[#26d81d]' :
+                    job.contractType === 'Bán thời gian' ? 'bg-[#1d87d826] text-[#1d87d8]' :
+                      job.contractType === 'Thực tập' ? 'bg-[#ffa50026] text-[#ffa500]' :
                         'bg-gray-100 text-gray-600'
                   }`}
               >
@@ -135,9 +139,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
             </div>
           </div>
           <p className="text-gray-700 text-sm mb-4 line-clamp-2">
-            {job.companyDescription
-              ? job.companyDescription
-              : `${job.companyName} is hiring for the position of ${job.title} in ${job.location}.`}
+            {convertString(job.description)}
           </p>
           <div className="my-2 border-b border-gray-300"></div>
           <div className="flex items-center justify-between">

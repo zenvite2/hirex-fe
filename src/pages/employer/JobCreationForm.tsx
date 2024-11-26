@@ -382,8 +382,8 @@ const JobCreationForm: React.FC = () => {
               {renderField('contractType', 'Loại công việc', 'select')}
               {renderField('education', 'Học vấn', 'select')}
               {renderField('email', 'Email', 'email')}
-              {renderField('minSalary', 'Mức lương min', 'tel')}
-              {renderField('maxSalary', 'Mức lương max', 'tel')}
+              {renderField('minSalary', 'Mức lương min', 'number')}
+              {renderField('maxSalary', 'Mức lương max', 'number')}
             </div>
 
             {renderField('description', 'Mô tả công việc', 'textarea')}
