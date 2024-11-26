@@ -192,44 +192,10 @@ const JobDetail = () => {
                     {/* Main Content */}
                     <div className="flex-1">
                         {/* Header Section */}
-                        <div className="relative w-full h-40 bg-gradient-to-r from-cyan-700 to-blue-900">
-                            <div className="absolute inset-0 bg-gradient-to-r from-cyan-700/60 to-blue-900/60" />
-
-                            <div className="absolute top-4 right-4">
-                                <img src={''} alt={`companyName`} className="h-8 object-contain" />
-                            </div>
-                        </div>
-
-                        {/* Company Info Bar */}
-                        <div className="relative bg-white shadow-md">
-                            <div className="px-6 py-3 flex items-center">
-                                <div className="w-24 h-24 bg-white rounded-lg shadow-lg -mt-12 flex items-center justify-center p-2">
-                                    <img
-                                        src={`company?.logo`}
-                                        alt="Logo"
-                                        className="w-20 h-20 object-contain"
-                                    />
-                                </div>
-
-                                <div className="ml-6 flex-grow">
-                                    <h1 className="text-2xl font-bold text-gray-900">{`company?.companyName`}</h1>
-                                    <div className="flex items-center gap-2 mt-2 text-gray-600">
-                                        <MapPin className="w-4 h-4" />
-                                        <span className="text-sm">{`company?.district`}, {`company?.city`}</span>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-2 text-gray-600">
-                                    <Users className="w-5 h-5" />
-                                    <span>{true ? `${`company.scale`} nhân viên` : `Không có thông tin`}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-6 rounded-xl shadow-sm">
+                        <div className="bg-white p-6 shadow-sm">
                             <div className="flex gap-4">
                                 {/* Company Logo */}
-                                <div className="w-20 h-20 bg-white border border-gray-200 rounded-lg flex items-center justify-center p-2">
+                                <div className="w-20 h-20 bg-white border border-gray-200  flex items-center justify-center p-2">
                                     {job?.company.logo ? (
                                         <img
                                             src={job?.company.logo}
@@ -306,9 +272,9 @@ const JobDetail = () => {
 
                             </div>
                         </div>
-
+                        <hr />
                         {/* Job Details Section */}
-                        <div className="bg-white p-6 rounded-xl shadow-sm">
+                        <div className="bg-white p-6 shadow-sm mt-2">
                             <section className="mb-8">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1 h-6 bg-blue-500 rounded"></div>
