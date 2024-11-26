@@ -42,6 +42,8 @@ import { ChatMessage, Status, VIDEO_CALL_RESPONSE } from "./pages/chat/Messenger
 import { Client, Message as MessageStompjs, over } from 'stompjs';
 import OTPInput from "./pages/OTP";
 import { NotificationType, setNotifications, setUnreadCount } from "./redux/slice/notificationSlice";
+import EmployerRoute from "./routes/EmployerRoute";
+import EmployeeRoute from "./routes/EmployeeRoute";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -168,8 +170,6 @@ function App() {
                         <Route element={<SidebarLayout />}>
                             <Route path="/dashboard" element={<Dashboard />} />
                             <Route path="/company-info" element={<CompanyInfo />} />
-                            <Route path="/job-posts" element={<JobPosts />} />
-                            <Route path="/applicants" element={<ApplicantsList />} />
                             <Route path="/info-page" element={<CompanyInfo />} />
                             <Route path="/apply-job" element={<JobForm />} />
                             <Route path="/jobs/edit/:id" element={<JobForm />} />
@@ -177,21 +177,28 @@ function App() {
                             <Route path="/resume/:id" element={<Resume />} />
                             <Route path="/saved-jobs" element={<SavedJobsPage />} />
                             <Route path="/applied-jobs" element={<AppliedJob />} />
-                            <Route path="/list-cv" element={<ListCV />} />
                         </Route>
 
-                        {/* Các route khác */}
-                        {/* <Route path='/messenger' element={<Messenger />} /> */}
-                        <Route path='/generate-cv/:id' element={<CVGenerate />} />
-                        <Route path='/cv-preview' element={<CVPreview />} />
                         <Route path="/register-employee" element={<RegisterEmployee />} />
                         <Route path="/register-employer" element={<RegisterEmployer />} />
-                        <Route path="/employer" element={<EmployerLanding />} />
                         <Route path="/about-us" element={<About />} />
-                        <Route path="/resume" element={<ResumePage />} />
-                        <Route path="/resume-content" element={<ResumeContent />} />
                         <Route path="/otp" element={<OTPInput />} />
 
+                        <Route element={<EmployeeRoute />}>
+                            <Route path="/list-cv" element={<ListCV />} />
+                            <Route path="/resume" element={<ResumePage />} />
+                            <Route path="/resume-content" element={<ResumeContent />} />
+                            <Route path='/cv-preview' element={<CVPreview />} />
+                            <Route path='/generate-cv/:id' element={<CVGenerate />} />
+
+                        </Route>
+
+                        <Route element={<EmployerRoute />}>
+                            <Route path="/applicants" element={<ApplicantsList />} />
+                            <Route path="/job-posts" element={<JobPosts />} />
+                            <Route path="/employer" element={<EmployerLanding />} />
+
+                        </Route>
                     </Routes>
                 </div>
             </main>
