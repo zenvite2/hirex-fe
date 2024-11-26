@@ -78,7 +78,7 @@ const ListCV = () => {
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                 }}
-                className="p-6 rounded-lg mb-6 text-black"
+                className="p-6 rounded-lg mb-6 text-black mt-4"
             >
                 <h1 className="text-2xl font-bold mb-2">Danh sách CV đã tạo</h1>
                 <p className="text-sm">

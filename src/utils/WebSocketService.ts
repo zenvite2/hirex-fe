@@ -1,10 +1,6 @@
 import { Client, Message as MessageStompjs, over } from 'stompjs';
 import SockJS from 'sockjs-client';
-import { startLoading, stopLoading } from '../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
-import { v4 as uuidv4 } from 'uuid';
-import store from '../redux/store';
-import { ChatMessage, Status } from '../pages/chat/Messenger';
 
 class WebSocketService {
     private static instance: WebSocketService;

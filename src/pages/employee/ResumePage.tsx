@@ -194,12 +194,11 @@ const ResumePage: React.FC = () => {
         if (getEmployees.fulfilled.match(action)) {
           const employeeData = action.payload.response?.data;
           if (employeeData) {
-            const [day, month, year] = employeeData.dateOfBirth.split('/');
-            const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            const [day, month, year] = employeeData.dateOfBirth?.split('/');
             setHeaderData({
               fullName: employeeData.fullName,
               gender: employeeData.gender,
-              dateOfBirth: formattedDate, // Đã được chuyển đổi sang yyyy-mm-dd
+              dateOfBirth: employeeData.dateOfBirth ? `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}` : null,
               address: employeeData.address,
               email: employeeData.email,
               phoneNumber: employeeData.phoneNumber,

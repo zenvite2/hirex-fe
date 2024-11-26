@@ -98,7 +98,11 @@ function App() {
         isLoggedIn && fetchUserInfo();
 
         if (userId && wsUrl) {
-            websocketService.connect(userId.toString(), wsUrl);
+            try {
+                websocketService.connect(userId.toString(), wsUrl);
+            } catch (error) {
+                console.log(error)
+            }
         }
 
     }, [userId]);
