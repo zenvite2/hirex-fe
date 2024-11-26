@@ -6,6 +6,8 @@ import { jobCreate, jobUpdate, jobGetWith, jobGet } from '../../services/jobApi'
 import { useLocationSelector } from './useLocationSelector';
 import { LocationSelector } from '../../components/registration/LocationSelector';
 import { toast } from 'react-toastify';
+import { X, ChevronDown } from 'lucide-react';
+import { skillList } from '../../services/autofillApi';
 
 interface ExperienceType {
   id: number;
@@ -36,6 +38,11 @@ interface contractType {
 
 interface Education {
   id: number;
+  name: string;
+}
+
+interface Skill {
+  id?: number;
   name: string;
 }
 
@@ -97,6 +104,62 @@ const JobCreationForm: React.FC = () => {
   const [salarys, setSalarys] = useState<IndustryType[]>([]);
   const [education, setEducation] = useState<Education[]>([]);
   const [contractType, setContractType] = useState<contractType[]>([]);
+
+  // Skill selection state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
+  const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchSkills = async (name: string) => {
+    setIsLoading(true);
+    try {
+      const result = await dispatch(skillList({ name })).unwrap();
+      if (result?.response) {
+        setAvailableSkills(result?.response?.data);
+      } else {
+        setAvailableSkills([]);
+      }
+    } catch (error) {
+      console.error('Error fetching skills:', error);
+      setAvailableSkills([]);
+      toast.error('Có lỗi khi tải danh sách kỹ năng');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Filter out already selected skills
+  const filteredSkills = availableSkills.filter(
+    skill => !selectedSkills.some(selected => selected.id === skill.id)
+  );
+
+  // Add skill handler
+  const handleAddSkill = (skill: Skill) => {
+    if (!selectedSkills.some(selected => selected.id === skill.id)) {
+      const updatedSkills = [...selectedSkills, skill];
+      setSelectedSkills(updatedSkills);
+      // Update form data with skill ids
+      setFormData(prev => ({
+        ...prev,
+        skills: updatedSkills.map(s => s.id).filter((id): id is number => id !== undefined)
+      }));
+    }
+    setSearchTerm('');
+    setIsDropdownOpen(false);
+  };
+
+  // Remove skill handler
+  const handleRemoveSkill = (skillToRemove: Skill) => {
+    const updatedSkills = selectedSkills.filter(s => s.id !== skillToRemove.id);
+    setSelectedSkills(updatedSkills);
+    // Update form data with skill ids
+    setFormData(prev => ({
+      ...prev,
+      skills: updatedSkills.map(s => s.id).filter((id): id is number => id !== undefined)
+    }));
+  };
 
   const {
     city,
@@ -168,7 +231,7 @@ const JobCreationForm: React.FC = () => {
           const result = await dispatch(jobGet(id));
           if (result?.payload?.response?.success) {
             const jobData = result.payload.response.data;
-        
+
 
             setFormData({
               ...jobData,
@@ -390,6 +453,82 @@ const JobCreationForm: React.FC = () => {
             {renderField('requirement', 'Trách nhiệm công việc', 'textarea')}
             {renderField('benefit', 'Quyền lợi', 'textarea')}
             {renderField('workingTime', 'Thời gian làm việc', 'textarea')}
+
+            <div className="col-span-full">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Kỹ năng <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    fetchSkills(e.target.value);
+                  }}
+                  onFocus={() => {
+                    setIsDropdownOpen(true);
+                    fetchSkills('');
+                  }}
+                  placeholder="Nhập mới hoặc chọn trong danh sách dưới đây"
+                  className="w-full p-2 pr-8 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <ChevronDown
+                  className={`absolute right-2 top-3 text-gray-400 transition-transform ${isDropdownOpen ? 'transform rotate-180' : ''}`}
+                  size={20}
+                  onClick={() => {
+                    setIsDropdownOpen(!isDropdownOpen);
+                    if (!isDropdownOpen) fetchSkills('');
+                  }}
+                />
+
+                {isDropdownOpen && (
+                  <div className="absolute w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto z-10">
+                    {isLoading ? (
+                      <div className="p-2 text-center text-gray-500">Đang tải...</div>
+                    ) : (
+                      <>
+                        {filteredSkills.map((skill) => (
+                          <button
+                            key={skill.id ?? skill.name}
+                            type="button"
+                            onClick={() => handleAddSkill(skill)}
+                            className="w-full text-left px-4 py-2 hover:bg-gray-50 focus:bg-gray-50"
+                          >
+                            {skill.name}
+                          </button>
+                        ))}
+                        {!isLoading && filteredSkills.length === 0 && (
+                          <div className="p-2 text-center text-gray-500">
+                            Không tìm thấy kỹ năng
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {selectedSkills.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {selectedSkills.map((skill) => (
+                    <div
+                      key={skill.id ?? skill.name}
+                      className="bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-sm flex items-center"
+                    >
+                      {skill.name}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSkill(skill)}
+                        className="ml-2 text-blue-600 hover:text-blue-800"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <div className="flex justify-end pt-6">
               <button
