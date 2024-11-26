@@ -92,8 +92,12 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
               <Building2 className="h-12 w-12 text-gray-400 mr-3" />
             )}
             <div>
-              <h3 className="text-lg font-semibold truncate">{job.title}</h3>
-              <p className="text-gray-500 text-sm truncate">{job.companyName}</p>
+              <h3 className="text-lg font-semibold truncate">
+                {job.title.length > 16 ? `${job.title.slice(0, 16)}...` : job.title}
+              </h3>
+              <p className="text-gray-500 text-sm truncate">
+                {job.companyName.length > 16 ? `${job.companyName.slice(0, 16)}...` : job.companyName}
+              </p>
             </div>
             {/* <button
               onClick={(e) => {
