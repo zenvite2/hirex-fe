@@ -104,6 +104,7 @@ const JobCreationForm: React.FC = () => {
   const [salarys, setSalarys] = useState<IndustryType[]>([]);
   const [education, setEducation] = useState<Education[]>([]);
   const [contractType, setContractType] = useState<contractType[]>([]);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   // Skill selection state
   const [searchTerm, setSearchTerm] = useState('');
@@ -129,6 +130,31 @@ const JobCreationForm: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  const validateForm = (): boolean => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.title.trim()) newErrors.title = 'Tiêu đề là bắt buộc';
+    if (!formData.city) newErrors.city = 'Tỉnh / Thành phố là bắt buộc';
+    if (!formData.district) newErrors.district = 'Quận / Huyện là bắt buộc';
+    if (!formData.industry) newErrors.industry = 'Ngành nghề là bắt buộc';
+    if (!formData.yearExperience) newErrors.yearExperience = 'Kinh nghiệm làm việc là bắt buộc';
+    if (!formData.jobType) newErrors.jobType = 'Loại hình làm việc là bắt buộc';
+    if (!formData.position) newErrors.position = 'Vị trí là bắt buộc';
+    if (!formData.deadline) newErrors.deadline = 'Hạn nộp hồ sơ là bắt buộc';
+    if (!formData.contractType) newErrors.contractType = 'Loại công việc là bắt buộc';
+    if (!formData.education) newErrors.education = 'Học vấn là bắt buộc';
+    if (!formData.email.trim()) newErrors.email = 'Email là bắt buộc';
+    if (!formData.phone.trim()) newErrors.phone = 'Số điện thoại là bắt buộc';
+    if (!formData.description.trim()) newErrors.description = 'Mô tả công việc là bắt buộc';
+    if (!formData.requirement.trim()) newErrors.requirement = 'Trách nhiệm công việc là bắt buộc';
+    if (!formData.benefit.trim()) newErrors.benefit = 'Quyền lợi là bắt buộc';
+    if (!formData.workingTime.trim()) newErrors.workingTime = 'Thời gian làm việc là bắt buộc';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Return true nếu không có lỗi
+  };
+
 
   // Filter out already selected skills
   const filteredSkills = availableSkills.filter(
@@ -266,6 +292,11 @@ const JobCreationForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!validateForm()) {
+      toast.error('Vui lòng kiểm tra lại các trường bắt buộc');
+      return; // Dừng gửi form nếu có lỗi
+    }
+
     // Validate mức lương
     if (formData.minSalary !== null && formData.maxSalary !== null) {
       if (formData.minSalary > formData.maxSalary) {
@@ -348,10 +379,55 @@ const JobCreationForm: React.FC = () => {
     }
   };
 
-  const renderField = (name: keyof FormData, label: string, type: string = 'text') => (
+  // const renderField = (name: keyof FormData, label: string, type: string = 'text') => (
+  //   <div className="relative space-y-2">
+  //     <label className="block text-sm font-semibold text-gray-700">
+  //       {label}
+  //     </label>
+  //     <div>
+  //       {type === 'select' ? (
+  //         <select
+  //           id={name}
+  //           name={name}
+  //           value={formData[name] as string}
+  //           onChange={handleInputChange}
+  //           className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+  //         >
+  //           <option value="">Chọn {label}</option>
+  //           {renderSelectOptions(name)}
+  //         </select>
+  //       ) : type === 'textarea' ? (
+  //         <textarea
+  //           id={name}
+  //           name={name}
+  //           value={formData[name] as string}
+  //           onChange={handleInputChange}
+  //           className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm whitespace-pre-wrap"
+  //           rows={4}
+  //         />
+  //       ) : (
+  //         <input
+  //           type={type}
+  //           id={name}
+  //           name={name}
+  //           value={formData[name] as string}
+  //           onChange={handleInputChange}
+  //           className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+  //         />
+  //       )}
+  //     </div>
+  //   </div>
+  // );
+
+  const renderField = (
+    name: keyof FormData,
+    label: string,
+    type: string = 'text',
+    isRequired: boolean = true // Mặc định các trường là bắt buộc
+  ) => (
     <div className="relative space-y-2">
       <label className="block text-sm font-semibold text-gray-700">
-        {label}
+        {label} {isRequired && <span className="text-red-500">*</span>}
       </label>
       <div>
         {type === 'select' ? (
@@ -360,7 +436,9 @@ const JobCreationForm: React.FC = () => {
             name={name}
             value={formData[name] as string}
             onChange={handleInputChange}
-            className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+            className={`block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none 
+                        focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm 
+                        ${errors[name] ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
           >
             <option value="">Chọn {label}</option>
             {renderSelectOptions(name)}
@@ -371,7 +449,9 @@ const JobCreationForm: React.FC = () => {
             name={name}
             value={formData[name] as string}
             onChange={handleInputChange}
-            className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm whitespace-pre-wrap"
+            className={`block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none 
+                        focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm whitespace-pre-wrap 
+                        ${errors[name] ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
             rows={4}
           />
         ) : (
@@ -381,10 +461,15 @@ const JobCreationForm: React.FC = () => {
             name={name}
             value={formData[name] as string}
             onChange={handleInputChange}
-            className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+            className={`block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none 
+                        focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm 
+                        ${errors[name] ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
           />
         )}
       </div>
+      {errors[name] && (
+        <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
+      )}
     </div>
   );
 
@@ -398,10 +483,9 @@ const JobCreationForm: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {renderField('title', 'Tiêu đề')}
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <LocationSelector
-                label="Tỉnh / TP"
+                label="Tỉnh / TP *" 
                 placeholder="Chọn tỉnh thành"
                 locations={cities}
                 value={city?.name || ''}
@@ -418,7 +502,7 @@ const JobCreationForm: React.FC = () => {
               />
 
               <LocationSelector
-                label="Quận / Huyện"
+                label="Quận / Huyện *"
                 placeholder="Chọn quận huyện"
                 locations={districts}
                 value={district?.name || ''}
