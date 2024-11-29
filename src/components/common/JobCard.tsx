@@ -93,10 +93,10 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
             )}
             <div>
               <h3 className="text-lg font-semibold truncate">
-                {job.title.length > 16 ? `${job.title.slice(0, 16)}...` : job.title}
+                {job?.title?.length > 16 ? `${job.title.slice(0, 16)}...` : job.title}
               </h3>
               <p className="text-gray-500 text-sm truncate">
-                {job.companyName.length > 16 ? `${job.companyName.slice(0, 16)}...` : job.companyName}
+                {job?.companyName?.length > 16 ? `${job.companyName.slice(0, 16)}...` : job.companyName}
               </p>
             </div>
             {/* <button
