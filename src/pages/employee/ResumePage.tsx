@@ -305,6 +305,12 @@ const ResumePage: React.FC = () => {
     return jobType?.name || 'Không xác định';
   };
 
+  const formatSalary = (min: number, max: number) => {
+    if (!min && !max) return 'Thương lượng';
+    const formatter = new Intl.NumberFormat('vi-VN');
+    return `Từ ${formatter.format(min)} - ${formatter.format(max)} VNĐ`;
+};
+
   return (
     <div className="bg-gray-100 min-h-screen py-8">
       <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-3xl">
@@ -488,7 +494,7 @@ const ResumePage: React.FC = () => {
               </p>
               <p>
                 <span className="font-semibold">Mức lương mong muốn: </span>
-                 {careerGoalData?.minSalary} - {careerGoalData?.maxSalary} VNĐ
+                {formatSalary(careerGoalData?.minSalary || 0, careerGoalData?.maxSalary || 0)}
               </p>
               <p>
                 <span className="font-semibold">Loại công việc: </span>

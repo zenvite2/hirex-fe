@@ -11,12 +11,18 @@ import { LocationSelector } from './LocationSelector';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import Pagination from './Pagination';
 
 interface Option {
   id: number;
   name: string;
   value?: any;
+}
+
+interface MetaData {
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  totalItems: number;
 }
 
 export interface Job {
@@ -94,10 +100,16 @@ const FindJobs: React.FC = () => {
   const [educationOptions, setEducationOptions] = useState<Option[]>([]);
   const [contractTypeOptions, setContractTypeOptions] = useState<Option[]>([]);
 
-  const [currentPage, setCurrentPage] = useState(0); // Backend uses 0-indexed pages
-  const [pageSize, setPageSize] = useState(2); // Default page size
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalItems, setTotalItems] = useState(0);
+  const [metaData, setMetaData] = useState<MetaData>({
+    totalPages: 0,
+    currentPage: 0,
+    pageSize: 10,
+    totalItems: 0
+  });
+
+    const [totalJobs, setTotalJobs] = useState<number>(0);
+    const [currentPage, setCurrentPage] = useState<number>(0);
+    const [pageSize] = useState<number>(9);
 
   const {
     city,
@@ -112,8 +124,6 @@ const FindJobs: React.FC = () => {
         dispatch(startLoading());
         const result = await dispatch(jobSearch({
           searchQuery,
-          page: currentPage,
-          size: pageSize,
           ...(city?.id ? { city: city.id } : {}),
           industryIds: selectedJobFieldIds,
           positionIds: selectedJobLevelIds,
@@ -125,9 +135,6 @@ const FindJobs: React.FC = () => {
         })).unwrap();
         if (result && result.response && result.response.success) {
           setJobs(result.response.data);
-          setTotalPages(result.response.metaData.totalPages);
-          setTotalItems(result.response.metaData.totalItems);
-          setCurrentPage(result.response.metaData.currentPage);
         }
       } catch (error) {
         console.error('Error fetching jobs:', error);
@@ -146,8 +153,8 @@ const FindJobs: React.FC = () => {
     selectedEducationIds,
     selectedJobTypeIds,
     selectedContractTypeIds,
-    currentPage,
-    pageSize
+    metaData.currentPage, 
+    metaData.pageSize,
   ]);
 
   const getRecommendJobs = useCallback(async () => {
@@ -167,6 +174,7 @@ const FindJobs: React.FC = () => {
           dispatch(positionList()).unwrap(),
           dispatch(jobTypeList()).unwrap(),
           dispatch(industryList()).unwrap(),
+          // dispatch(salaryList()).unwrap(),
           dispatch(contracTypeList()).unwrap(),
           dispatch(educationList()).unwrap(),
         ]);
@@ -227,8 +235,6 @@ const FindJobs: React.FC = () => {
       const result = await dispatch(jobSearch({
         searchQuery,
         ...(city?.id ? { city: city.id } : {}),
-        page: currentPage,
-        size: pageSize,
         industryIds: selectedJobFieldIds,
         positionIds: selectedJobLevelIds,
         experienceIds: selectedExperienceIds,
@@ -239,24 +245,20 @@ const FindJobs: React.FC = () => {
       })).unwrap();
       if (result && result.response && result.response.success) {
         setJobs(result.response.data);
-
-        if (result.response.metaData) {
-          setTotalPages(result.response.metaData.totalPages);
-          setTotalItems(result.response.metaData.totalItems);
-          setCurrentPage(result.response.metaData.currentPage);
-
-          console.log(result.response.metaData.totalPages)
-        }
-
+        setMetaData(result.response.metaData);
       }
     } catch (error) {
       console.error('Error fetching jobs:', error);
     }
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
   };
+
+  // Tính toán số trang
+  const totalPages = Math.ceil(totalJobs / pageSize);
+
 
   return (
     <div className="bg-[#f7fdfd]">
@@ -331,13 +333,38 @@ const FindJobs: React.FC = () => {
             </div>
           ))}
         </div>
-          <div className="flex justify-center mt-6">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </div>
+
+        {/* Phân trang */}
+        <div className="flex justify-center items-center space-x-2 mt-6">
+          <button 
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 0}
+            className="px-4 py-2 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Trước
+          </button>
+          
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index}
+              onClick={() => handlePageChange(index)}
+              className={`px-4 py-2 border rounded-md ${
+                currentPage === index ? 'bg-[#0069DB] text-white' : ''
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+          
+          <button 
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages - 1}
+            className="px-4 py-2 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Sau
+          </button>
+        </div>
+
         {isLoggedIn && recommendJobs.length > 0 && <>
           <div className="sticky top-0 border-t-2 border-gray-200 py-4 mt-6">
             <h2 className="text-2xl font-bold text-gray-600 max-w-7xl mx-auto px-2">
@@ -353,6 +380,8 @@ const FindJobs: React.FC = () => {
             ))}
           </div>
         </>}
+
+
       </div>
     </div>
   );
