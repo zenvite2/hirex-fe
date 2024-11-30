@@ -7,6 +7,7 @@ import { Link, useParams } from 'react-router-dom';
 import axiosIns from '../../services/axiosIns';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
+import { denormalizeTextAreaContent } from '../../utils/utils';
 
 interface JobDetail {
   responsibilities: string[];
@@ -144,7 +145,8 @@ const CompanyDetail = () => {
               <div className="bg-white rounded-xl shadow-sm">
                 <div className="p-6">
                   <h2 className="text-xl font-semibold text-gray-800">Về công ty</h2>
-                  <p className="mt-4 text-gray-600">{company?.description}</p>
+                  <p className="mt-4 text-gray-600" style={{ lineHeight: '2' }} dangerouslySetInnerHTML={{ __html: denormalizeTextAreaContent(company?.description || '') }}>
+                  </p>
                   <div className="mt-4">
                     <a
                       href={company?.website}

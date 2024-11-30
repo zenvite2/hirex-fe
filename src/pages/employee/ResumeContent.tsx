@@ -14,8 +14,8 @@ const ResumeContent: React.FC = () => {
           <p className="text-gray-600 mb-4">
             Xin hãy chọn nút "Tạo hồ sơ mới" để tạo hồ sơ cho bạn.
           </p>
-          <Link 
-            to="/login" 
+          <Link
+            to="/login"
             className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center justify-center mx-auto w-fit"
           >
             <Plus size={20} className="mr-2" />
@@ -23,8 +23,8 @@ const ResumeContent: React.FC = () => {
           </Link>
         </div>
       </div>
-      
-      <div>
+
+      {/* <div>
         <h2 className="text-2xl font-semibold mb-4">Thư xin việc ( 0 )</h2>
         <div className="border border-dashed border-gray-300 rounded-lg p-8 text-center">
           <div className="flex justify-center mb-4">
@@ -38,7 +38,7 @@ const ResumeContent: React.FC = () => {
             Tạo thư mới
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

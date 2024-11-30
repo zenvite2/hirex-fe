@@ -13,7 +13,7 @@ import { RootState } from '../../redux/store';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import axiosIns from '../../services/axiosIns';
 import { Job } from './FindJobs';
-import { formatDateToDDMMYYYY } from '../../utils/utils';
+import { denormalizeTextAreaContent, formatDateToDDMMYYYY } from '../../utils/utils';
 
 interface JobData {
     id: number;
@@ -126,11 +126,6 @@ const JobDetail = () => {
         } else {
             setIsModalOpen(true);
         }
-    };
-
-    const denormalizeTextAreaContent = (content: string): string => {
-        if (!content) return '';
-        return content.replace(/\\n/g, '<br />').replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
     };
 
     const handleSubmit = () => {
@@ -397,7 +392,7 @@ const JobDetail = () => {
                     </div>
 
                     {/* Similar Jobs Sidebar */}
-                    {/* <div className="w-80">
+                    <div className="w-80">
                         <section className="sticky top-6">
                             <h2 className="text-lg font-semibold text-gray-900 mb-3">Việc làm tương tự</h2>
                             <div className="space-y-4">
@@ -449,7 +444,7 @@ const JobDetail = () => {
                                 ))}
                             </div>
                         </section>
-                    </div> */}
+                    </div>
                 </div>
             </div>
 

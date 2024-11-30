@@ -28,3 +28,8 @@ export function formatNumberToVietnameseShort(number: number): string {
     }
     return number.toString();
 }
+
+export const denormalizeTextAreaContent = (content: string): string => {
+    if (!content) return '';
+    return content.replace(/\\n/g, '<br />').replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+};
