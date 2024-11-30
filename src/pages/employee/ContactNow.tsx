@@ -16,7 +16,7 @@ interface Employer {
     avatar: string | null;
 }
 
-const ContactNow: React.FC<{ employer: Employer }> = ({ employer }) => {
+const ContactNow: React.FC<{ employer: Employer, jobId: number }> = ({ employer, jobId }) => {
     const { userId, fullName } = useSelector((state: RootState) => state.authReducer);
     const dispatch = useAppDispatch();
 
@@ -27,7 +27,6 @@ const ContactNow: React.FC<{ employer: Employer }> = ({ employer }) => {
             </div>
 
             <div className="space-y-2 w-full">
-
                 <button
                     className="space-x-2 flex items-center justify-center w-full px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg shadow-sm transition duration-200"
                     onClick={() => {
@@ -64,10 +63,10 @@ const ContactNow: React.FC<{ employer: Employer }> = ({ employer }) => {
                             senderName: String(fullName),
                             direction: 'outgoing',
                             position: 'normal',
-                            message: '2',
+                            message: String(jobId),
                             sender: String(userId),
                             sentTime: new Date().toISOString(),
-                            type: 'html'
+                            type: 'html',
                         };
 
                         employer

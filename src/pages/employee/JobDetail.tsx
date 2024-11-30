@@ -459,7 +459,7 @@ const JobDetail = () => {
                 height='small'
                 width='small'
             >
-                {job?.employer && <ContactNow employer={job.employer} />}
+                {job?.employer && job.id && <ContactNow employer={job.employer} jobId={job.id} />}
             </CustomModal>
         </div>
     );
