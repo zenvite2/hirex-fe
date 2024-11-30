@@ -52,6 +52,7 @@ import CVManagement from "./pages/cms/CVManagement";
 import Job from "./pages/cms/Job";
 import JobCMS from "./pages/cms/Job";
 import AdminRoute from "./routes/AdminRoute";
+import Footer from "./components/layout/Footer";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -254,6 +255,7 @@ function App() {
                         </Route>
                     </Routes>
                 </div>
+                <Footer />
             </main>
             <ToastContainer
                 position="bottom-right"
@@ -271,6 +273,7 @@ function App() {
             {showCallRqModal && <CustomModal isOpen={showCallRqModal} onClose={() => setShowCallRqModal(false)} width='small' height='small'>
                 <VideoCallRequest fromUser={toCaller.id} toUser={userId + ''} fromUserFullname={toCaller.fullname} setShowCallRequestModal={setShowCallRqModal} handleRefuseCall={handleRefuseCall} />
             </CustomModal>}
+
         </>
     );
 }

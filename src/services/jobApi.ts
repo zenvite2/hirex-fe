@@ -78,7 +78,7 @@ export const getAllUserCMS = createAsyncThunk<any>(
 export const updateActiveUser = createAsyncThunk<any, number>(
     'cms/update',
     async (id) => {
-        return axiosIns.patch(`/cms/user/${id}`, {active : true} , {
+        return axiosIns.patch(`/cms/user/${id}`, { active: true }, {
             includeToken: true
         })
             .then(response => { return { response: response.data } })
@@ -90,7 +90,7 @@ export const updateActiveUser = createAsyncThunk<any, number>(
 export const updateInActiveUser = createAsyncThunk<any, number>(
     'cms/update',
     async (id) => {
-        return axiosIns.patch(`/cms/user/${id}`, {active : false} , {
+        return axiosIns.patch(`/cms/user/${id}`, { active: false }, {
             includeToken: true
         })
             .then(response => { return { response: response.data } })
@@ -146,7 +146,7 @@ export const jobDelete = createAsyncThunk<any, number>(
 export const updateRejectJobCMS = createAsyncThunk<any, number>(
     'cms/update',
     async (id) => {
-        return axiosIns.patch(`/cms/${id}`, {active : false} , {
+        return axiosIns.patch(`/cms/${id}`, { active: false }, {
             includeToken: true
         })
             .then(response => { return { response: response.data } })
@@ -158,7 +158,7 @@ export const updateRejectJobCMS = createAsyncThunk<any, number>(
 export const updateAcceptJobCMS = createAsyncThunk<any, number>(
     'cms/update',
     async (id) => {
-        return axiosIns.patch(`/cms/${id}`, {active : true} , {
+        return axiosIns.patch(`/cms/${id}`, { active: true }, {
             includeToken: true
         })
             .then(response => { return { response: response.data } })
@@ -256,5 +256,11 @@ export const recommendJob = async (id: number) => {
 export const getSimilarJobs = async (id: string) => {
     return axiosIns.get(`/similar/${id}`)
         .then(response => { return response.data })
+        .catch(error => { });
+}
+
+export const getFullJobById = async (id: number) => {
+    return axiosIns.get(`/job/full-job/${id}`)
+        .then(response => response.data)
         .catch(error => { });
 }

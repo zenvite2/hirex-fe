@@ -96,8 +96,6 @@ const JobDetail = () => {
         }
     }, [id]);
 
-
-
     useEffect(() => {
         const checkSavedJobs = async () => {
             try {
