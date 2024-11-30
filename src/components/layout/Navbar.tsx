@@ -153,17 +153,30 @@ const Navbar: React.FC<{}> = () => {
                   Hồ sơ cá nhân
                 </Link>
               </>
-            ) : (
+            ) : role === 'EMPLOYER' ? (
               <>
                 {/* Hiển thị "Đăng việc làm" khi vai trò là 'EMPLOYER' */}
                 <Link
                   to="/employer"
                   className={`${getLinkClassName('/employer')} ${location.pathname.startsWith('/employer')
-                    ? 'text-[#0069DB] font-semibold border-b-2 border-[#0069DB]'
-                    : ''
+                      ? 'text-[#0069DB] font-semibold border-b-2 border-[#0069DB]'
+                      : ''
                     }`}
                 >
                   Đăng việc làm
+                </Link>
+              </>
+            ) : (
+              <>
+                {/* Hiển thị "Quản trị" khi vai trò là 'ADMIN' */}
+                <Link
+                  to="/admin-dashboard"
+                  className={`${getLinkClassName('/admin-dashboard')} ${location.pathname.startsWith('/admin-dashboard')
+                      ? 'text-[#FF5733] font-semibold border-b-2 border-[#FF5733]'
+                      : ''
+                    }`}
+                >
+                  Quản trị
                 </Link>
               </>
             )}
