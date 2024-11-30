@@ -305,7 +305,7 @@ const FindJobs: React.FC = () => {
           ))}
         </div>
 
-        {isLoggedIn && recommendJobs.length > 0 && <>
+        {/* {isLoggedIn && recommendJobs.length > 0 && <>
           <div className="sticky top-0 border-t-2 border-gray-200 py-4 mt-6">
             <h2 className="text-2xl font-bold text-gray-600 max-w-7xl mx-auto px-2">
               Gợi ý cho bạn
@@ -319,7 +319,7 @@ const FindJobs: React.FC = () => {
               </div>
             ))}
           </div>
-        </>}
+        </>} */}
       </div>
     </div>
   );
