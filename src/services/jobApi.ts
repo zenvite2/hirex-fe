@@ -50,6 +50,54 @@ export const jobGetAll = createAsyncThunk<any>(
     }
 );
 
+// Get all job cms
+export const jobGetAllCMS = createAsyncThunk<any>(
+    'job/getAll',
+    async () => {
+        return axiosIns.get('/cms', {
+            includeToken: true
+        })
+            .then(response => { return { response: response.data } })
+            .catch(error => { });
+    }
+);
+
+// Get all user cms
+export const getAllUserCMS = createAsyncThunk<any>(
+    'job/getAll',
+    async () => {
+        return axiosIns.get('/cms/user', {
+            includeToken: true
+        })
+            .then(response => { return { response: response.data } })
+            .catch(error => { });
+    }
+);
+
+// update active
+export const updateActiveUser = createAsyncThunk<any, number>(
+    'cms/update',
+    async (id) => {
+        return axiosIns.patch(`/cms/user/${id}`, {active : true} , {
+            includeToken: true
+        })
+            .then(response => { return { response: response.data } })
+            .catch(error => { });
+    }
+);
+
+// update active
+export const updateInActiveUser = createAsyncThunk<any, number>(
+    'cms/update',
+    async (id) => {
+        return axiosIns.patch(`/cms/user/${id}`, {active : false} , {
+            includeToken: true
+        })
+            .then(response => { return { response: response.data } })
+            .catch(error => { });
+    }
+);
+
 // Get job
 export const jobGet = createAsyncThunk<any, any>(
     'job/getJob',
@@ -87,6 +135,30 @@ export const jobDelete = createAsyncThunk<any, number>(
     'job/delete',
     async (id) => {
         return axiosIns.delete(`/job/${id}`, {
+            includeToken: true
+        })
+            .then(response => { return { response: response.data } })
+            .catch(error => { });
+    }
+);
+
+// update reject job
+export const updateRejectJobCMS = createAsyncThunk<any, number>(
+    'cms/update',
+    async (id) => {
+        return axiosIns.patch(`/cms/${id}`, {active : false} , {
+            includeToken: true
+        })
+            .then(response => { return { response: response.data } })
+            .catch(error => { });
+    }
+);
+
+// update accept job
+export const updateAcceptJobCMS = createAsyncThunk<any, number>(
+    'cms/update',
+    async (id) => {
+        return axiosIns.patch(`/cms/${id}`, {active : true} , {
             includeToken: true
         })
             .then(response => { return { response: response.data } })

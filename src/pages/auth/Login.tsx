@@ -36,8 +36,10 @@ const LoginPage = () => {
     if (result?.payload?.response?.success == true) {
       if (result?.payload?.response?.data.role == 'EMPLOYEE') {
         navigate('/find-jobs');
-      } else {
+      } else if (result?.payload?.response?.data.role == 'EMPLOYER') {
         navigate('/employer');
+      } else if (result?.payload?.response?.data.role == 'ADMIN') {
+        navigate('/cms/account-management');
       }
     }
     else {

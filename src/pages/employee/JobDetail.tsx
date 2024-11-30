@@ -397,7 +397,7 @@ const JobDetail = () => {
                     </div>
 
                     {/* Similar Jobs Sidebar */}
-                    <div className="w-80">
+                    {/* <div className="w-80">
                         <section className="sticky top-6">
                             <h2 className="text-lg font-semibold text-gray-900 mb-3">Việc làm tương tự</h2>
                             <div className="space-y-4">
@@ -449,7 +449,7 @@ const JobDetail = () => {
                                 ))}
                             </div>
                         </section>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
