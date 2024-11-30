@@ -135,7 +135,7 @@ const FindJobs: React.FC = () => {
 
   const getRecommendJobs = useCallback(async () => {
     const lstJobs = await recommendJob(userId);
-    setRecommendJobs(lstJobs ?? []);
+    lstJobs && setRecommendJobs(lstJobs);
   }, [userId]);
 
   useEffect(() => {

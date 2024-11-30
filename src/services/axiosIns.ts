@@ -14,7 +14,7 @@ interface ApiConfig extends InternalAxiosRequestConfig {
 
 const axiosIns: AxiosInstance = axios.create({
     baseURL: process.env.REACT_APP_BASE_URL || 'http://localhost:8080',
-    timeout: 5000,
+    timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -22,7 +22,7 @@ const axiosIns: AxiosInstance = axios.create({
 
 const axiosWsIns: AxiosInstance = axios.create({
     baseURL: process.env.REACT_APP_BASE_WS_URL || 'https://localhost:8888',
-    timeout: 5000,
+    timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
     },

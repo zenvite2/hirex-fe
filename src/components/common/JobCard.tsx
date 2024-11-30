@@ -131,7 +131,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
             </div>
             <div className="flex items-center">
               {/* <FaDollarSign className="text-gray-500 mr-1" /> */}
-              <span className="text-xs text-gray-600">{formatNumberToVietnameseShort(job.minSalary)} - {formatNumberToVietnameseShort(job.maxSalary)}</span>
+              <span className="text-xs text-gray-600">{job.minSalary ? formatNumberToVietnameseShort(job.minSalary) : ''} - {job.maxSalary ? formatNumberToVietnameseShort(job.maxSalary) : ''}</span>
             </div>
           </div>
           <p className="text-gray-700 text-sm mb-4 line-clamp-2">
