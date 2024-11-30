@@ -49,15 +49,15 @@ const Notifications: React.FC = () => {
                         <div className="py-4">
                             {notifications.map((notification) => (
                                 <div
-                                    key={notification.id}
-                                    className={`text-gray-700 p-2 rounded-md cursor-pointer ${!notification.read ? 'bg-blue-50 font-semibold' : 'hover:bg-gray-100'}`}
-                                    onClick={() => handleNotificationClick(notification.id)}
+                                    key={notification?.id}
+                                    className={`text-gray-700 p-2 rounded-md cursor-pointer ${!notification?.read ? 'bg-blue-50 font-semibold' : 'hover:bg-gray-100'}`}
+                                    onClick={() => handleNotificationClick(notification?.id)}
                                 >
-                                    <div className="font-bold text-sm">{notification.title}</div>
+                                    <div className="font-bold text-sm">{notification?.title}</div>
                                     <div className="text-xs text-gray-600 truncate">
-                                        {notification.content.length > 50
-                                            ? `${notification.content.slice(0, 50)}...`
-                                            : notification.content}
+                                        {notification?.content.length > 50
+                                            ? `${notification?.content.slice(0, 50)}...`
+                                            : notification?.content}
                                     </div>
                                 </div>
                             ))}

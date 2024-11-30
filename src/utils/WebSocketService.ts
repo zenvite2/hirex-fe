@@ -20,44 +20,48 @@ class WebSocketService {
     connect(userId: string, wsUrl: string): Promise<void> {
         return new Promise((resolve, reject) => {
 
-            if (!this.isConnected) {
-                const sock = new SockJS(wsUrl + '/ws');
-                this.stompClient = over(sock);
-                this.isConnected = true;
+            try {
+                if (!this.isConnected) {
+                    const sock = new SockJS(wsUrl + '/ws');
+                    this.stompClient = over(sock);
+                    this.isConnected = true;
 
-                this.stompClient.connect(
-                    {},
-                    () => {
-                        this.stompClient.subscribe('/user/' + userId + '/private', this.handleMessage.bind(this));
+                    this.stompClient.connect(
+                        {},
+                        () => {
+                            this.stompClient.subscribe('/user/' + userId + '/private', this.handleMessage.bind(this));
 
-                        // const chatMessage: ChatMessage = {
-                        //     sender: userId,
-                        //     message: `${userId} connected to server.`,
-                        //     sentTime: new Date().toISOString(),
-                        //     receiver: '...',
-                        //     status: Status.JOIN,
-                        //     type: 'custom',
-                        //     direction: 'outgoing',
-                        //     position: 'normal',
-                        //     id: uuidv4(),
-                        // };
-                        // this.stompClient.send("/app/private-message", {}, JSON.stringify(chatMessage));
-                        resolve();
-                    },
-                    (error) => {
+                            // const chatMessage: ChatMessage = {
+                            //     sender: userId,
+                            //     message: `${userId} connected to server.`,
+                            //     sentTime: new Date().toISOString(),
+                            //     receiver: '...',
+                            //     status: Status.JOIN,
+                            //     type: 'custom',
+                            //     direction: 'outgoing',
+                            //     position: 'normal',
+                            //     id: uuidv4(),
+                            // };
+                            // this.stompClient.send("/app/private-message", {}, JSON.stringify(chatMessage));
+                            resolve();
+                        },
+                        (error) => {
+                            this.isConnected = false;
+                            toast.error('Mất kết nối tới máy chủ, vui lòng thử lại.');
+                            reject(error);
+                        }
+                    );
+
+                    sock.onerror = () => {
                         this.isConnected = false;
-                        toast.error('Mất kết nối tới máy chủ, vui lòng thử lại.');
-                        reject(error);
-                    }
-                );
-
-                sock.onerror = () => {
-                    this.isConnected = false;
-                    toast.error('Có lỗi khi kết nối tới máy chủ, vui lòng thử lại.');
-                    reject();
-                };
-            } else {
-                resolve();
+                        toast.error('Có lỗi khi kết nối tới máy chủ, vui lòng thử lại.');
+                        reject();
+                    };
+                } else {
+                    resolve();
+                }
+            } catch (error) {
+                console.log('Error when connecting to ws:', error);
             }
         });
     }

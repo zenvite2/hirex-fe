@@ -101,10 +101,9 @@ function App() {
             try {
                 websocketService.connect(userId.toString(), wsUrl);
             } catch (error) {
-                console.log(error)
+                console.log(error);
             }
         }
-
     }, [userId]);
 
     useEffect(() => {
