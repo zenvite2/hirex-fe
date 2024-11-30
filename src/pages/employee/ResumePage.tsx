@@ -11,13 +11,13 @@ import { RiAccountBoxFill } from "react-icons/ri";
 import { educationDelete, educationGetAll } from '../../services/educationApi';
 import { experienceDelete, experienceGetAll } from '../../services/experienceApi';
 import { careergoalGet } from '../../services/careergoalApi';
-import { jobTypeList, positionList } from '../../services/autofillApi';
+import { jobTypeList, positionList, industryList} from '../../services/autofillApi';
 import { toast } from 'react-toastify';
 
 interface Experience {
   id?: number;
   companyName: string;
-  position: string;
+  position: 1,
   startDate: string;
   endDate: string;
   description: string;
@@ -51,8 +51,10 @@ interface HeaderData {
 
 interface CareerGoal {
   id?: number;
+  industry: number;
   position: number;
-  salary: number;
+  minSalary: number | null;
+  maxSalary: number | null;
   jobType: number;
 }
 
@@ -93,6 +95,7 @@ const ResumePage: React.FC = () => {
   const [careerGoalData, setCareerGoalData] = useState<CareerGoal | null>(null);
   const [positions, setPositions] = useState<Type[]>([]);
   const [jobTypes, setJobTypes] = useState<Type[]>([]);
+  const [industry, setIndustry] = useState<Type[]>([]);
 
   const handleSaveHeaderData = (newData: HeaderData) => {
     setHeaderData(newData);
@@ -174,7 +177,7 @@ const ResumePage: React.FC = () => {
     try {
       const action = await dispatch(experienceDelete(id));
       if (experienceDelete.fulfilled.match(action)) {
-        await fetchEducations();
+        await fetchExperiens();
         toast.success('Experience deleted successfully');
       }
     } catch (error) {
@@ -264,9 +267,10 @@ const ResumePage: React.FC = () => {
   };
   const fetchLookupData = async () => {
     try {
-      const [positionResult, jobTypeResult] = await Promise.all([
+      const [positionResult, jobTypeResult, industryResult] = await Promise.all([
         dispatch(positionList()).unwrap(),
         dispatch(jobTypeList()).unwrap(),
+        dispatch(industryList()).unwrap(),
       ]);
 
       if (positionResult.response?.data) {
@@ -275,19 +279,15 @@ const ResumePage: React.FC = () => {
       if (jobTypeResult.response?.data) {
         setJobTypes(jobTypeResult.response.data);
       }
+      if (industryResult.response?.data) {
+        setIndustry(industryResult.response.data);
+    }
     } catch (error) {
       toast.error('Đã có lỗi xảy ra khi tải dữ liệu tham chiếu');
     }
   };
   const handleSaveCareerGoalData = (updatedCareerGoal: CareerGoal) => {
     setCareerGoalData(updatedCareerGoal);
-  };
-
-  const formatSalary = (salary: number): string => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(salary);
   };
 
   const getPositionName = (positionId: number): string => {
@@ -297,6 +297,11 @@ const ResumePage: React.FC = () => {
 
   const getJobTypeName = (jobTypeId: number): string => {
     const jobType = jobTypes.find(j => j.id === jobTypeId);
+    return jobType?.name || 'Không xác định';
+  };
+
+  const getIndustryName = (industruId: number): string => {
+    const jobType = jobTypes.find(j => j.id === industruId);
     return jobType?.name || 'Không xác định';
   };
 
@@ -408,7 +413,7 @@ const ResumePage: React.FC = () => {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="font-semibold text-lg">{exp.companyName}</p>
-                  <p className="text-gray-600">{exp.position}</p>
+                  <p className="text-gray-600">{exp?.position ? getPositionName(exp.position) : ''}</p>
                   <p className="text-sm text-gray-500">{exp.startDate} - {exp.endDate}</p>
                 </div>
                 <div className="flex gap-2">
@@ -483,11 +488,15 @@ const ResumePage: React.FC = () => {
               </p>
               <p>
                 <span className="font-semibold">Mức lương mong muốn: </span>
-                {careerGoalData?.salary ? formatSalary(careerGoalData.salary) : ''}
+                 {careerGoalData?.minSalary} - {careerGoalData?.maxSalary} VNĐ
               </p>
               <p>
                 <span className="font-semibold">Loại công việc: </span>
                 {careerGoalData?.jobType ? getJobTypeName(careerGoalData.jobType) : ''}
+              </p>
+              <p>
+                <span className="font-semibold">Ngành nghề: </span>
+                {careerGoalData?.industry ? getIndustryName(careerGoalData.industry) : ''}
               </p>
             </div>
           </div>

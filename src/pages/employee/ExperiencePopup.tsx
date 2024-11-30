@@ -3,11 +3,14 @@ import { X } from 'lucide-react';
 import { experienceCreate, experienceUpdate } from '../../services/experienceApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { toast } from 'react-toastify';
+import { positionList } from '../../services/autofillApi';
+import { DatePicker } from 'antd';
+import moment from 'moment';
 
 interface Experience {
   id?: number;
   companyName: string;
-  position: string;
+  position: number;
   startDate: string;
   endDate: string;
   description: string;
@@ -16,13 +19,17 @@ interface Experience {
 
 interface ExperienceRequestData {
   companyName: string;
-  position: string;
+  position: number;
   startDate: string;
   endDate: string;
   description: string;
   yearExperience: number;
 }
 
+interface Type {
+  id: number;
+  name: string;
+}
 
 interface ExperiencePopupProps {
   isOpen: boolean;
@@ -35,10 +42,11 @@ interface ExperiencePopupProps {
 const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSave, experience, editingExperience }) => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [positionType, setPositions] = useState<Type[]>([]);
   const dispatch = useAppDispatch();
   const [formData, setFormData] = useState<Experience>({
     companyName: '',
-    position: '',
+    position: 1,
     startDate: '',
     endDate: '',
     description: '',
@@ -51,7 +59,7 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
     } else {
       setFormData({
         companyName: '',
-        position: '',
+        position: 1,
         startDate: '',
         endDate: '',
         description: '',
@@ -62,27 +70,47 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
 
   const [errors, setErrors] = useState<Partial<Record<keyof Experience, string>>>({});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (errors[name as keyof Experience]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
-
   };
+  const handleDateChange = (name: 'startDate' | 'endDate', date: moment.Moment | null) => {
+    const dateString = date ? date.format('MM/YYYY') : '';
+    setFormData((prev) => ({ ...prev, [name]: dateString }));
+
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+
+  useEffect(() => {
+    const fetchJobTypes = async () => {
+      try {
+        const [positionResult] = await Promise.all([
+          dispatch(positionList()).unwrap(),
+        ]);
+
+        if (positionResult.response?.data) {
+          setPositions(positionResult.response.data);
+        }
+      } catch (error) {
+        toast.error('Lỗi khi tải dữ liệu. Vui lòng thử lại sau.');
+      }
+    };
+
+    fetchJobTypes();
+  }, []);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof Experience, string>> = {};
 
     if (!formData.companyName) {
       newErrors.companyName = 'Vui lòng nhập tên công ty';
-    }
-    if (!formData.position.trim()) {
-      newErrors.position = 'Vui lòng nhập vị trí';
-    }
-    if (!formData.yearExperience) {
-      newErrors.yearExperience = 'Vui lòng nhập năm kinh nhiệm';
     }
     if (!formData.startDate) {
       newErrors.startDate = 'Vui lòng chọn ngày bắt đầu';
@@ -99,6 +127,7 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+
     e.preventDefault();
 
     if (!validateForm()) {
@@ -204,13 +233,19 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
 
           <div className="mb-4">
             <label className="block mb-2 text-sm font-medium">Vị trí <span className="text-red-500">*</span></label>
-            <input
-              type="text"
+            <select
               name="position"
               value={formData.position}
               onChange={handleChange}
+              required
               className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            >
+              {positionType.map(type => (
+                <option key={type.id} value={type.id}>
+                  {type.name}
+                </option>
+              ))}
+            </select>
             {errors.position && (
               <p className="mt-1 text-sm text-red-500">{errors.position}</p>
             )}
@@ -221,12 +256,12 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 Ngày bắt đầu <span className="text-red-500">*</span>
               </label>
-              <input
-                type="date"
+              <DatePicker
                 name="startDate"
-                value={formData.startDate}
-                onChange={handleChange}
+                value={formData.startDate ? moment(formData.startDate, 'MM/YYYY') : null}
+                onChange={(date) => handleDateChange('startDate', date)}
                 disabled={isSubmitting}
+                format="MM/YYYY"
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.startDate && (
@@ -237,12 +272,12 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 Ngày kết thúc <span className="text-red-500">*</span>
               </label>
-              <input
-                type="date"
+              <DatePicker
                 name="endDate"
-                value={formData.endDate}
-                onChange={handleChange}
+                value={formData.endDate ? moment(formData.endDate, 'MM/YYYY') : null}
+                onChange={(date) => handleDateChange('endDate', date)}
                 disabled={isSubmitting}
+                format="MM/YYYY"
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.endDate && (
