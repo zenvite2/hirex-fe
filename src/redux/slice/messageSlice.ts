@@ -24,8 +24,8 @@ const messagesSlice = createSlice({
   name: 'messages',
   initialState,
   reducers: {
-    addMessage: (state, action: PayloadAction<{ converId: number; msg: ChatMessage; avtUrl?: string; name?: string; openMessenger?: boolean }>) => {
-      const { converId, msg, openMessenger, avtUrl, name } = action.payload;
+    addMessage: (state, action: PayloadAction<{ converId: number; msg: ChatMessage; avtUrl?: string; username?: string; fullName?: string; openMessenger?: boolean }>) => {
+      const { converId, msg, openMessenger, avtUrl, username, fullName } = action.payload;
 
       const existingConversationIndex = state.lstConvers.findIndex(item => item.userId === converId);
 
@@ -46,7 +46,8 @@ const messagesSlice = createSlice({
         const newConversation: Conversation = {
           avtUrl: avtUrl,
           last10Messages: [msg],
-          name,
+          username,
+          fullName,
           userId: converId
         };
 

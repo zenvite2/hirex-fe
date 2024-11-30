@@ -17,14 +17,9 @@ import {
     MessageType,
 
 } from "@chatscope/chat-ui-kit-react";
-import { Client, Message as MessageStompjs, over } from 'stompjs';
-import SockJS from 'sockjs-client';
-import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import CustomModal from '../../components/common/CustomModal';
-import VideoCallRequest from './VideoCallRequest';
 import { addMessage, selectCurrentConver, setCurrentIndex, setToCaller } from '../../redux/slice/messageSlice';
 import { getConversations } from '../../services/messageApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
@@ -62,7 +57,8 @@ export interface ChatMessage extends MessageModel {
 
 export interface Conversation {
     userId: number,
-    name: string,
+    username: string,
+    fullName: string,
     avtUrl: string,
     last10Messages: ChatMessage[]
 }
@@ -156,19 +152,19 @@ const Messenger: React.FC = () => {
                             {lstConvers.map(conversation => (
                                 <Conversation
                                     key={conversation.userId}
-                                    name={conversation.name}
-                                    lastSenderName={conversation.name}
+                                    name={conversation.fullName ?? conversation.username}
+                                    // lastSenderName={conversation.fullName ?? conversation.username}
                                     info={conversation.last10Messages[conversation.last10Messages.length - 1]?.message ?? ''}
                                     active={currentConver?.userId === conversation.userId}
                                     onClick={() => {
                                         dispatch(setCurrentIndex(conversation.userId));
                                         setToCaller({
                                             id: conversation.userId + '',
-                                            fullname: conversation.name
+                                            fullname: conversation.username
                                         });
                                     }}
                                 >
-                                    <Avatar src={conversation.avtUrl} name={conversation.name} />
+                                    <Avatar src={conversation.avtUrl} name={conversation.fullName ?? conversation.username} />
                                 </Conversation>
                             ))}
                         </ConversationList>
@@ -177,8 +173,8 @@ const Messenger: React.FC = () => {
                     <ChatContainer>
                         {currentConver && (
                             <ConversationHeader>
-                                <Avatar src={currentConver?.avtUrl} name={currentConver?.name} />
-                                <ConversationHeader.Content userName={currentConver?.name} info="Online" />
+                                <Avatar src={currentConver?.avtUrl} name={currentConver?.fullName ?? currentConver?.username} />
+                                <ConversationHeader.Content userName={currentConver?.fullName ?? currentConver?.username} info="Online" />
                                 <ConversationHeader.Actions>
                                     <VideoCallButton onClick={handleVideoCall} />
                                 </ConversationHeader.Actions>
@@ -217,7 +213,7 @@ const Messenger: React.FC = () => {
 
                         {currentConver &&
                             <MessageInput
-                                placeholder={`Type message to ${currentConver.name || ""}...`}
+                                placeholder={`Type message to ${(currentConver?.fullName ?? currentConver?.username)}...`}
                                 value={msgInput}
                                 onChange={val => setMsgInput(val)}
                                 onSend={() => { handleSendMessage('text') }}
