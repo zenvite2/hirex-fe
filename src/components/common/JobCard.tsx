@@ -41,8 +41,15 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
   }, [isLoggedIn, job.id]);
 
   const convertString = (input: string): string => {
-    return input?.replace(`\n`, '.');
+    if (!input) return ""; // Kiểm tra chuỗi rỗng hoặc null
+    return input.replace(/\n/g, ". ").replace(/\r/g, ""); // Thay \n bằng ". " và loại bỏ \r
   };
+
+  const cleanDescription = (content: string): string => {
+    if (!content) return '';
+    return content.replace(/\\n/g, ' ').replace(/\\t/g, ' ');
+  };
+
 
   const handleSaveJob = async () => {
     if (!isLoggedIn) {
@@ -143,7 +150,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
             </div>
           </div>
           <p className="text-gray-700 text-sm mb-4 line-clamp-2">
-            {convertString(job?.description)}
+            {cleanDescription(job?.description || '')}
           </p>
           <div className="my-2 border-b border-gray-300"></div>
           <div className="flex items-center justify-between">
