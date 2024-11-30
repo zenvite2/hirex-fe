@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { careergoalCreate, careergoalUpdate } from '../../services/careergoalApi';
-import { jobTypeList, positionList } from '../../services/autofillApi';
+import { jobTypeList, positionList, industryList } from '../../services/autofillApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { toast } from 'react-toastify';
 
 interface CareerGoal {
     id?: number;
     position: number;
-    salary: number;
+    minSalary: number | null;
+    maxSalary: number | null;
     jobType: number;
+    industry: number;
 }
 
 interface CareerGoalPopups {
@@ -28,30 +30,35 @@ const CareerGoalPopup: React.FC<CareerGoalPopups> = ({ isOpen, onClose, onSave, 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [jobTypes, setJobTypes] = useState<Type[]>([]);
     const [positionType, setPositions] = useState<Type[]>([]);
+    const [industry, setIndustry] = useState<Type[]>([]);
+
     const dispatch = useAppDispatch();
     const [formData, setFormData] = useState<CareerGoal>({
         position: 1,
-        salary: 0,
+        minSalary: null,
+        maxSalary: null,
         jobType: 1,
+        industry: 1,
     });
 
     useEffect(() => {
         const fetchJobTypes = async () => {
             try {
-                const [positionResult, jobTypeResult] = await Promise.all([
+                const [positionResult, jobTypeResult, industryResult] = await Promise.all([
                     dispatch(positionList()).unwrap(),
                     dispatch(jobTypeList()).unwrap(),
-     
-                  ]);
+                    dispatch(industryList()).unwrap(),
+                ]);
           
-   
-                  if (positionResult.response?.data) {
+                if (positionResult.response?.data) {
                     setPositions(positionResult.response.data);
-                  }
-                  if (jobTypeResult.response?.data) {
+                }
+                if (jobTypeResult.response?.data) {
                     setJobTypes(jobTypeResult.response.data);
-                  }
-
+                }
+                if (industryResult.response?.data) {
+                    setIndustry(industryResult.response.data);
+                }
             } catch (error) {
                 toast.error('Lỗi khi tải dữ liệu. Vui lòng thử lại sau.');
             }
@@ -66,8 +73,10 @@ const CareerGoalPopup: React.FC<CareerGoalPopups> = ({ isOpen, onClose, onSave, 
                 setFormData(careergoal);
             } else {
                 setFormData({
+                    industry: jobTypes.length > 0 ? jobTypes[0].id : 1,
                     position: jobTypes.length > 0 ? jobTypes[0].id : 1,
-                    salary: 0,
+                    minSalary: null,
+                    maxSalary: null,
                     jobType: jobTypes.length > 0 ? jobTypes[0].id : 1,
                 });
             }
@@ -77,13 +86,13 @@ const CareerGoalPopup: React.FC<CareerGoalPopups> = ({ isOpen, onClose, onSave, 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         
-        let updatedValue: string | number = value;
+        let updatedValue: string | number | null = value;
         
-        if (name === 'salary') {
+        if (name === 'minSalary' || name === 'maxSalary') {
             // Chỉ lấy số từ input
             const numericValue = value.replace(/[^0-9]/g, '');
-            updatedValue = numericValue ? parseInt(numericValue) : 0;
-        } else if (name === 'jobType') {
+            updatedValue = numericValue ? parseInt(numericValue) : null;
+        } else if (name === 'jobType' || name === 'position' || name == 'industry') {
             updatedValue = parseInt(value);
         }
 
@@ -93,20 +102,28 @@ const CareerGoalPopup: React.FC<CareerGoalPopups> = ({ isOpen, onClose, onSave, 
         }));
     };
 
-    const formatSalaryInput = (value: number): string => {
-        return new Intl.NumberFormat('vi-VN').format(value);
+    const formatSalaryInput = (value: number | null): string => {
+        return value ? new Intl.NumberFormat('vi-VN').format(value) : '';
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
+        // Kiểm tra mức lương min <= max
+        if (formData.minSalary && formData.maxSalary && formData.minSalary > formData.maxSalary) {
+            toast.error('Mức lương tối thiểu phải nhỏ hơn hoặc bằng mức lương tối đa');
+            setIsSubmitting(false);
+            return;
+        }
+
         try {
-            // Đảm bảo dữ liệu được format đúng trước khi gửi
             const careergoalData = {
-                position: Number(formData.jobType),
-                salary: Number(formData.salary),
-                jobType: Number(formData.jobType)
+                position: Number(formData.position),
+                minSalary: formData.minSalary,
+                maxSalary: formData.maxSalary,
+                jobType: Number(formData.jobType),
+                industry: Number(formData.industry)
             };
 
             let result;
@@ -160,9 +177,9 @@ const CareerGoalPopup: React.FC<CareerGoalPopups> = ({ isOpen, onClose, onSave, 
 
                 <form onSubmit={handleSubmit} className="p-6">
                     <div className="mb-4">
-                    <label className="block mb-2 text-sm font-medium">Vị trí <span className="text-red-500">*</span></label>
+                        <label className="block mb-2 text-sm font-medium">Vị trí <span className="text-red-500">*</span></label>
                         <select
-                            name="positionType"
+                            name="position"
                             value={formData.position}
                             onChange={handleChange}
                             required
@@ -176,20 +193,39 @@ const CareerGoalPopup: React.FC<CareerGoalPopups> = ({ isOpen, onClose, onSave, 
                         </select>
                     </div>
 
-                    <div className="mb-4">
-                        <label className="block mb-2 text-sm font-medium">Mức lương mong muốn <span className="text-red-500">*</span></label>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                name="salary"
-                                value={formatSalaryInput(formData.salary)}
-                                onChange={handleChange}
-                                required
-                                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                                VNĐ
-                            </span>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label className="block mb-2 text-sm font-medium">Mức lương tối thiểu <span className="text-red-500">*</span></label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    name="minSalary"
+                                    value={formatSalaryInput(formData.minSalary)}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                    VNĐ
+                                </span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block mb-2 text-sm font-medium">Mức lương tối đa <span className="text-red-500">*</span></label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    name="maxSalary"
+                                    value={formatSalaryInput(formData.maxSalary)}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                    VNĐ
+                                </span>
+                            </div>
                         </div>
                     </div>
 
@@ -203,6 +239,23 @@ const CareerGoalPopup: React.FC<CareerGoalPopups> = ({ isOpen, onClose, onSave, 
                             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             {jobTypes.map(type => (
+                                <option key={type.id} value={type.id}>
+                                    {type.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="block mb-2 text-sm font-medium">Ngành nghề <span className="text-red-500">*</span></label>
+                        <select
+                            name="industry"
+                            value={formData.id}
+                            onChange={handleChange}
+                            required
+                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            {industry.map(type => (
                                 <option key={type.id} value={type.id}>
                                     {type.name}
                                 </option>

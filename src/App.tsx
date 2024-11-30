@@ -45,6 +45,13 @@ import OTPInput from "./pages/OTP";
 import { NotificationType, setNotifications, setUnreadCount } from "./redux/slice/notificationSlice";
 import EmployerRoute from "./routes/EmployerRoute";
 import EmployeeRoute from "./routes/EmployeeRoute";
+import BrowseJob from "./pages/cms/BrowseJob";
+import AccountManagement from "./pages/cms/AccountManagement";
+import SidebarCMS from "./components/layout/SidebarCMS";
+import CVManagement from "./pages/cms/CVManagement";
+import Job from "./pages/cms/Job";
+import JobCMS from "./pages/cms/Job";
+import AdminRoute from "./routes/AdminRoute";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -64,6 +71,30 @@ function SidebarLayout() {
             {showSidebar && (
                 <div className="w-64 bg-white shadow-md">
                     <Sidebar />
+                </div>
+            )}
+            <div className="flex-1 p-8">
+                <Outlet />
+            </div>
+        </div>
+    );
+}
+
+function SidebarCMSLayout() {
+    const location = useLocation();
+    const showSidebar = [
+        "/cms/browse-job",
+        "/cms/account-management",
+        "/cms/cv-management"
+    ].includes(location.pathname) ||
+        /^\/cms\/job\/\d+$/.test(location.pathname);
+
+    return (
+        <div className="flex min-h-screen">
+            {/* Sidebar chỉ hiển thị trên các trang có Sidebar */}
+            {showSidebar && (
+                <div className="w-64 bg-white shadow-md">
+                    <SidebarCMS />
                 </div>
             )}
             <div className="flex-1 p-8">
@@ -204,6 +235,18 @@ function App() {
                             <Route element={<SidebarLayout />}>
                                 <Route path="/applicants" element={<ApplicantsList />} />
                                 <Route path="/job-posts" element={<JobPosts />} />
+                            </Route>
+
+                            <Route path="/employer" element={<EmployerLanding />} />
+
+                        </Route>
+
+                        <Route element={<AdminRoute />}>
+                            <Route element={<SidebarCMSLayout />}>
+                                <Route path="/cms/browse-job" element={<BrowseJob />} />
+                                <Route path="/cms/account-management" element={<AccountManagement />} />
+                                <Route path="/cms/cv-management" element={<CVManagement />} />
+                                <Route path="/cms/job/:id" element={<JobCMS />} />
                             </Route>
 
                             <Route path="/employer" element={<EmployerLanding />} />

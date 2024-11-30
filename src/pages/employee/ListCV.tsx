@@ -48,7 +48,7 @@ const ListCV = () => {
         try {
             await dispatch(deleteResume(resumeId));
             setResume(resume.filter((resume) => resume.id !== resumeId));
-            toast.success('Xóa công việc thành công!');
+            toast.success('Xóa CV thành công!');
         } catch (error) {
             toast.error('Có lỗi xảy ra khi xóa công việc');
         }

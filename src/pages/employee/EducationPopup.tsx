@@ -4,6 +4,8 @@ import { educationCreate, educationUpdate } from '../../services/educationApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { toast } from 'react-toastify';
 import { educationList } from '../../services/autofillApi';
+import { DatePicker } from 'antd';
+import moment from 'moment';
 
 interface Education {
   id?: number;
@@ -56,6 +58,15 @@ const EducationForm: React.FC<EducationFormProps> = ({
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof Education, string>>>({});
+
+  const handleDateChange = (name: 'startDate' | 'endDate', date: moment.Moment | null) => {
+    const dateString = date ? date.format('MM/YYYY') : '';
+    setFormData((prev) => ({ ...prev, [name]: dateString }));
+
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
 
   useEffect(() => {
     const fetchEducationLevels = async () => {
@@ -204,6 +215,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
       setIsSubmitting(false);
     }
   };
+  
   const renderEducationLevelSelect = () => {
     return (
       <div className="mb-4">
@@ -297,14 +309,13 @@ const EducationForm: React.FC<EducationFormProps> = ({
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 Ngày bắt đầu <span className="text-red-500">*</span>
               </label>
-              <input
-                type="date"
+              <DatePicker
                 name="startDate"
-                value={formData.startDate}
-                onChange={handleChange}
+                value={formData.startDate ? moment(formData.startDate, 'MM/YYYY') : null}
+                onChange={(date) => handleDateChange('startDate', date)}
                 disabled={isSubmitting}
-                className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.startDate ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                format="MM/YYYY"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.startDate && (
                 <p className="mt-1 text-sm text-red-500">{errors.startDate}</p>
@@ -314,14 +325,13 @@ const EducationForm: React.FC<EducationFormProps> = ({
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 Ngày kết thúc <span className="text-red-500">*</span>
               </label>
-              <input
-                type="date"
+              <DatePicker
                 name="endDate"
-                value={formData.endDate}
-                onChange={handleChange}
+                value={formData.endDate ? moment(formData.endDate, 'MM/YYYY') : null}
+                onChange={(date) => handleDateChange('endDate', date)}
                 disabled={isSubmitting}
-                className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.endDate ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                format="MM/YYYY"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.endDate && (
                 <p className="mt-1 text-sm text-red-500">{errors.endDate}</p>
