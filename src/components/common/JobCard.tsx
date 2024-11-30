@@ -41,7 +41,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
   }, [isLoggedIn, job.id]);
 
   const convertString = (input: string): string => {
-    return input.replace(`\n`, '.');
+    return input?.replace(`\n`, '.');
   };
 
   const handleSaveJob = async () => {
@@ -143,7 +143,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
             </div>
           </div>
           <p className="text-gray-700 text-sm mb-4 line-clamp-2">
-            {convertString(job.description)}
+            {convertString(job?.description)}
           </p>
           <div className="my-2 border-b border-gray-300"></div>
           <div className="flex items-center justify-between">

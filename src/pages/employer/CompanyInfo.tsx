@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { useLocationSelector } from './useLocationSelector';
 import { LocationSelector } from '../../components/registration/LocationSelector';
 import { updateCompany, getCompany } from '../../services/companyApi';
+import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 
 interface CompanyInfo {
   companyName: string;
@@ -79,10 +80,12 @@ const CompanyInfoForm: React.FC = () => {
             });
 
             if (companyData.city) {
+              dispatch(startLoading());
               await setCityFromId(companyData.city);
               if (companyData.district) {
                 await setDistrictFromId(companyData.district, companyData.city);
               }
+              dispatch(stopLoading());
             }
 
           }
@@ -115,12 +118,14 @@ const CompanyInfoForm: React.FC = () => {
     if (logoFile) submitFormData.append('logo', logoFile);
     if (formData.scale) submitFormData.append('scale', formData.scale.toString());
 
+    dispatch(startLoading());
     const result = await dispatch(updateCompany(submitFormData));
     if (result?.payload?.response?.success === true) {
       toast.success('Cập nhật thông tin công ty thành công');
     } else {
       toast.error('Cập nhật thông tin công ty thất bại');
     }
+    dispatch(stopLoading());
   };
   return (
     <div className="max-w-3xl mx-auto bg-white rounded-lg shadow p-6">
