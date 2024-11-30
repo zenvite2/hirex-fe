@@ -98,11 +98,15 @@ const CompanyDetail = () => {
       <div className="max-w-6xl mx-auto px-6">
         {/* Banner Image Section */}
         <div className="relative w-full h-40 bg-gradient-to-r from-cyan-700 to-blue-900">
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-700/60 to-blue-900/60" />
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-700/60 to-blue-900/60"></div>
 
-          <div className="absolute top-4 right-4">
-            <img src={company?.logo} alt={company?.companyName} className="h-8 object-contain" />
-          </div>
+          {/* Full-Sized Logo */}
+          <img
+            src={company?.logo}
+            alt={company?.companyName}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
         </div>
 
         {/* Company Info Bar */}
