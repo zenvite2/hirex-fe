@@ -3,6 +3,10 @@ import React from 'react';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { addMessage } from '../../redux/slice/messageSlice';
+import { ChatMessage } from '../chat/Messenger';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import websocketService from '../../utils/WebSocketService'
 
 interface Employer {
     userId: number,
@@ -12,8 +16,8 @@ interface Employer {
     avatar: string | null;
 }
 
-const ContactNow: React.FC<{ employer: Employer }> = ({ employer }) => {
-
+const ContactNow: React.FC<{ employer: Employer, jobId: number }> = ({ employer, jobId }) => {
+    const { userId, fullName } = useSelector((state: RootState) => state.authReducer);
     const dispatch = useAppDispatch();
 
     return (
@@ -23,21 +27,20 @@ const ContactNow: React.FC<{ employer: Employer }> = ({ employer }) => {
             </div>
 
             <div className="space-y-2 w-full">
-
                 <button
                     className="space-x-2 flex items-center justify-center w-full px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg shadow-sm transition duration-200"
                     onClick={() => {
-                        window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${employer.email}`, '_blank');
+                        window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${employer?.email}`, '_blank');
                     }}
                 >
                     <Mail />
-                    <span>{employer.email}</span>
+                    <span>{employer?.email}</span>
                 </button>
 
                 <button
                     className="space-x-2 flex items-center justify-center w-full px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg shadow-sm transition duration-200"
                     onClick={() => {
-                        employer.phoneNumber && navigator.clipboard.writeText(employer.phoneNumber)
+                        employer?.phoneNumber && navigator.clipboard.writeText(employer?.phoneNumber)
                             .then(() => {
                                 toast.info('Đã sao chép số điện thoại');
                             })
@@ -47,20 +50,43 @@ const ContactNow: React.FC<{ employer: Employer }> = ({ employer }) => {
                     }}
                 >
                     <PhoneCall />
-                    <span>{employer.phoneNumber ?? 'Không có thông tin'}</span>
+                    <span>{employer?.phoneNumber ?? 'Không có thông tin'}</span>
                 </button>
 
                 <button
                     className="space-x-2 flex items-center justify-center w-full px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg shadow-sm transition duration-200"
                     onClick={() => {
-                        employer && dispatch(addMessage({ converId: employer.userId, avtUrl: employer.avatar, fullName: employer.fullName ?? employer.email ?? employer.phoneNumber, msg: null, openMessenger: true }));
+                        const msg: ChatMessage = {
+                            receiver: String(employer.userId),
+                            status: 'MESSAGE',
+                            id: null,
+                            senderName: String(fullName),
+                            direction: 'outgoing',
+                            position: 'normal',
+                            message: String(jobId),
+                            sender: String(userId),
+                            sentTime: new Date().toISOString(),
+                            type: 'html',
+                        };
+
+                        employer
+                            && dispatch(
+                                addMessage({
+                                    converId: employer?.userId,
+                                    avtUrl: employer?.avatar,
+                                    fullName: employer?.fullName ?? employer?.email ?? employer?.phoneNumber,
+                                    msg,
+                                    openMessenger: true
+                                })
+                            )
+                            && websocketService.sendMessage(msg);
                     }}
                 >
                     <MessageCircleQuestion />
                     <span>Nhắn tin</span>
                 </button>
             </div>
-        </div>
+        </div >
     );
 };
 

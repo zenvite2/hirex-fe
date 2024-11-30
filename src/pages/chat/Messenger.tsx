@@ -27,6 +27,7 @@ import { uploadFile } from '../../services/fileUploadApi';
 import { Inbox } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import websocketService from '../../utils/WebSocketService'
+import MessageJobCard from './MessageJobCard';
 
 export const VIDEO_CALL_RESPONSE = {
     ACCEPT: 'VIDEO_CALL_RESPONSE_ACCEPT',
@@ -153,8 +154,16 @@ const Messenger: React.FC = () => {
                                 <Conversation
                                     key={conversation.userId}
                                     name={conversation.fullName ?? conversation.username}
-                                    // lastSenderName={conversation.fullName ?? conversation.username}
-                                    info={conversation.last10Messages[conversation.last10Messages.length - 1]?.message ?? ''}
+                                    lastSenderName={conversation.last10Messages[conversation.last10Messages.length - 1].sender == String(userId)
+                                        ? fullName ?? username
+                                        : conversation.fullName}
+                                    info={conversation.last10Messages[conversation.last10Messages.length - 1].type == 'html'
+                                        ? 'Đã gửi một liên kết công việc'
+                                        : (conversation.last10Messages[conversation.last10Messages.length - 1].type == 'image'
+                                            ? 'Đã gửi một ảnh'
+                                            : conversation.last10Messages[conversation.last10Messages.length - 1].type == 'custom'
+                                                ? 'Đã gửi một file'
+                                                : conversation.last10Messages[conversation.last10Messages.length - 1]?.message ?? '')}
                                     active={currentConver?.userId === conversation.userId}
                                     onClick={() => {
                                         dispatch(setCurrentIndex(conversation.userId));
@@ -205,6 +214,11 @@ const Messenger: React.FC = () => {
                                             />
                                         </Message.CustomContent>
                                     )}
+                                    {msg.type == 'html' && msg.message && <Message.CustomContent>
+                                        <MessageJobCard
+                                            jobId={Number(msg.message)}
+                                        />
+                                    </Message.CustomContent>}
                                 </Message>
                             ))}
 
@@ -231,7 +245,8 @@ const Messenger: React.FC = () => {
                     <Inbox color="gray" className="mr-3" size={50} />
                 </div>
                 <p className="text-gray-400 text-lg font-medium">Hãy kết nối với người khác.</p>
-            </div>}
+            </div>
+            }
 
             <input
                 type="file"
@@ -240,7 +255,7 @@ const Messenger: React.FC = () => {
                 style={{ display: 'none' }}
                 onChange={handleFileChosen}
             />
-        </div>
+        </div >
     );
 };
 

@@ -12,6 +12,7 @@ import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import Pagination from './Pagination';
+
 interface Option {
   id: number;
   name: string;
@@ -112,7 +113,7 @@ const FindJobs: React.FC = () => {
         const result = await dispatch(jobSearch({
           searchQuery,
           page: currentPage,
-          size: pageSize, 
+          size: pageSize,
           ...(city?.id ? { city: city.id } : {}),
           industryIds: selectedJobFieldIds,
           positionIds: selectedJobLevelIds,
@@ -146,7 +147,7 @@ const FindJobs: React.FC = () => {
     selectedJobTypeIds,
     selectedContractTypeIds,
     currentPage,
-    pageSize 
+    pageSize
   ]);
 
   const getRecommendJobs = useCallback(async () => {
@@ -166,7 +167,6 @@ const FindJobs: React.FC = () => {
           dispatch(positionList()).unwrap(),
           dispatch(jobTypeList()).unwrap(),
           dispatch(industryList()).unwrap(),
-          // dispatch(salaryList()).unwrap(),
           dispatch(contracTypeList()).unwrap(),
           dispatch(educationList()).unwrap(),
         ]);
@@ -244,7 +244,7 @@ const FindJobs: React.FC = () => {
           setTotalPages(result.response.metaData.totalPages);
           setTotalItems(result.response.metaData.totalItems);
           setCurrentPage(result.response.metaData.currentPage);
-          
+
           console.log(result.response.metaData.totalPages)
         }
 
@@ -338,7 +338,7 @@ const FindJobs: React.FC = () => {
               onPageChange={handlePageChange}
             />
           </div>
-        {/* {isLoggedIn && recommendJobs.length > 0 && <>
+        {isLoggedIn && recommendJobs.length > 0 && <>
           <div className="sticky top-0 border-t-2 border-gray-200 py-4 mt-6">
             <h2 className="text-2xl font-bold text-gray-600 max-w-7xl mx-auto px-2">
               Gợi ý cho bạn
@@ -352,7 +352,7 @@ const FindJobs: React.FC = () => {
               </div>
             ))}
           </div>
-        </>} */}
+        </>}
       </div>
     </div>
   );
