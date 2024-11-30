@@ -38,7 +38,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === 0}
         className="px-4 py-2 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
       >
-        Previous
+        Trước
       </button>
       
       {renderPageNumbers()}
@@ -48,7 +48,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === totalPages - 1}
         className="px-4 py-2 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
       >
-        Next
+        Sau
       </button>
     </div>
   );

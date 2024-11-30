@@ -15,7 +15,9 @@ interface CompanyInfo {
   scale: number | null;
   website?: string;
   logo?: File;
-  logoUrl: string
+  logoUrl: string,
+  bannerUrl?: string;
+  banner?: File;
   description?: string;
 }
 
@@ -30,6 +32,7 @@ const CompanyInfoForm: React.FC = () => {
     scale: null,
     website: '',
     logoUrl: '',
+    bannerUrl: '',
     description: ''
   });
 
@@ -50,6 +53,10 @@ const CompanyInfoForm: React.FC = () => {
   const [previewUrl, setPreviewUrl] = React.useState<string>('');
   const [logoFile, setLogoFile] = React.useState<File | null>(null);
 
+  const [selectedBannerFile, setSelectedBannerFile] = React.useState<string>('');
+  const [previewBannerUrl, setPreviewBannerUrl] = React.useState<string>('');
+  const [bannerFile, setBannerFile] = React.useState<File | null>(null);
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -60,13 +67,27 @@ const CompanyInfoForm: React.FC = () => {
     }
   };
 
+  const handleBannerFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedBannerFile(file.name);
+      setBannerFile(file);
+      const url = URL.createObjectURL(file);
+      setPreviewBannerUrl(url);
+    }
+  };
+
   React.useEffect(() => {
     return () => {
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
+      if (previewBannerUrl) {
+        URL.revokeObjectURL(previewBannerUrl);
+      }
     };
-  }, [previewUrl]);
+  }, [previewUrl, previewBannerUrl]);
+
 
   useEffect(() => {
     const fetchEmployeeData = async () => {
@@ -116,6 +137,7 @@ const CompanyInfoForm: React.FC = () => {
     if (formData.website) submitFormData.append('website', formData.website);
     if (formData.description) submitFormData.append('description', formData.description);
     if (logoFile) submitFormData.append('logo', logoFile);
+    if (bannerFile) submitFormData.append('banner', bannerFile);
     if (formData.scale) submitFormData.append('scale', formData.scale.toString());
 
     dispatch(startLoading());
@@ -272,6 +294,48 @@ const CompanyInfoForm: React.FC = () => {
               </div>
               <span className="text-sm text-gray-500">
                 {selectedFile || 'Không có tệp nào được chọn'}
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Banner</label>
+            <div className="flex items-center gap-4">
+              <div className="flex flex-col items-center gap-2">
+              <div className="w-96 h-24 border rounded-lg flex items-center justify-center bg-gray-50">
+              {previewBannerUrl ? (
+                    <img
+                      src={previewBannerUrl}
+                      alt="Banner preview"
+                      className="max-w-full max-h-full object-cover"
+                    />
+                  ) : formData.bannerUrl ? (
+                    <img
+                      src={formData.bannerUrl}
+                      alt="Company banner"
+                      className="max-w-full max-h-full object-cover"
+                    />
+                  ) : (
+                    <Image className="w-12 h-12 text-gray-400" />
+                  )}
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  id="banner-upload"
+                  onChange={handleBannerFileChange}
+                />
+                <button
+                  type="button"
+                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onClick={() => document.getElementById('banner-upload')?.click()}
+                >
+                  Chọn tệp
+                </button>
+              </div>
+              <span className="text-sm text-gray-500">
+                {selectedBannerFile || 'Không có tệp nào được chọn'}
               </span>
             </div>
           </div>
