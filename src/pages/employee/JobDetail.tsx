@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Building2, MapPin, Bookmark, MessageCircle, CalendarCheck, Navigation, BriefcaseConveyorBelt, Users } from 'lucide-react';
+import { Building2, MapPin, Bookmark, MessageCircle, CalendarCheck, Navigation, BriefcaseConveyorBelt, Users, Heart } from 'lucide-react';
 import { getSimilarJobs, jobGetWith } from '../../services/jobApi';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
@@ -69,6 +69,7 @@ const JobDetail = () => {
     const { isLoggedIn, userId } = useSelector((state: RootState) => state.authReducer);
     const navigate = useNavigate();
     const [isSaved, setIsSaved] = useState(false);
+    const [isFollow, setIsFollow] = useState(false);
     const [similarJobs, setSimilarJobs] = useState<Job[]>([]);
 
     useEffect(() => {
@@ -165,6 +166,39 @@ const JobDetail = () => {
             }
         } catch (error) {
             console.error("Lỗi khi lưu/xóa việc làm:", error);
+            toast.error("Đã xảy ra lỗi, vui lòng thử lại");
+        }
+    };
+
+    const handleFollowCompany = async () => {
+        if (!isLoggedIn) {
+            toast.error("Vui lòng đăng nhập để theo dõi công ty");
+            return;
+        }
+
+        try {
+            if (isFollow) {
+                // Gọi API xóa công việc đã lưu
+                const response = await axiosIns.delete(`/follow-company/${job.company.id}`, { includeToken: true });
+                if (response.data.success) {
+                    setIsFollow(false);
+                    toast.success("Đã xóa khỏi danh sách theo dõi công ty");
+                } else {
+                    toast.error(response.data.message || "Không thể xóa công ty đã theo dõi");
+                }
+            } else {
+                // Gọi API lưu công việc
+                const followRequest = { companyId: job.company.id, employeeId: userId };
+                const response = await axiosIns.post("/follow-company", followRequest, { includeToken: true });
+                if (response.data.success) {
+                    setIsFollow(true);
+                    toast.success("Đã theo dõi công ty thành công");
+                } else {
+                    toast.error(response.data.message || "Không thể theo dõi công ty");
+                }
+            }
+        } catch (error) {
+            console.error("Lỗi khi theo dõi công ty:", error);
             toast.error("Đã xảy ra lỗi, vui lòng thử lại");
         }
     };
@@ -266,7 +300,19 @@ const JobDetail = () => {
                                             }`}
                                     >
                                         <Bookmark className={`w-4 h-4 ${isSaved ? "fill-current" : "stroke-current"}`} />
-                                        Đã lưu
+                                        Lưu việc làm
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            handleFollowCompany();
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                        }}
+                                        className={`w-full px-6 py-2 bg-blue-50 rounded-lg hover:bg-blue-100 font-medium flex items-center justify-center gap-2 ${isFollow ? "text-blue-600" : "text-gray-600"
+                                            }`}
+                                    >
+                                        <Heart className={`w-4 h-4 ${isFollow ? "fill-current" : "stroke-current"}`} />
+                                        Theo dõi công ty
                                     </button>
                                 </div>
 

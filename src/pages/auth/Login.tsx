@@ -117,13 +117,13 @@ const LoginPage = () => {
               {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </button>
           </form>
-          <div className="mt-4 text-center">
+          {/* <div className="mt-4 text-center">
             <span className="text-sm text-gray-500">hoặc</span>
-          </div>
-          <button className="mt-4 flex w-full items-center justify-center rounded-md border border-gray-300 bg-white p-2 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+          </div> */}
+          {/* <button className="mt-4 flex w-full items-center justify-center rounded-md border border-gray-300 bg-white p-2 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
             <GoogleIcon />
             <span className="ml-2">Tiếp tục với Google</span>
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

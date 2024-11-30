@@ -29,6 +29,7 @@ export interface Job {
   companyName: string;
   companyLogo: string | null;
   companyDescription: string | null;
+  description: string | null;
   jobType: string;
   experience: string;
   minSalary: number;
@@ -42,7 +43,7 @@ export const salaryOptions: Option[] = [
     id: 1,
     value: {
       minSalary: 0,
-      maxSalary: 5000000
+      maxSalary: 5000000 - 1
     }
   },
   {
@@ -50,7 +51,7 @@ export const salaryOptions: Option[] = [
     id: 2,
     value: {
       minSalary: 5000000,
-      maxSalary: 10000000
+      maxSalary: 10000000 - 1
     }
   },
   {
@@ -58,7 +59,7 @@ export const salaryOptions: Option[] = [
     id: 3,
     value: {
       minSalary: 10000000,
-      maxSalary: 20000000
+      maxSalary: 20000000 - 1
     }
   },
   {
@@ -82,6 +83,7 @@ const FindJobs: React.FC = () => {
   const [selectedSalaryIds, setSelectedSalaryIds] = useState<number[]>([]);
   const [selectedEducationIds, setSelectedEducationIds] = useState<number[]>([]);
   const [selectedJobTypeIds, setSelectedJobTypeIds] = useState<number[]>([]);
+  const [selectedContractTypeIds, setSelectedContractTypeIds] = useState<number[]>([]);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const [industryOptions, setIndustryOptions] = useState<Option[]>([]);
@@ -111,6 +113,7 @@ const FindJobs: React.FC = () => {
           salaryOptionsId: selectedSalaryIds,
           educationIds: selectedEducationIds,
           jobTypeIds: selectedJobTypeIds,
+          contractTypeIds: selectedContractTypeIds
         })).unwrap();
         if (result && result.response && result.response.success) {
           setJobs(result.response.data);
@@ -131,6 +134,7 @@ const FindJobs: React.FC = () => {
     selectedSalaryIds,
     selectedEducationIds,
     selectedJobTypeIds,
+    selectedContractTypeIds,
   ]);
 
   const getRecommendJobs = useCallback(async () => {
@@ -217,6 +221,7 @@ const FindJobs: React.FC = () => {
         salaryOptionsId: selectedSalaryIds,
         educationIds: selectedEducationIds,
         jobTypeIds: selectedJobTypeIds,
+        contractTypeIds: selectedContractTypeIds,
       })).unwrap();
       if (result && result.response && result.response.success) {
         setJobs(result.response.data);
@@ -275,7 +280,8 @@ const FindJobs: React.FC = () => {
             {renderDropdown(FaBriefcase, 'Kinh nghiệm', experienceOptions, selectedExperienceIds, setSelectedExperienceIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaDollarSign, 'Mức lương', salaryOptions, selectedSalaryIds, setSelectedSalaryIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaGraduationCap, 'Học vấn', educationOptions, selectedEducationIds, setSelectedEducationIds, openDropdown, setOpenDropdown)}
-            {renderDropdown(FaBriefcase, 'Loại công việc', jobTypeOptions, selectedJobTypeIds, setSelectedJobTypeIds, openDropdown, setOpenDropdown)}
+            {renderDropdown(FaBriefcase, 'Làm việc', jobTypeOptions, selectedJobTypeIds, setSelectedJobTypeIds, openDropdown, setOpenDropdown)}
+            {renderDropdown(FaBriefcase, 'Loại công việc', contractTypeOptions, selectedContractTypeIds, setSelectedContractTypeIds, openDropdown, setOpenDropdown)}
           </div>
         </div>
       </div>

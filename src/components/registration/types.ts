@@ -14,4 +14,5 @@ export interface FormData {
   company: string;
   workLocation: number;
   district: number;
+  city: number;
 }

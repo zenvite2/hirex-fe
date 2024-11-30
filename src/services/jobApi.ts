@@ -104,6 +104,7 @@ export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
         let jobTypeIdsParam;
         let salaryOptionsParam;
         let educationIdsParam;
+        let contractTypeIdsParam;
 
         // Map other parameters if needed
         if (request.industryIds.length > 0) {
@@ -148,6 +149,12 @@ export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
             jobTypeIdsParam = null;
         }
 
+        if (request.contractTypeIds.length > 0) {
+            contractTypeIdsParam = request.contractTypeIds.join(',');
+        } else {
+            contractTypeIdsParam = null;
+        }
+
         return axiosIns.get('/job/search', {
             params: {
                 searchQuery: request.searchQuery,
@@ -157,6 +164,7 @@ export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
                 experienceIds: experienceIdsParam,
                 educationIds: educationIdsParam,
                 jobTypeIds: jobTypeIdsParam,
+                contractTypeIds: contractTypeIdsParam,
                 salaryOptions: salaryOptionsParam && encodeURIComponent(JSON.stringify(salaryOptionsParam))
             },
         })

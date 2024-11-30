@@ -8,6 +8,8 @@ import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 
 const ListCV = () => {
     const [resume, setResume] = useState([]);
+    const [showPopup, setShowPopup] = useState(false);
+    const [newResumeName, setNewResumeName] = useState('');
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
@@ -16,7 +18,7 @@ const ListCV = () => {
             dispatch(startLoading());
             try {
                 const result = await dispatch(resumeGet());
-                if (result?.payload?.response?.success == true) {
+                if (result?.payload?.response?.success === true) {
                     setResume(result.payload.response.data);
                 }
             } catch (error) {
@@ -54,11 +56,13 @@ const ListCV = () => {
 
     const handleCreate = async () => {
         try {
-            const result = await dispatch(resumeCreate());
+            const result = await dispatch(resumeCreate({ name: newResumeName }));
             if (result?.payload?.response?.success) {
                 const createdResume = result.payload.response.data;
                 toast.success('Thêm CV thành công!');
-                navigate(`/resume/${createdResume.id}`); // Điều chỉnh cách gọi navigate
+                navigate(`/resume/${createdResume.id}`);
+                setShowPopup(false);
+                setNewResumeName('');
             } else {
                 toast.error('Không thể tạo CV, hãy thử lại.');
             }
@@ -89,12 +93,45 @@ const ListCV = () => {
             <div className="p-4">
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-xl font-bold">Danh sách CV đã tạo</h1>
-                    <button className="bg-[#0069DB] text-white px-3 py-2 rounded-md hover:bg-[#0050B3] transition duration-300"
-                        onClick={() => handleCreate()}>
+                    <button
+                        className="bg-[#0069DB] text-white px-3 py-2 rounded-md hover:bg-[#0050B3] transition duration-300"
+                        onClick={() => setShowPopup(true)}
+                    >
                         Tạo CV mới
                     </button>
                 </div>
 
+                {/* Popup */}
+                {showPopup && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                        <div className="bg-white p-6 rounded shadow-lg">
+                            <h2 className="text-lg font-bold mb-4">Nhập tên CV</h2>
+                            <input
+                                type="text"
+                                value={newResumeName}
+                                onChange={(e) => setNewResumeName(e.target.value)}
+                                placeholder="Nhập tên CV"
+                                className="border p-2 rounded w-full mb-4"
+                            />
+                            <div className="flex justify-end space-x-4">
+                                <button
+                                    onClick={() => setShowPopup(false)}
+                                    className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    onClick={handleCreate}
+                                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                >
+                                    Tạo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Resume Table */}
                 <div className="overflow-x-auto">
                     <table className="w-full min-w-[800px]">
                         <thead>
@@ -115,10 +152,12 @@ const ListCV = () => {
                                         <div className="text-sm text-gray-600">{formatDate(resume.updatedAt)}</div>
                                     </td>
                                     <td className="py-4">
-                                        <span className={`px-2 py-1 rounded-full text-sm ${resume.status
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-yellow-100 text-yellow-800'
-                                            }`}>
+                                        <span
+                                            className={`px-2 py-1 rounded-full text-sm ${resume.status
+                                                ? 'bg-green-100 text-green-800'
+                                                : 'bg-yellow-100 text-yellow-800'
+                                                }`}
+                                        >
                                             {resume.status ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
@@ -127,11 +166,13 @@ const ListCV = () => {
                                             <button
                                                 onClick={() => navigate(`/resume/${resume.id}`)}
                                                 className="hover:text-yellow-600 transition-colors"
-                                            >                      <Pencil size={18} />
+                                            >
+                                                <Pencil size={18} />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(resume.id)}
-                                                className="hover:text-red-600 transition-colors">
+                                                className="hover:text-red-600 transition-colors"
+                                            >
                                                 <Trash size={18} />
                                             </button>
                                         </div>
