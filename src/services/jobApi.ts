@@ -12,6 +12,8 @@ interface JobSearchRequest {
     jobTypeIds?: number[];
     contractTypeIds?: number[];
     salaryOptionsId?: number[];
+    page?: number;
+    size?: number;
 }
 
 // Create job
@@ -237,7 +239,9 @@ export const jobSearch = createAsyncThunk<any, JobSearchRequest>(
                 educationIds: educationIdsParam,
                 jobTypeIds: jobTypeIdsParam,
                 contractTypeIds: contractTypeIdsParam,
-                salaryOptions: salaryOptionsParam && encodeURIComponent(JSON.stringify(salaryOptionsParam))
+                salaryOptions: salaryOptionsParam && encodeURIComponent(JSON.stringify(salaryOptionsParam)),
+                page: request.page || 0,
+                size: request.size || 9,
             },
         })
             .then(response => { return { response: response.data } })
