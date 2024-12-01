@@ -11,8 +11,9 @@ import { RiAccountBoxFill } from "react-icons/ri";
 import { educationDelete, educationGetAll } from '../../services/educationApi';
 import { experienceDelete, experienceGetAll } from '../../services/experienceApi';
 import { careergoalGet } from '../../services/careergoalApi';
-import { jobTypeList, positionList, industryList} from '../../services/autofillApi';
+import { jobTypeList, positionList, industryList } from '../../services/autofillApi';
 import { toast } from 'react-toastify';
+import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 
 interface Experience {
   id?: number;
@@ -192,6 +193,7 @@ const ResumePage: React.FC = () => {
 
   useEffect(() => {
     const fetchEmployeeData = async () => {
+      dispatch(startLoading());
       try {
         const action = await dispatch(getEmployees());
         if (getEmployees.fulfilled.match(action)) {
@@ -211,6 +213,8 @@ const ResumePage: React.FC = () => {
         }
       } catch (error) {
         console.error('Failed to fetch employee data:', error);
+      } finally {
+        dispatch(stopLoading());
       }
     };
 
@@ -281,7 +285,7 @@ const ResumePage: React.FC = () => {
       }
       if (industryResult.response?.data) {
         setIndustry(industryResult.response.data);
-    }
+      }
     } catch (error) {
       toast.error('Đã có lỗi xảy ra khi tải dữ liệu tham chiếu');
     }
@@ -309,7 +313,7 @@ const ResumePage: React.FC = () => {
     if (!min && !max) return 'Thương lượng';
     const formatter = new Intl.NumberFormat('vi-VN');
     return `Từ ${formatter.format(min)} - ${formatter.format(max)} VNĐ`;
-};
+  };
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">

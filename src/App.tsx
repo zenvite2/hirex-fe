@@ -151,7 +151,7 @@ function App() {
     const handleRefuseCall = () => {
         const acceptPayload = {
             fromUser: userId,
-            toUser: toCaller,
+            toUser: toCaller?.id,
             status: VIDEO_CALL_RESPONSE.REFUSE,
         };
         websocketService.sendMessage(acceptPayload, '/app/accept');
@@ -190,10 +190,10 @@ function App() {
 
     return (
         <>
-            <main className="bg-[#f7fdfd]">
+            <main className="bg-[#f7fdfd] min-h-screen flex flex-col">
                 {/* Chỉ hiển thị Navbar nếu không phải trang login hoặc register-employee */}
                 {!hideNavbarOnLogin && <Navbar />}
-                <div className={hideNavbarOnLogin ? "" : "pt-[50px]"}>
+                <div className={hideNavbarOnLogin ? "" : "pt-[50px] min-h-screen "}>
                     <Routes>
                         {/* Routes với xác thực */}
                         <Route path="/" element={<Navigate to="/find-jobs" replace={true} />} />
@@ -268,10 +268,16 @@ function App() {
                 pauseOnFocusLoss={false}
                 stacked
             />
-            <CustomModal isOpen={showMessenger} width='large' height='large' onClose={() => { dispatch(closeMessenger()); }} children={<Messenger />} />
             <Loading />
+            {showMessenger && <CustomModal isOpen={showMessenger} width='large' height='large' onClose={() => { dispatch(closeMessenger()); }} children={<Messenger />} />}
             {showCallRqModal && <CustomModal isOpen={showCallRqModal} onClose={() => setShowCallRqModal(false)} width='small' height='small'>
-                <VideoCallRequest fromUser={toCaller.id} toUser={userId + ''} fromUserFullname={toCaller.fullname} setShowCallRequestModal={setShowCallRqModal} handleRefuseCall={handleRefuseCall} />
+                <VideoCallRequest
+                    fromUser={toCaller.id}
+                    toUser={userId + ''}
+                    fromUserFullname={toCaller.fullname}
+                    setShowCallRequestModal={setShowCallRqModal}
+                    handleRefuseCall={handleRefuseCall}
+                />
             </CustomModal>}
 
         </>

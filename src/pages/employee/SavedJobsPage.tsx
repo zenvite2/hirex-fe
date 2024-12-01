@@ -93,7 +93,7 @@ const SavedJobsPage = () => {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
-        className="p-6 rounded-lg mb-6 text-black"
+        className="p-6 rounded-lg mb-6 text-black mt-4"
       >
         <h1 className="text-2xl font-bold mb-2">Việc làm đã lưu</h1>
         <p className="text-sm">
@@ -112,7 +112,7 @@ const SavedJobsPage = () => {
       </div>
 
       {/* Job Cards */}
-      {savedJobs.map(savedJob => (
+      {savedJobs?.map(savedJob => (
         <div key={savedJob.id} className="bg-rose-50 rounded-lg shadow-sm mb-4">
           <div className="p-4">
             <div className="flex gap-4">
