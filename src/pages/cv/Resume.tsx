@@ -760,8 +760,8 @@ const ResumeComponent: React.FC = () => {
                     </h2>
                     <button
                         onClick={() => {
-                            resetEducationForm();
-                            setShowEducationPopup(true);
+                            resetExperienceForm();
+                            setShowExperiencePopup(true);
                         }}
                         className="text-green-600 hover:bg-green-100 p-2 rounded-full"
                     >

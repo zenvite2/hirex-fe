@@ -316,6 +316,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
                 disabled={isSubmitting}
                 format="MM/YYYY"
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="MM/YYYY"
               />
               {errors.startDate && (
                 <p className="mt-1 text-sm text-red-500">{errors.startDate}</p>
@@ -332,6 +333,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
                 disabled={isSubmitting}
                 format="MM/YYYY"
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="MM/YYYY"
               />
               {errors.endDate && (
                 <p className="mt-1 text-sm text-red-500">{errors.endDate}</p>

@@ -113,7 +113,7 @@ const ResumePage: React.FC = () => {
           startDate: item.startDate || '',
           endDate: item.endDate || '',
           description: item.description,
-          level: item.level // Assuming the API now returns the level
+          educationLevelId: item.educationLevelId // Assuming the API now returns the level
         }));
         setEducations(educationsData);
       }
