@@ -57,7 +57,7 @@ const Notifications: React.FC = () => {
 
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-300 rounded-md shadow-lg max-h-80 overflow-y-auto">
-                    {notifications.length > 0 ? (
+                    {notifications?.length > 0 ? (
                         <div className="py-4 px-3">
                             <div className="font-bold text-gray-800 mb-3 border-b pb-1 text-red-500">Thông báo</div>
                             {notifications.map((notification) => (
@@ -69,7 +69,7 @@ const Notifications: React.FC = () => {
                                 >
                                     <div className="font-bold text-sm">{notification?.title}</div>
                                     <div className="text-xs text-gray-600 truncate">
-                                        {notification?.content.length > 50
+                                        {notification?.content?.length > 50
                                             ? `${notification?.content.slice(0, 50)}...`
                                             : notification?.content}
                                     </div>
