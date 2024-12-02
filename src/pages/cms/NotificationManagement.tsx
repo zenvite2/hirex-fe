@@ -131,7 +131,7 @@ const NotificationManagement = () => {
                                 onChange={(e) => setRecipientType(e.target.value)}
                                 className={`w-full p-2 border ${errors.recipientType ? 'border-red-500' : 'border-gray-300'} rounded-md`}
                             >
-                                <option value="0">Chọn đối tượng nhận</option>
+                                <option value="0">Tất cả mọi người</option>
                                 <option value="1">Người tìm việc</option>
                                 <option value="2">Nhà tuyển dụng</option>
                             </select>
