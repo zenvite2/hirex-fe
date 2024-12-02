@@ -170,19 +170,26 @@ const ApplicantsList = () => {
                 <td className="py-2">
                   <div>{application.fullName || 'Chưa có tên'}</div>
                   <div className="flex items-center">
-                    {application.cvPdf ? (
+                    {application.resumeId && (
                       <a
-                        href={application.cvPdf}
-                        download={`CV_${application.fullName || 'unnamed'}.pdf`}
-                        className="flex items-center text-blue-500 hover:text-blue-700"
+                        href={`/generate-cv/${application.resumeId}`}
                         target="_blank"
-                        rel="noopener noreferrer"
+                        className="text-blue-500 underline"
                       >
-                        CV: <Download className="w-4 h-4 ml-1" /> Download
+                        Xem trước
                       </a>
-                    ) : (
-                      <span className="text-gray-400">Chưa có CV</span>
                     )}
+
+                    {application.cvPdf && application.resumeId == null &&(
+                      <a
+                        href={`/api/resumes/${application.resumeId}/download`}
+                        target="_blank"
+                        className="text-blue-500 underline"
+                      >
+                        Download
+                      </a>
+                    )}
+
                   </div>
                 </td>
                 <td className="py-2">
@@ -212,8 +219,8 @@ const ApplicantsList = () => {
                   />
                   <CheckCircle
                     className={`inline-block mr-2 cursor-pointer ${application.status === ApplicationStatus.ACCEPTED
-                        ? 'text-green-500'
-                        : 'text-gray-500 hover:text-green-500'
+                      ? 'text-green-500'
+                      : 'text-gray-500 hover:text-green-500'
                       } ${updatingId === application.id ? 'opacity-50' : ''}`}
                     size={18}
                     onClick={() => {
@@ -224,8 +231,8 @@ const ApplicantsList = () => {
                   />
                   <XCircle
                     className={`inline-block cursor-pointer ${application.status === ApplicationStatus.REJECTED
-                        ? 'text-red-500'
-                        : 'text-gray-500 hover:text-red-500'
+                      ? 'text-red-500'
+                      : 'text-gray-500 hover:text-red-500'
                       } ${updatingId === application.id ? 'opacity-50' : ''}`}
                     size={18}
                     onClick={() => {
