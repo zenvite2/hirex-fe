@@ -53,6 +53,7 @@ import Job from "./pages/cms/Job";
 import JobCMS from "./pages/cms/Job";
 import AdminRoute from "./routes/AdminRoute";
 import Footer from "./components/layout/Footer";
+import NotificationManagement from "./pages/cms/NotificationManagement";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -86,7 +87,7 @@ function SidebarCMSLayout() {
     const showSidebar = [
         "/cms/browse-job",
         "/cms/account-management",
-        "/cms/cv-management"
+        "/cms/notification"
     ].includes(location.pathname) ||
         /^\/cms\/job\/\d+$/.test(location.pathname);
 
@@ -246,7 +247,7 @@ function App() {
                             <Route element={<SidebarCMSLayout />}>
                                 <Route path="/cms/browse-job" element={<BrowseJob />} />
                                 <Route path="/cms/account-management" element={<AccountManagement />} />
-                                <Route path="/cms/cv-management" element={<CVManagement />} />
+                                <Route path="/cms/notification" element={<NotificationManagement />} />
                                 <Route path="/cms/job/:id" element={<JobCMS />} />
                             </Route>
 

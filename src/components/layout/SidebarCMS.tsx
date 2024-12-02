@@ -1,11 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { BarChart2, FileText, Users, Info } from 'lucide-react';
+import {BarChart2, FileText, Users, Info, Bell} from 'lucide-react';
 
 const sidebarItems = [
   // { to: "/dashboard", label: "Bảng tin", icon: <BarChart2 className="mr-4 h-6 w-6" /> },
-  { to: "/cms/account-management", label: "Quản lý tài khoản", icon: <FileText className="mr-4 h-6 w-6" /> },
+  { to: "/cms/account-management", label: "Quản lý tài khoản", icon: <Users className="mr-4 h-6 w-6" /> },
   { to: "/cms/browse-job", label: "Quản lý tin tuyển dụng", icon: <FileText className="mr-4 h-6 w-6" /> },
-  { to: "/cms/cv-management", label: "Quản lý CV đã tạo", icon: <Users className="mr-4 h-6 w-6" /> },
+  { to: "/cms/notification", label: "Quản lý thông báo", icon: <Bell className="mr-4 h-6 w-6" /> },
   // { to: "/info-page", label: "Xem trang thông tin", icon: <Info className="mr-4 h-6 w-6" /> }
 ];
 
