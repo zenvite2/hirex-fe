@@ -10,6 +10,9 @@ const ListCV = () => {
     const [resume, setResume] = useState([]);
     const [showPopup, setShowPopup] = useState(false);
     const [newResumeName, setNewResumeName] = useState('');
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [resumeToDelete, setResumeToDelete] = useState(null);
+
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
@@ -44,13 +47,16 @@ const ListCV = () => {
         });
     };
 
-    const handleDelete = async (resumeId) => {
+    const handleDelete = async () => {
+        if (!resumeToDelete) return;
         try {
-            await dispatch(deleteResume(resumeId));
-            setResume(resume.filter((resume) => resume.id !== resumeId));
+            await dispatch(deleteResume(resumeToDelete.id));
+            setResume(resume.filter((res) => res.id !== resumeToDelete.id));
             toast.success('Xóa CV thành công!');
+            setShowDeleteModal(false);
+            setResumeToDelete(null);
         } catch (error) {
-            toast.error('Có lỗi xảy ra khi xóa công việc');
+            toast.error('Có lỗi xảy ra khi xóa CV');
         }
     };
 
@@ -101,10 +107,10 @@ const ListCV = () => {
                     </button>
                 </div>
 
-                {/* Popup */}
+                {/* Popup Tạo CV */}
                 {showPopup && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                        <div className="bg-white p-6 rounded shadow-lg">
+                    <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+                        <div className="bg-white p-6 rounded-lg shadow-lg w-96">
                             <h2 className="text-lg font-bold mb-4">Nhập tên CV</h2>
                             <input
                                 type="text"
@@ -113,19 +119,33 @@ const ListCV = () => {
                                 placeholder="Nhập tên CV"
                                 className="border p-2 rounded w-full mb-4"
                             />
-                            <div className="flex justify-end space-x-4">
+                            <div className="mt-4 flex justify-end space-x-2">
                                 <button
+                                    className="px-4 py-2 bg-gray-300 text-black rounded"
                                     onClick={() => setShowPopup(false)}
-                                    className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
                                 >
                                     Hủy
                                 </button>
                                 <button
+                                    className="px-4 py-2 bg-blue-500 text-white rounded"
                                     onClick={handleCreate}
-                                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                                 >
                                     Tạo
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Modal Xóa */}
+                {showDeleteModal && (
+                    <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+                        <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                            <h3 className="text-xl font-semibold mb-4">Xác nhận</h3>
+                            <p>Bạn có chắc chắn muốn xóa CV này?</p>
+                            <div className="mt-4 flex justify-end space-x-2">
+                                <button className="px-4 py-2 bg-gray-300 text-black rounded" onClick={() => setShowDeleteModal(false)}>Hủy</button>
+                                <button className="px-4 py-2 bg-red-500 text-white rounded" onClick={handleDelete}>Xóa</button>
                             </div>
                         </div>
                     </div>
@@ -149,7 +169,9 @@ const ListCV = () => {
                                         <div className="font-medium">{resume.title}</div>
                                     </td>
                                     <td className="py-4">
-                                        <div className="text-sm text-gray-600">{formatDate(resume.updatedAt)}</div>
+                                        <div className="text-sm text-gray-600">
+                                            {formatDate(resume.updatedAt)}
+                                        </div>
                                     </td>
                                     <td className="py-4">
                                         <span
@@ -170,7 +192,10 @@ const ListCV = () => {
                                                 <Pencil size={18} />
                                             </button>
                                             <button
-                                                onClick={() => handleDelete(resume.id)}
+                                                onClick={() => {
+                                                    setResumeToDelete(resume);
+                                                    setShowDeleteModal(true);
+                                                }}
                                                 className="hover:text-red-600 transition-colors"
                                             >
                                                 <Trash size={18} />

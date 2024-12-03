@@ -16,6 +16,44 @@ const AccountManagement = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  // Thêm state quản lý modal
+  const [modalData, setModalData] = useState({
+    show: false,
+    action: '',
+    userId: null
+  });
+
+  // Hàm mở modal
+  const handleModalShow = (action, userId) => {
+    setModalData({
+      show: true,
+      action,
+      userId
+    });
+  };
+
+  // Hàm đóng modal
+  const handleModalClose = () => {
+    setModalData({
+      show: false,
+      action: '',
+      userId: null
+    });
+  };
+
+  // Hàm xử lý khi xác nhận
+  const handleModalConfirm = async () => {
+    try {
+      if (modalData.action === 'activate') {
+        await handleUpdateActive(modalData.userId);
+      } else {
+        await handleUpdateInActive(modalData.userId);
+      }
+      handleModalClose();
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   // Lấy danh sách user
   const fetchUser = async () => {
@@ -40,6 +78,7 @@ const AccountManagement = () => {
 
   const handleUpdateActive = async (userId) => {
     try {
+      setUpdatingId(userId);
       await dispatch(updateActiveUser(userId));
 
       setUsers((prevUsers) =>
@@ -51,11 +90,14 @@ const AccountManagement = () => {
       toast.success("Mở khóa tài khoản thành công!");
     } catch (error) {
       toast.error("Có lỗi xảy ra khi mở khóa tài khoản");
+    } finally {
+      setUpdatingId(null);
     }
   };
 
   const handleUpdateInActive = async (userId) => {
     try {
+      setUpdatingId(userId);
       await dispatch(updateInActiveUser(userId));
 
       setUsers((prevUsers) =>
@@ -67,6 +109,8 @@ const AccountManagement = () => {
       toast.success("Khóa tài khoản thành công!");
     } catch (error) {
       toast.error("Có lỗi xảy ra khi khóa tài khoản");
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -205,9 +249,7 @@ const AccountManagement = () => {
                       : 'text-gray-500 hover:text-green-500'
                       } ${updatingId === user.id ? 'opacity-50' : ''}`}
                     size={18}
-                    onClick={() => {
-                      handleUpdateActive(user.id);
-                    }}
+                    onClick={() => handleModalShow('activate', user.id)}
                   />
                   <XCircle
                     className={`inline-block cursor-pointer ${user.active === false
@@ -215,15 +257,29 @@ const AccountManagement = () => {
                       : 'text-gray-500 hover:text-red-500'
                       } ${updatingId === user.id ? 'opacity-50' : ''}`}
                     size={18}
-                    onClick={() => {
-                      handleUpdateInActive(user.id);
-                    }}
+                    onClick={() => handleModalShow('deactivate', user.id)}
                   />
                 </td>
               </tr>
             ))}
           </tbody>
         </table >
+      )}
+
+      {/* Modal xác nhận */}
+      {modalData.show && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h3 className="text-xl font-semibold mb-4">Xác nhận</h3>
+            <p>
+              {modalData.action === 'activate' ? 'Bạn có chắc muốn mở khóa tài khoản này?' : 'Bạn có chắc muốn khóa tài khoản này?'}
+            </p>
+            <div className="mt-4 flex justify-end space-x-2">
+              <button className="px-4 py-2 bg-gray-300 text-black rounded" onClick={handleModalClose}>Hủy</button>
+              <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={handleModalConfirm}>Xác nhận</button>
+            </div>
+          </div>
+        </div>
       )}
     </div >
   );

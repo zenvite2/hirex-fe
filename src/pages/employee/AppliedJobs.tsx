@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, ChevronDown, Download, Trash } from 'lucide-react';
+import { Search, ChevronDown, Download, Trash, X } from 'lucide-react';
 import { appliedJob, deleteApplication } from '../../services/applicationApi';
 import moment from 'moment';
 import useAppDispatch from '../../hooks/useAppDispatch';
@@ -14,11 +14,12 @@ const AppliedJob = () => {
   const [applications, setApplications] = useState([]);
   const [error, setError] = useState(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
-  // Bộ lọc trạng thái và tìm kiếm
+  const [selectedId, setSelectedId] = useState<number | null>(null); // ID của ứng dụng được chọn
+  const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái mở modal
+
   const [filterStatus, setFilterStatus] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Hàm lấy danh sách ứng dụng
   const fetchJobDetail = async () => {
     dispatch(startLoading());
     setError(null);
@@ -36,7 +37,6 @@ const AppliedJob = () => {
     fetchJobDetail();
   }, []);
 
-  // Hàm xóa ứng dụng
   const handleDeleteApplication = async (id: number) => {
     const originalApplications = [...applications];
     setApplications((prevApplications) =>
@@ -54,7 +54,23 @@ const AppliedJob = () => {
     }
   };
 
-  // Hiển thị lỗi
+  const openModal = (id: number) => {
+    setSelectedId(id);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedId(null);
+    setIsModalOpen(false);
+  };
+
+  const confirmDelete = () => {
+    if (selectedId !== null) {
+      handleDeleteApplication(selectedId);
+    }
+    closeModal();
+  };
+
   if (error) {
     return (
       <div className="p-4">
@@ -65,7 +81,6 @@ const AppliedJob = () => {
     );
   }
 
-  // Lọc và tìm kiếm dữ liệu
   const filteredApplications = applications
     .filter((application) =>
       filterStatus === '' || application.status === filterStatus
@@ -77,7 +92,6 @@ const AppliedJob = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      {/* Header Section */}
       <div
         style={{
           backgroundImage:
@@ -93,8 +107,6 @@ const AppliedJob = () => {
         </p>
       </div>
 
-
-      {/* Bộ lọc và tìm kiếm */}
       <div>
         <div className="flex mb-4 items-center">
           <input
@@ -123,13 +135,12 @@ const AppliedJob = () => {
           </button>
         </div>
 
-        {/* Danh sách ứng dụng */}
         {filteredApplications.length === 0 ? (
           <div className="text-center py-8 bg-gray-50 rounded-lg">
             <div className="text-gray-500">Không có dữ liệu ứng tuyển</div>
           </div>
         ) : (
-          <div className='p-5 bg-rose-50 rounded-lg'>
+          <div className="p-5 bg-rose-50 rounded-lg">
             <table className="w-full">
               <thead>
                 <tr className="text-left text-pink-500">
@@ -166,18 +177,29 @@ const AppliedJob = () => {
                     </td>
                     <td className="py-2 text-center align-middle">
                       <Trash
-                        className={`inline-block mr-2 text-gray-500 cursor-pointer ${updatingId === application.id
-                          ? 'opacity-50 pointer-events-none'
-                          : ''
+                        className={`inline-block mr-2 text-gray-500 cursor-pointer ${updatingId === application.id ? 'opacity-50 pointer-events-none' : ''
                           }`}
                         size={18}
-                        onClick={() => handleDeleteApplication(application.id)}
+                        onClick={() => openModal(application.id)}
                       />
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {isModalOpen && (
+          <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+              <h3 className="text-xl font-semibold mb-4">Xác nhận</h3>
+              <p>Bạn có chắc chắn muốn xóa đơn ứng tuyển này không?</p>
+              <div className="mt-4 flex justify-end space-x-2">
+                <button className="px-4 py-2 bg-gray-300 text-black rounded" onClick={closeModal}>Hủy</button>
+                <button className="px-4 py-2 bg-red-500 text-white rounded" onClick={confirmDelete}>Xác nhận</button>
+              </div>
+            </div>
           </div>
         )}
       </div>
