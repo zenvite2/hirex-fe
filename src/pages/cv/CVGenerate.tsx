@@ -75,7 +75,7 @@ const CVGenerate: React.FC = () => {
                         }
                     `}
                 >
-                    {isLoading ? 'Exporting...' : 'Export to PDF'}
+                    {isLoading ? 'Exporting...' : 'Xuất file PDF'}
                 </button>
             </div>
 

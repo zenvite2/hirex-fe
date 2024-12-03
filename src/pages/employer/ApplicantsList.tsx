@@ -173,12 +173,14 @@ const ApplicantsList = () => {
 
                     {application.cvPdf && application.resumeId == null && (
                       <a
-                        href={`/api/resumes/${application.resumeId}/download`}
-                        target="_blank"
-                        className="text-blue-500 underline"
-                      >
-                        Download
-                      </a>
+                      href={application.cvPdf}
+                      download={`CV_${application.fullName || 'unnamed'}.pdf`}
+                      className="flex items-center text-blue-500 hover:text-blue-700"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      CV: <Download className="w-4 h-4 ml-1" /> Download
+                    </a>
                     )}
 
                   </div>

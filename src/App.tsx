@@ -112,7 +112,12 @@ function App() {
     const dispatch = useAppDispatch();
     const { userId, isLoggedIn } = useSelector((state: RootState) => state.authReducer);
     // Không hiển thị Navbar trên trang login và register-employee  
-    const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer" || location.pathname === "/otp";
+    const hideNavbarOnLogin = location.pathname === "/login" ||
+        location.pathname === "/register-employee" ||
+        location.pathname === "/register-employer" ||
+        location.pathname === "/otp" ||
+        location.pathname === "/generate-cv/:id" ||
+        location.pathname.startsWith("/generate-cv/");
     const wsUrl = process.env.REACT_APP_BASE_WS_URL;
     const [showCallRqModal, setShowCallRqModal] = useState(false);
     const { notifications, unreadCount } = useSelector((state: RootState) => state.notificationReducer);
@@ -229,7 +234,7 @@ function App() {
                             <Route path="/resume" element={<ResumePage />} />
                             <Route path="/resume-content" element={<ResumeContent />} />
                             <Route path='/cv-preview' element={<CVPreview />} />
-                            <Route path='/generate-cv/:id' element={<CVGenerate />} />
+                            {/* <Route path='/generate-cv/:id' element={<CVGenerate />} /> */}
 
                         </Route>
 
@@ -254,6 +259,7 @@ function App() {
                             <Route path="/employer" element={<EmployerLanding />} />
 
                         </Route>
+                        <Route path='/generate-cv/:id' element={<CVGenerate />} />
                     </Routes>
                 </div>
                 <Footer />

@@ -9,13 +9,21 @@ import { toast } from 'react-toastify';
 interface CVPreviewProps {
     passedId?: number;
 }
+interface HeaderData {
+    fullName: string;
+    gender: string;
+    dateOfBirth: string;
+    address: string;
+    email: string;
+    phoneNumber: string;
+    avatarUrl?: string;
+  }
 
 const CVPreview: React.FC<CVPreviewProps> = ({ passedId }) => {
     const { id } = useParams();
     const dispatch = useAppDispatch();
     const [resumeData, setResumeData] = useState(null);
 
-    const avtUrl = 'https://s3.deploy-hirexptit.io.vn/hirex/images/1731423859557_wallpaperflare.com_wallpaper__1_.jpg';
     const backgroundImageUrl = '/assets/cv-bg-1.jpg';
 
     useEffect(() => {
@@ -51,7 +59,7 @@ const CVPreview: React.FC<CVPreviewProps> = ({ passedId }) => {
                     <div className="w-full flex justify-center items-center mb-4">
                         <img
                             className="bg-gray-300 w-full aspect-square rounded-md object-cover"
-                            src={avtUrl}
+                            src={resumeData?.avatar}
                             alt="Avatar"
                         />
                     </div>
@@ -59,11 +67,9 @@ const CVPreview: React.FC<CVPreviewProps> = ({ passedId }) => {
                     {/* Personal Information */}
                     <div className="mb-4 font-xs">
                         <h2 className="font-md font-semibold mb-1">Thông tin cá nhân</h2>
-                        <p>✉ tqviet02.work@gmail.com</p>
-                        <p>📞 0946745428</p>
-                        <p>🌐 <a href="https://www.facebook.com/tqviet.02" className="text-blue-500">facebook.com/tqviet.02</a></p>
-                        <p>📍 Mỗ Lao, Hà Đông, Hà Nội</p>
-                        <p>GitHub: <a href="https://github.com/Cutiepie4" className="text-blue-500">github.com/Cutiepie4</a></p>
+                        <p>✉ {resumeData?.email}</p>
+                        <p>📞 {resumeData?.phoneNumber}</p>
+                        <p>📍  {resumeData?.address}</p>
                     </div>
 
                     {/* Awards and Certifications */}
@@ -98,7 +104,7 @@ const CVPreview: React.FC<CVPreviewProps> = ({ passedId }) => {
                 <div className="col-span-2 p-6 font-xs">
                     {/* Header Section */}
                     <div className="mb-6">
-                        <h1 className="font-2xl font-bold">Trương Quốc Việt</h1>
+                        <h1 className="font-2xl font-bold">{resumeData?.fullName}</h1>
                         <p className="font-md font-semibold">Web Developer</p>
                     </div>
 

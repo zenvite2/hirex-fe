@@ -11,7 +11,6 @@ import { LocationSelector } from './LocationSelector';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import Pagination from './Pagination';
 
 interface Option {
   id: number;
@@ -30,7 +29,6 @@ export interface Job {
   companyName: string;
   companyLogo: string | null;
   companyDescription: string | null;
-  description: string | null;
   jobType: string;
   experience: string;
   minSalary: number;
@@ -44,7 +42,7 @@ export const salaryOptions: Option[] = [
     id: 1,
     value: {
       minSalary: 0,
-      maxSalary: 5000000 - 1
+      maxSalary: 5000000
     }
   },
   {
@@ -52,7 +50,7 @@ export const salaryOptions: Option[] = [
     id: 2,
     value: {
       minSalary: 5000000,
-      maxSalary: 10000000 - 1
+      maxSalary: 10000000
     }
   },
   {
@@ -60,7 +58,7 @@ export const salaryOptions: Option[] = [
     id: 3,
     value: {
       minSalary: 10000000,
-      maxSalary: 20000000 - 1
+      maxSalary: 20000000
     }
   },
   {
@@ -84,7 +82,6 @@ const FindJobs: React.FC = () => {
   const [selectedSalaryIds, setSelectedSalaryIds] = useState<number[]>([]);
   const [selectedEducationIds, setSelectedEducationIds] = useState<number[]>([]);
   const [selectedJobTypeIds, setSelectedJobTypeIds] = useState<number[]>([]);
-  const [selectedContractTypeIds, setSelectedContractTypeIds] = useState<number[]>([]);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const [industryOptions, setIndustryOptions] = useState<Option[]>([]);
@@ -93,11 +90,6 @@ const FindJobs: React.FC = () => {
   const [jobTypeOptions, setJobTypeOptions] = useState<Option[]>([]);
   const [educationOptions, setEducationOptions] = useState<Option[]>([]);
   const [contractTypeOptions, setContractTypeOptions] = useState<Option[]>([]);
-
-  const [currentPage, setCurrentPage] = useState(0); // Backend uses 0-indexed pages
-  const [pageSize, setPageSize] = useState(2); // Default page size
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalItems, setTotalItems] = useState(0);
 
   const {
     city,
@@ -112,8 +104,6 @@ const FindJobs: React.FC = () => {
         dispatch(startLoading());
         const result = await dispatch(jobSearch({
           searchQuery,
-          page: currentPage,
-          size: pageSize,
           ...(city?.id ? { city: city.id } : {}),
           industryIds: selectedJobFieldIds,
           positionIds: selectedJobLevelIds,
@@ -121,13 +111,9 @@ const FindJobs: React.FC = () => {
           salaryOptionsId: selectedSalaryIds,
           educationIds: selectedEducationIds,
           jobTypeIds: selectedJobTypeIds,
-          contractTypeIds: selectedContractTypeIds
         })).unwrap();
         if (result && result.response && result.response.success) {
           setJobs(result.response.data);
-          setTotalPages(result.response.metaData.totalPages);
-          setTotalItems(result.response.metaData.totalItems);
-          setCurrentPage(result.response.metaData.currentPage);
         }
       } catch (error) {
         console.error('Error fetching jobs:', error);
@@ -145,14 +131,11 @@ const FindJobs: React.FC = () => {
     selectedSalaryIds,
     selectedEducationIds,
     selectedJobTypeIds,
-    selectedContractTypeIds,
-    currentPage,
-    pageSize
   ]);
 
   const getRecommendJobs = useCallback(async () => {
     const lstJobs = await recommendJob(userId);
-    lstJobs && setRecommendJobs(lstJobs);
+    setRecommendJobs(lstJobs ?? []);
   }, [userId]);
 
   useEffect(() => {
@@ -167,6 +150,7 @@ const FindJobs: React.FC = () => {
           dispatch(positionList()).unwrap(),
           dispatch(jobTypeList()).unwrap(),
           dispatch(industryList()).unwrap(),
+          // dispatch(salaryList()).unwrap(),
           dispatch(contracTypeList()).unwrap(),
           dispatch(educationList()).unwrap(),
         ]);
@@ -227,35 +211,19 @@ const FindJobs: React.FC = () => {
       const result = await dispatch(jobSearch({
         searchQuery,
         ...(city?.id ? { city: city.id } : {}),
-        page: currentPage,
-        size: pageSize,
         industryIds: selectedJobFieldIds,
         positionIds: selectedJobLevelIds,
         experienceIds: selectedExperienceIds,
         salaryOptionsId: selectedSalaryIds,
         educationIds: selectedEducationIds,
         jobTypeIds: selectedJobTypeIds,
-        contractTypeIds: selectedContractTypeIds,
       })).unwrap();
       if (result && result.response && result.response.success) {
         setJobs(result.response.data);
-
-        if (result.response.metaData) {
-          setTotalPages(result.response.metaData.totalPages);
-          setTotalItems(result.response.metaData.totalItems);
-          setCurrentPage(result.response.metaData.currentPage);
-
-          console.log(result.response.metaData.totalPages)
-        }
-
       }
     } catch (error) {
       console.error('Error fetching jobs:', error);
     }
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
   };
 
   return (
@@ -307,8 +275,7 @@ const FindJobs: React.FC = () => {
             {renderDropdown(FaBriefcase, 'Kinh nghiệm', experienceOptions, selectedExperienceIds, setSelectedExperienceIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaDollarSign, 'Mức lương', salaryOptions, selectedSalaryIds, setSelectedSalaryIds, openDropdown, setOpenDropdown)}
             {renderDropdown(FaGraduationCap, 'Học vấn', educationOptions, selectedEducationIds, setSelectedEducationIds, openDropdown, setOpenDropdown)}
-            {renderDropdown(FaBriefcase, 'Làm việc', jobTypeOptions, selectedJobTypeIds, setSelectedJobTypeIds, openDropdown, setOpenDropdown)}
-            {renderDropdown(FaBriefcase, 'Loại công việc', contractTypeOptions, selectedContractTypeIds, setSelectedContractTypeIds, openDropdown, setOpenDropdown)}
+            {renderDropdown(FaBriefcase, 'Loại công việc', jobTypeOptions, selectedJobTypeIds, setSelectedJobTypeIds, openDropdown, setOpenDropdown)}
           </div>
         </div>
       </div>
@@ -331,13 +298,7 @@ const FindJobs: React.FC = () => {
             </div>
           ))}
         </div>
-          <div className="flex justify-center mt-6">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </div>
+
         {isLoggedIn && recommendJobs.length > 0 && <>
           <div className="sticky top-0 border-t-2 border-gray-200 py-4 mt-6">
             <h2 className="text-2xl font-bold text-gray-600 max-w-7xl mx-auto px-2">

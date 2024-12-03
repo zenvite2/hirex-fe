@@ -23,20 +23,14 @@ export const resumeGet = createAsyncThunk<any>(
 );
 
 // Create resume
-export const resumeCreate = createAsyncThunk<
-    any, // Kiểu dữ liệu trả về
-    { name: string }, // Kiểu của tham số đầu vào
-    { rejectValue: string } // Kiểu của giá trị trả về khi reject
->(
+export const resumeCreate = createAsyncThunk<any>(
     'resume/create',
-    async (payload, { rejectWithValue }) => {
+    async (_, { rejectWithValue }) => {
         try {
-            const response = await axiosIns.post(
-                '/resumes',
-                { name: payload.name }, // Gửi tên CV trong body
+            const response = await axiosIns.post('/resumes', {}, 
                 { includeToken: true }
             );
-
+            
             return { response: response.data };
         } catch (error: any) {
             console.error('Resume create error:', error);

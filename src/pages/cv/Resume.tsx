@@ -453,7 +453,7 @@ const ResumeComponent: React.FC = () => {
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105"
                 >
                     <FileDown size={20} />
-                    <span>Xuất báo cáo</span>
+                    <span>Xem trước CV</span>
                 </button>
             </div>
 
