@@ -164,13 +164,15 @@ function App() {
 
     const onReceive = (payload: MessageStompjs) => {
         const msgReceived: ChatMessage = { ...JSON.parse(payload.body), position: 'normal', direction: 'incoming' };
-        updateLstConvers(msgReceived);
-        if (msgReceived.status == Status.VIDEO_CALL_REQUEST) {
-            setShowCallRqModal(true);
-            dispatch(setToCaller({
-                id: msgReceived.sender,
-                fullname: msgReceived.senderName
-            }))
+        if (msgReceived?.type != null) {
+            updateLstConvers(msgReceived);
+            if (msgReceived.status == Status.VIDEO_CALL_REQUEST) {
+                setShowCallRqModal(true);
+                dispatch(setToCaller({
+                    id: msgReceived.sender,
+                    fullname: msgReceived.senderName
+                }))
+            }
         }
     };
 
