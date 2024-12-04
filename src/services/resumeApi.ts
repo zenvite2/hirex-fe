@@ -4,7 +4,7 @@ import { Resume } from '../pages/cv/types';
 
 export const fetchResume = async (resumeId) => {
     try {
-        const response = await axiosIns.get(`/resumes/${resumeId}`, { includeToken: true });
+        const response = await axiosIns.get(`/resumes/${resumeId}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching resume:', error);

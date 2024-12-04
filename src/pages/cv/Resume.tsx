@@ -453,7 +453,7 @@ const ResumeComponent: React.FC = () => {
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105"
                 >
                     <FileDown size={20} />
-                    <span>Xuất báo cáo</span>
+                    <span>Xem trước CV</span>
                 </button>
             </div>
 
@@ -760,8 +760,8 @@ const ResumeComponent: React.FC = () => {
                     </h2>
                     <button
                         onClick={() => {
-                            resetEducationForm();
-                            setShowEducationPopup(true);
+                            resetExperienceForm();
+                            setShowExperiencePopup(true);
                         }}
                         className="text-green-600 hover:bg-green-100 p-2 rounded-full"
                     >

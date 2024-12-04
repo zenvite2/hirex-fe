@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Search, ChevronDown, Download, Trash, CheckCircle, XCircle } from 'lucide-react';
-import { applicationLists, applicationUpdate, deleteApplication, ApplicationStatus } from '../../services/applicationApi';
+import {
+  Search,
+  ChevronDown,
+  Download,
+  Trash,
+  CheckCircle,
+  XCircle,
+} from 'lucide-react';
+import {
+  applicationLists,
+  applicationUpdate,
+  deleteApplication,
+  ApplicationStatus,
+} from '../../services/applicationApi';
 import moment from 'moment';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { toast } from 'react-toastify';
@@ -11,7 +23,8 @@ const ApplicantsList = () => {
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [error, setError] = useState(null);
-  const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [modalData, setModalData] = useState(null); // Data for the modal
+  const [modalAction, setModalAction] = useState(''); // Action type: delete, accept, reject
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -32,54 +45,38 @@ const ApplicantsList = () => {
     }
   };
 
-  // Lấy dữ liệu khi component được mount
   useEffect(() => {
     fetchJobDetail();
   }, []);
 
-  // Hàm cập nhật trạng thái ứng dụng
-  const handleUpdateStatus = async (id: number, status: ApplicationStatus) => {
-    const originalApplications = [...applications];
-    setApplications((prevApplications) =>
-      prevApplications.map((app) =>
-        app.id === id ? { ...app, status } : app
-      )
-    );
+  const handleAction = async () => {
+    if (!modalData) return;
 
     try {
-      setUpdatingId(id);
-      const result = await dispatch(applicationUpdate({ id, status }));
-      if (!result?.payload?.response?.data) {
-        throw new Error('Không thể cập nhật trạng thái');
+      if (modalAction === 'delete') {
+        const result = await dispatch(deleteApplication({ id: modalData.id }));
+        setApplications((prev) => prev.filter((app) => app.id !== modalData.id));
+        toast.success('Xóa đơn ứng tuyển thành công!');
+      } else {
+        const status =
+          modalAction === 'accept'
+            ? ApplicationStatus.ACCEPTED
+            : ApplicationStatus.REJECTED;
+        const result = await dispatch(applicationUpdate({ id: modalData.id, status }));
+        setApplications((prev) =>
+          prev.map((app) =>
+            app.id === modalData.id ? { ...app, status } : app
+          )
+        );
+        toast.success(`Cập nhật trạng thái thành ${status}`);
       }
-      toast.success(`Cập nhật trạng thái thành ${status}`);
     } catch (err) {
-      setApplications(originalApplications);
-      toast.error(err.message || 'Có lỗi xảy ra');
+      toast.error(err.message || 'Có lỗi xảy ra khi thực hiện thao tác');
     } finally {
-      setUpdatingId(null);
+      setModalData(null); // Close modal
     }
   };
 
-  // Hàm xóa ứng dụng
-  const handleDeleteApplication = async (id: number) => {
-    const originalApplications = [...applications];
-    setApplications((prevApplications) =>
-      prevApplications.filter((app) => app.id !== id)
-    );
-
-    try {
-      const result = await dispatch(deleteApplication({ id }));
-      toast.success('Xóa đơn ứng tuyển thành công');
-    } catch (err) {
-      setApplications(originalApplications);
-      toast.error(err.message || 'Có lỗi xảy ra');
-    } finally {
-      setUpdatingId(null);
-    }
-  };
-
-  // Cập nhật danh sách ứng dụng hiển thị khi tìm kiếm hoặc lọc trạng thái thay đổi
   useEffect(() => {
     let filtered = applications;
 
@@ -96,7 +93,6 @@ const ApplicantsList = () => {
     setFilteredApplications(filtered);
   }, [searchQuery, statusFilter, applications]);
 
-  // Hiển thị lỗi
   if (error) {
     return (
       <div className="p-4">
@@ -110,7 +106,6 @@ const ApplicantsList = () => {
   return (
     <div className="p-4">
       <div className="flex mb-4">
-        {/* Ô tìm kiếm */}
         <input
           type="text"
           placeholder="Tên ứng viên"
@@ -119,7 +114,6 @@ const ApplicantsList = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
 
-        {/* Lọc trạng thái */}
         <div className="relative inline-block mr-2">
           <select
             className="border p-2 pr-8 appearance-none rounded"
@@ -134,10 +128,7 @@ const ApplicantsList = () => {
           <ChevronDown className="absolute right-2 top-3 w-4 h-4 pointer-events-none" />
         </div>
 
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded flex items-center"
-        // onClick={() => fetchJobDetail()}
-        >
+        <button className="bg-blue-500 text-white px-4 py-2 rounded flex items-center">
           <Search className="w-4 h-4 mr-2" />
           Tìm kiếm
         </button>
@@ -167,28 +158,35 @@ const ApplicantsList = () => {
                   <div className="font-bold">{application.jobTitle}</div>
                   <div className="text-gray-500">📍 {application.address}</div>
                 </td>
-                <td className="py-2">
-                  <div>{application.fullName || 'Chưa có tên'}</div>
+                <td
+                  className="py-2">{application.fullName || 'Chưa có tên'}
                   <div className="flex items-center">
-                    {application.cvPdf ? (
+                    {application.resumeId && (
                       <a
-                        href={application.cvPdf}
-                        download={`CV_${application.fullName || 'unnamed'}.pdf`}
-                        className="flex items-center text-blue-500 hover:text-blue-700"
+                        href={`/generate-cv/${application.resumeId}`}
                         target="_blank"
-                        rel="noopener noreferrer"
+                        className="text-blue-500 underline"
                       >
-                        CV: <Download className="w-4 h-4 ml-1" /> Download
+                        Xem trước
                       </a>
-                    ) : (
-                      <span className="text-gray-400">Chưa có CV</span>
                     )}
+
+                    {application.cvPdf && application.resumeId == null && (
+                      <a
+                      href={application.cvPdf}
+                      download={`CV_${application.fullName || 'unnamed'}.pdf`}
+                      className="flex items-center text-blue-500 hover:text-blue-700"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      CV: <Download className="w-4 h-4 ml-1" /> Download
+                    </a>
+                    )}
+
                   </div>
                 </td>
                 <td className="py-2">
-                  {application.createdAt
-                    ? moment(application.createdAt).format('YYYY-MM-DD HH:mm')
-                    : 'Chưa có thời gian'}
+                  {moment(application.createdAt).format('YYYY-MM-DD HH:mm')}
                 </td>
                 <td className="py-2">
                   <span
@@ -205,33 +203,33 @@ const ApplicantsList = () => {
                 </td>
                 <td className="py-2">
                   <Trash
-                    className={`inline-block mr-2 text-gray-500 cursor-pointer ${updatingId === application.id ? 'opacity-50 pointer-events-none' : ''
-                      }`}
-                    size={18}
-                    onClick={() => handleDeleteApplication(application.id)}
-                  />
-                  <CheckCircle
-                    className={`inline-block mr-2 cursor-pointer ${application.status === ApplicationStatus.ACCEPTED
-                        ? 'text-green-500'
-                        : 'text-gray-500 hover:text-green-500'
-                      } ${updatingId === application.id ? 'opacity-50' : ''}`}
+                    className="inline-block mr-2 text-gray-500 cursor-pointer"
                     size={18}
                     onClick={() => {
-                      if (application.status !== ApplicationStatus.ACCEPTED) {
-                        handleUpdateStatus(application.id, ApplicationStatus.ACCEPTED);
-                      }
+                      setModalData(application);
+                      setModalAction('delete');
+                    }}
+                  />
+                  <CheckCircle
+                    className={`inline-block mr-2 ${application.status === ApplicationStatus.ACCEPTED
+                      ? 'text-green-500'
+                      : 'text-gray-500 hover:text-green-500'
+                      }`}
+                    size={18}
+                    onClick={() => {
+                      setModalData(application);
+                      setModalAction('accept');
                     }}
                   />
                   <XCircle
-                    className={`inline-block cursor-pointer ${application.status === ApplicationStatus.REJECTED
-                        ? 'text-red-500'
-                        : 'text-gray-500 hover:text-red-500'
-                      } ${updatingId === application.id ? 'opacity-50' : ''}`}
+                    className={`inline-block ${application.status === ApplicationStatus.REJECTED
+                      ? 'text-red-500'
+                      : 'text-gray-500 hover:text-red-500'
+                      }`}
                     size={18}
                     onClick={() => {
-                      if (application.status !== ApplicationStatus.REJECTED) {
-                        handleUpdateStatus(application.id, ApplicationStatus.REJECTED);
-                      }
+                      setModalData(application);
+                      setModalAction('reject');
                     }}
                   />
                 </td>
@@ -239,6 +237,37 @@ const ApplicantsList = () => {
             ))}
           </tbody>
         </table>
+      )}
+
+      {modalData && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-lg font-bold mb-4">Xác nhận thao tác</h2>
+            <p className="text-gray-700 mb-4">
+              Bạn có chắc chắn muốn{' '}
+              {modalAction === 'delete'
+                ? 'xóa'
+                : modalAction === 'accept'
+                  ? 'duyệt'
+                  : 'từ chối'}{' '}
+              ứng viên này?
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                className="px-4 py-2 bg-gray-300 text-black rounded"
+                onClick={() => setModalData(null)}
+              >
+                Hủy
+              </button>
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+                onClick={handleAction}
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

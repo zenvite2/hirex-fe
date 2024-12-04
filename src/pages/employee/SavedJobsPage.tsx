@@ -32,9 +32,14 @@ interface ApiResponse {
 
 const SavedJobsPage = () => {
   const navigate = useNavigate();
-  const [filterOption, setFilterOption] = useState<'recent' | 'urgent' | 'salary'>('recent');
   const [savedJobs, setSavedJobs] = useState<SavedJob[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [modalData, setModalData] = useState<{ show: boolean; jobId: number | null; savedJobId: number | null }>({
+    show: false,
+    jobId: null,
+    savedJobId: null,
+  });
+
   const { isLoggedIn } = useSelector((state: RootState) => state.authReducer);
   const dispatch = useAppDispatch();
 
@@ -60,20 +65,33 @@ const SavedJobsPage = () => {
     fetchSavedJobs();
   }, []);
 
-  // Xóa việc làm đã lưu
-  const handleDeleteSavedJob = async (jobId: number, savedJobId: number) => {
-    try {
-      const response = await axiosIns.delete(`/saved-job/${jobId}`, { includeToken: true });
-      if (response.data.success) {
-        // Cập nhật danh sách việc làm sau khi xóa
-        setSavedJobs(prevJobs => prevJobs.filter(job => job.id !== savedJobId));
-      } else {
-        setError('Không thể xóa việc làm');
+  // Xử lý xóa công việc đã lưu
+  const handleDeleteSavedJob = async () => {
+    if (modalData.jobId && modalData.savedJobId) {
+      try {
+        const response = await axiosIns.delete(`/saved-job/${modalData.jobId}`, { includeToken: true });
+        if (response.data.success) {
+          setSavedJobs(prevJobs => prevJobs.filter(job => job.id !== modalData.savedJobId));
+        } else {
+          setError('Không thể xóa việc làm');
+        }
+      } catch (err) {
+        setError('Đã xảy ra lỗi khi xóa việc làm');
+        console.error(err);
+      } finally {
+        handleModalClose();
       }
-    } catch (err) {
-      setError('Đã xảy ra lỗi khi xóa việc làm');
-      console.error(err);
     }
+  };
+
+  // Mở modal
+  const handleModalShow = (jobId: number, savedJobId: number) => {
+    setModalData({ show: true, jobId, savedJobId });
+  };
+
+  // Đóng modal
+  const handleModalClose = () => {
+    setModalData({ show: false, jobId: null, savedJobId: null });
   };
 
   // Chuyển đến trang chi tiết việc làm
@@ -101,16 +119,6 @@ const SavedJobsPage = () => {
         </p>
       </div>
 
-      {/* Filter Section */}
-      <div className="mb-6">
-        <h2 className="text-lg mb-4">Danh sách {savedJobs.length} việc làm đã lưu</h2>
-        <div className="flex gap-4 items-center">
-          {/* <span className="text-gray-600">Ưu tiên hiển thị:</span>
-          <div className="flex gap-4">
-          </div> */}
-        </div>
-      </div>
-
       {/* Job Cards */}
       {savedJobs?.map(savedJob => (
         <div key={savedJob.id} className="bg-rose-50 rounded-lg shadow-sm mb-4">
@@ -125,7 +133,6 @@ const SavedJobsPage = () => {
                     >
                       {savedJob.jobResponse.title}
                     </h3>
-                    <br></br>
                     <p className="text-gray-600">Ngày lưu: {new Date(savedJob.createdAt).toLocaleDateString()}</p>
                   </div>
                   <span className="text-black font-semibold" style={{ fontSize: 20 }}>
@@ -147,7 +154,7 @@ const SavedJobsPage = () => {
                     </button>
                     <button
                       className="p-2 text-gray-500 hover:text-gray-700"
-                      onClick={() => handleDeleteSavedJob(savedJob.jobResponse.id, savedJob.id)}
+                      onClick={() => handleModalShow(savedJob.jobResponse.id, savedJob.id)}
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -158,6 +165,30 @@ const SavedJobsPage = () => {
           </div>
         </div>
       ))}
+
+      {/* Modal */}
+      {modalData.show && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h3 className="text-xl font-semibold mb-4">Xác nhận</h3>
+            <p>Bạn có chắc muốn xóa công việc đã lưu này không?</p>
+            <div className="flex justify-end mt-4 gap-2">
+              <button
+                className="px-4 py-2 bg-gray-300 text-black rounded"
+                onClick={handleModalClose}
+              >
+                Hủy
+              </button>
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded"
+                onClick={handleDeleteSavedJob}
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

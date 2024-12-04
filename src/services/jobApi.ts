@@ -120,6 +120,28 @@ export const jobGetWith = createAsyncThunk<any, any>(
     }
 );
 
+// Hàm lấy danh sách công việc đã lưu
+export const fetchSavedJobs = async (): Promise<any[]> => {
+    try {
+        const response = await axiosIns.get(`/saved-job/list`, { includeToken: true });
+        return response.data.data; // Trả về danh sách công việc đã lưu
+    } catch (error) {
+        console.error("Lỗi khi lấy danh sách việc làm đã lưu:", error);
+        throw error; // Ném lỗi để component xử lý
+    }
+};
+
+// Hàm lấy danh sách company đã lưu
+export const fetchFollowCompany = async (): Promise<any[]> => {
+    try {
+        const response = await axiosIns.get(`/follow-company/list`, { includeToken: true });
+        return response.data.data; // Trả về danh sách công việc đã lưu
+    } catch (error) {
+        console.error("Lỗi khi lấy danh sách việc làm đã lưu:", error);
+        throw error; // Ném lỗi để component xử lý
+    }
+};
+
 // Get job with company
 export const jobGetWithCompany = createAsyncThunk<any>(
     'job/getJobWithComapany',

@@ -95,7 +95,7 @@ const FindJobs: React.FC = () => {
   const [contractTypeOptions, setContractTypeOptions] = useState<Option[]>([]);
 
   const [currentPage, setCurrentPage] = useState(0); // Backend uses 0-indexed pages
-  const [pageSize, setPageSize] = useState(2); // Default page size
+  const [pageSize, setPageSize] = useState(12); // Default page size
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
 

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Building2, MapPin, Bookmark, MessageCircle, CalendarCheck, Navigation, BriefcaseConveyorBelt, Users, Heart } from 'lucide-react';
-import { getSimilarJobs, jobGetWith } from '../../services/jobApi';
+import { fetchFollowCompany, fetchSavedJobs, getSimilarJobs, jobGetWith } from '../../services/jobApi';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { Link } from "react-router-dom";
@@ -69,7 +69,7 @@ const JobDetail = () => {
     const { isLoggedIn, userId } = useSelector((state: RootState) => state.authReducer);
     const navigate = useNavigate();
     const [isSaved, setIsSaved] = useState(false);
-    const [isFollow, setIsFollow] = useState(false);
+    const [isFollowed, setIsFollowed] = useState(false);
     const [similarJobs, setSimilarJobs] = useState<Job[]>([]);
 
     useEffect(() => {
@@ -99,13 +99,26 @@ const JobDetail = () => {
     useEffect(() => {
         const checkSavedJobs = async () => {
             try {
-                if (!isLoggedIn) return; // Không gọi API nếu người dùng chưa đăng nhập
-                const response = await axiosIns.get(`/saved-job/list`, { includeToken: true });
-                const savedJobs = response.data.data; // Danh sách công việc đã lưu từ backend
+                if (!isLoggedIn) return;
+                const savedJobs = await fetchSavedJobs();
 
-                if (job) { // Chỉ kiểm tra nếu job đã được tải
-                    const isJobSaved = savedJobs.some((savedJob: any) => savedJob.jobResponse.id === job.id);
+                if (job) { // Kiểm tra xem công việc hiện tại có trong danh sách đã lưu
+                    const isJobSaved = savedJobs.some((savedJob) => savedJob.jobResponse.id === job.id);
                     setIsSaved(isJobSaved); // Cập nhật trạng thái
+                }
+            } catch (error) {
+                console.error("Lỗi khi kiểm tra danh sách việc làm đã lưu:", error);
+            }
+        };
+
+        const checkFollowCompany = async () => {
+            try {
+                if (!isLoggedIn) return;
+                const savedJobs = await fetchFollowCompany();
+
+                if (job) { // Kiểm tra xem công việc hiện tại có trong danh sách đã lưu
+                    const isFollowed = savedJobs.some((isFollow) => isFollow?.companyId === job.company.id);
+                    setIsFollowed(isFollowed); // Cập nhật trạng thái
                 }
             } catch (error) {
                 console.error("Lỗi khi kiểm tra danh sách việc làm đã lưu:", error);
@@ -114,9 +127,9 @@ const JobDetail = () => {
 
         if (id) {
             checkSavedJobs();
+            checkFollowCompany();
         }
     }, [isLoggedIn, job, id]);
-
 
     const handleApplyNow = () => {
         if (!isLoggedIn) {
@@ -170,11 +183,11 @@ const JobDetail = () => {
         }
 
         try {
-            if (isFollow) {
+            if (isFollowed) {
                 // Gọi API xóa công việc đã lưu
                 const response = await axiosIns.delete(`/follow-company/${job.company.id}`, { includeToken: true });
                 if (response.data.success) {
-                    setIsFollow(false);
+                    setIsFollowed(false);
                     toast.success("Đã xóa khỏi danh sách theo dõi công ty");
                 } else {
                     toast.error(response.data.message || "Không thể xóa công ty đã theo dõi");
@@ -184,7 +197,7 @@ const JobDetail = () => {
                 const followRequest = { companyId: job.company.id, employeeId: userId };
                 const response = await axiosIns.post("/follow-company", followRequest, { includeToken: true });
                 if (response.data.success) {
-                    setIsFollow(true);
+                    setIsFollowed(true);
                     toast.success("Đã theo dõi công ty thành công");
                 } else {
                     toast.error(response.data.message || "Không thể theo dõi công ty");
@@ -301,10 +314,10 @@ const JobDetail = () => {
                                             e.preventDefault();
                                             e.stopPropagation();
                                         }}
-                                        className={`w-full px-6 py-2 bg-blue-50 rounded-lg hover:bg-blue-100 font-medium flex items-center justify-center gap-2 ${isFollow ? "text-blue-600" : "text-gray-600"
+                                        className={`w-full px-6 py-2 bg-blue-50 rounded-lg hover:bg-blue-100 font-medium flex items-center justify-center gap-2 ${isFollowed ? "text-blue-600" : "text-gray-600"
                                             }`}
                                     >
-                                        <Heart className={`w-4 h-4 ${isFollow ? "fill-current" : "stroke-current"}`} />
+                                        <Heart className={`w-4 h-4 ${isFollowed ? "fill-current" : "stroke-current"}`} />
                                         Theo dõi công ty
                                     </button>
                                 </div>

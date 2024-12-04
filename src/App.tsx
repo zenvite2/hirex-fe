@@ -53,6 +53,7 @@ import Job from "./pages/cms/Job";
 import JobCMS from "./pages/cms/Job";
 import AdminRoute from "./routes/AdminRoute";
 import Footer from "./components/layout/Footer";
+import NotificationManagement from "./pages/cms/NotificationManagement";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -86,7 +87,7 @@ function SidebarCMSLayout() {
     const showSidebar = [
         "/cms/browse-job",
         "/cms/account-management",
-        "/cms/cv-management"
+        "/cms/notification"
     ].includes(location.pathname) ||
         /^\/cms\/job\/\d+$/.test(location.pathname);
 
@@ -111,7 +112,12 @@ function App() {
     const dispatch = useAppDispatch();
     const { userId, isLoggedIn } = useSelector((state: RootState) => state.authReducer);
     // Không hiển thị Navbar trên trang login và register-employee  
-    const hideNavbarOnLogin = location.pathname === "/login" || location.pathname === "/register-employee" || location.pathname === "/register-employer" || location.pathname === "/otp";
+    const hideNavbarOnLogin = location.pathname === "/login" ||
+        location.pathname === "/register-employee" ||
+        location.pathname === "/register-employer" ||
+        location.pathname === "/otp" ||
+        location.pathname === "/generate-cv/:id" ||
+        location.pathname.startsWith("/generate-cv/");
     const wsUrl = process.env.REACT_APP_BASE_WS_URL;
     const [showCallRqModal, setShowCallRqModal] = useState(false);
     const { notifications, unreadCount } = useSelector((state: RootState) => state.notificationReducer);
@@ -230,7 +236,7 @@ function App() {
                             <Route path="/resume" element={<ResumePage />} />
                             <Route path="/resume-content" element={<ResumeContent />} />
                             <Route path='/cv-preview' element={<CVPreview />} />
-                            <Route path='/generate-cv/:id' element={<CVGenerate />} />
+                            {/* <Route path='/generate-cv/:id' element={<CVGenerate />} /> */}
 
                         </Route>
 
@@ -248,13 +254,14 @@ function App() {
                             <Route element={<SidebarCMSLayout />}>
                                 <Route path="/cms/browse-job" element={<BrowseJob />} />
                                 <Route path="/cms/account-management" element={<AccountManagement />} />
-                                <Route path="/cms/cv-management" element={<CVManagement />} />
+                                <Route path="/cms/notification" element={<NotificationManagement />} />
                                 <Route path="/cms/job/:id" element={<JobCMS />} />
                             </Route>
 
                             <Route path="/employer" element={<EmployerLanding />} />
 
                         </Route>
+                        <Route path='/generate-cv/:id' element={<CVGenerate />} />
                     </Routes>
                 </div>
                 <Footer />

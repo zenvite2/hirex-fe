@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CheckCircle, ChevronDown, Eye, Pencil, Search, Trash, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { jobGetAllCMS, updateRejectJobCMS, updateAcceptJobCMS } from "../../services/jobApi";
 import { toast } from "react-toastify";
@@ -8,9 +8,10 @@ import { startLoading, stopLoading } from "../../redux/slice/loadingSlice";
 
 const BrowseJob = () => {
   const [jobs, setJobs] = useState([]);
-  const [searchQuery, setSearchQuery] = useState(""); // Tìm kiếm
-  const [statusFilter, setStatusFilter] = useState(""); // Lọc trạng thái
-  const [filteredJobs, setFilteredJobs] = useState([]); // Danh sách sau lọc
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [filteredJobs, setFilteredJobs] = useState([]);
+  const [modalData, setModalData] = useState({ show: false, action: '', jobId: null });
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -31,7 +32,7 @@ const BrowseJob = () => {
     fetchJobs();
   }, []);
 
-  // Tìm kiếm và lọc
+  // Search and filter logic
   const handleSearchAndFilter = () => {
     const filtered = jobs.filter((job) => {
       const matchesSearch =
@@ -48,7 +49,7 @@ const BrowseJob = () => {
     setFilteredJobs(filtered);
   };
 
-  // Áp dụng tìm kiếm và lọc khi dữ liệu thay đổi
+  // Apply search and filter when data changes
   useEffect(() => {
     handleSearchAndFilter();
   }, [jobs, searchQuery, statusFilter]);
@@ -66,26 +67,37 @@ const BrowseJob = () => {
     });
   };
 
-  const handleUpdateReject = async (jobId) => {
-    try {
-      await dispatch(updateRejectJobCMS(jobId));
-      // Cập nhật lại trạng thái công việc trong state jobs       
-      setJobs((prevJobs) => prevJobs.map((job) => job.id === jobId ? { ...job, active: false } : job));
-      toast.success("Từ chối đăng công việc thành công!");
-    } catch (error) {
-      toast.error("Có lỗi xảy ra khi từ chối công việc");
-    }
+  // Handle modal open for action
+  const handleModalShow = (action, jobId) => {
+    setModalData({ show: true, action, jobId });
   };
 
-  const handleUpdateAccept = async (jobId) => {
-    try {
-      await dispatch(updateAcceptJobCMS(jobId));
-      // Cập nhật lại trạng thái công việc trong state jobs 
-      setJobs((prevJobs) => prevJobs.map((job) => job.id === jobId ? { ...job, active: true } : job));
+  // Handle modal close
+  const handleModalClose = () => {
+    setModalData({ show: false, action: '', jobId: null });
+  };
 
-      toast.success("Chấp nhận đăng công việc thành công!");
+  // Confirm modal action (Accept or Reject job)
+  const handleModalConfirm = async () => {
+    const { action, jobId } = modalData;
+    try {
+      if (action === "accept") {
+        await dispatch(updateAcceptJobCMS(jobId));
+        setJobs((prevJobs) =>
+          prevJobs.map((job) => job.id === jobId ? { ...job, active: true } : job)
+        );
+        toast.success("Chấp nhận đăng công việc thành công!");
+      } else if (action === "reject") {
+        await dispatch(updateRejectJobCMS(jobId));
+        setJobs((prevJobs) =>
+          prevJobs.map((job) => job.id === jobId ? { ...job, active: false } : job)
+        );
+        toast.success("Từ chối đăng công việc thành công!");
+      }
     } catch (error) {
-      toast.error("Có lỗi xảy ra khi chấp nhận công việc");
+      toast.error("Có lỗi xảy ra khi xử lý công việc");
+    } finally {
+      handleModalClose();
     }
   };
 
@@ -103,7 +115,6 @@ const BrowseJob = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-
         <select
           className="border p-2 pr-8 appearance-none rounded mr-2"
           value={statusFilter}
@@ -114,7 +125,6 @@ const BrowseJob = () => {
           <option value="ACCEPTED">Đã duyệt</option>
           <option value="REJECTED">Đã từ chối</option>
         </select>
-
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded flex items-center"
           onClick={handleSearchAndFilter}
@@ -144,9 +154,7 @@ const BrowseJob = () => {
                   >
                     {job?.title}
                   </Link>
-                  <div className="text-gray-500 text-sm mt-1">
-                    {job?.location}
-                  </div>
+                  <div className="text-gray-500 text-sm mt-1">{job?.location}</div>
                 </td>
                 <td className="py-4">
                   <div className="text-sm text-gray-600">{formatDate(job?.createdAt)}</div>
@@ -154,11 +162,10 @@ const BrowseJob = () => {
                 <td className="py-4">
                   <span
                     className={`px-2 py-1 rounded-full text-sm ${job?.active === true
-                      ? 'bg-green-100 text-green-800' // Màu cho "Đã duyệt"
+                      ? 'bg-green-100 text-green-800'
                       : job?.active === false
-                        ? 'bg-red-100 text-red-800' // Màu cho "Đã từ chối"
-                        : 'bg-yellow-100 text-yellow-800' // Màu cho "Chờ duyệt"
-                      }`}
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-yellow-100 text-yellow-800'}`}
                   >
                     {job?.active === true
                       ? 'Đã duyệt'
@@ -170,23 +177,25 @@ const BrowseJob = () => {
                 <td className="py-4">
                   <div className="flex gap-3">
                     <button
-                      onClick={() => handleUpdateAccept(job?.id)}
-                      className="hover:text-red-600 transition-colors">
-                      <CheckCircle size={18}
+                      onClick={() => handleModalShow("accept", job?.id)}
+                      className="hover:text-red-600 transition-colors"
+                    >
+                      <CheckCircle
+                        size={18}
                         className={`inline-block cursor-pointer ${job?.active === true
                           ? 'text-green-500'
-                          : 'text-gray-500 hover:text-red-500'
-                          }`}
+                          : 'text-gray-500 hover:text-green-500'}`}
                       />
                     </button>
                     <button
-                      onClick={() => handleUpdateReject(job?.id)}
-                      className="hover:text-red-600 transition-colors">
-                      <XCircle size={18}
+                      onClick={() => handleModalShow("reject", job?.id)}
+                      className="hover:text-red-600 transition-colors"
+                    >
+                      <XCircle
+                        size={18}
                         className={`inline-block cursor-pointer ${job?.active === false
                           ? 'text-red-500'
-                          : 'text-gray-500 hover:text-red-500'
-                          }`}
+                          : 'text-gray-500 hover:text-red-500'}`}
                       />
                     </button>
                   </div>
@@ -199,6 +208,34 @@ const BrowseJob = () => {
 
       {filteredJobs.length === 0 && (
         <div className="text-center py-8 text-gray-500">Không tìm thấy công việc phù hợp</div>
+      )}
+
+      {/* Modal */}
+      {modalData.show && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h3 className="text-xl font-semibold mb-4">Xác nhận</h3>
+            <p>
+              {modalData.action === "accept"
+                ? "Bạn có chắc muốn chấp nhận công việc này?"
+                : "Bạn có chắc muốn từ chối công việc này?"}
+            </p>
+            <div className="flex justify-end mt-4 gap-2">
+              <button
+                className="px-4 py-2 bg-gray-300 text-black rounded"
+                onClick={handleModalClose}
+              >
+                Hủy
+              </button>
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+                onClick={handleModalConfirm}
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
