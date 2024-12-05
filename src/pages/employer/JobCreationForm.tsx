@@ -145,7 +145,6 @@ const JobCreationForm: React.FC = () => {
     if (!formData.contractType) newErrors.contractType = 'Loại công việc là bắt buộc';
     if (!formData.education) newErrors.education = 'Học vấn là bắt buộc';
     if (!formData.email.trim()) newErrors.email = 'Email là bắt buộc';
-    if (!formData.phone.trim()) newErrors.phone = 'Số điện thoại là bắt buộc';
     if (!formData.description.trim()) newErrors.description = 'Mô tả công việc là bắt buộc';
     if (!formData.requirement.trim()) newErrors.requirement = 'Trách nhiệm công việc là bắt buộc';
     if (!formData.benefit.trim()) newErrors.benefit = 'Quyền lợi là bắt buộc';

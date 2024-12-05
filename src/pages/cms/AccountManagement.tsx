@@ -198,11 +198,11 @@ const AccountManagement = () => {
         </button>
       </div>
 
-      <h2 className="text-xl font-bold mb-4">Danh sách ứng tuyển</h2>
+      <h2 className="text-xl font-bold mb-4">Danh sách tài khoản</h2>
 
       {filteredApplications.length === 0 ? (
         <div className="text-center py-8 bg-gray-50 rounded-lg">
-          <div className="text-gray-500">Không có dữ liệu ứng viên</div>
+          <div className="text-gray-500">Không có dữ liệu tài khoản</div>
         </div>
       ) : (
         <table className="w-full">
