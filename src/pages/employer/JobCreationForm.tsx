@@ -297,9 +297,12 @@ const JobCreationForm: React.FC = () => {
     }
 
     // Validate mức lương
-    if (formData.minSalary !== null && formData.maxSalary !== null) {
-      if (formData.minSalary > formData.maxSalary) {
-        toast.error('Vui lòng nhập mức lương min nhỏ hơn mức lương max');
+    if (formData.minSalary && formData.maxSalary) {
+      const minSalary = Number(formData.minSalary);
+      const maxSalary = Number(formData.maxSalary);
+
+      if (minSalary > maxSalary) {
+        toast.error('Vui lòng nhập mức lương tối thiểu nhỏ hơn mức lương tối đa');
         return; // Dừng quá trình submit
       }
     }
@@ -484,7 +487,7 @@ const JobCreationForm: React.FC = () => {
             {renderField('title', 'Tiêu đề')}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <LocationSelector
-                label="Tỉnh / TP *" 
+                label="Tỉnh / TP *"
                 placeholder="Chọn tỉnh thành"
                 locations={cities}
                 value={city?.name || ''}
@@ -528,8 +531,8 @@ const JobCreationForm: React.FC = () => {
               {renderField('contractType', 'Loại công việc', 'select')}
               {renderField('education', 'Học vấn', 'select')}
               {renderField('email', 'Email', 'email')}
-              {renderField('minSalary', 'Mức lương min', 'number')}
-              {renderField('maxSalary', 'Mức lương max', 'number')}
+              {renderField('minSalary', 'Mức lương tối thiểu', 'number')}
+              {renderField('maxSalary', 'Mức lương tối đa', 'number')}
             </div>
 
             {renderField('description', 'Mô tả công việc', 'textarea')}
