@@ -191,8 +191,8 @@ const Messenger: React.FC = () => {
                         )}
 
                         <MessageList>
-                            {currentConver?.last10Messages.filter(item => item != null).map((msg: ChatMessage, index) => (
-                                <Message
+                            {currentConver?.last10Messages.filter(item => item != null).map((msg: ChatMessage, index) => {
+                                return (msg.type == 'html' && !msg.message) ? null : (<Message
                                     key={index}
                                     model={{
                                         message: msg.type === 'text' ? msg.message : undefined,
@@ -219,8 +219,8 @@ const Messenger: React.FC = () => {
                                             jobId={Number(msg.message)}
                                         />
                                     </Message.CustomContent>}
-                                </Message>
-                            ))}
+                                </Message>);
+                            })}
 
                             {/* <TypingIndicator content={`${currentConver?.name} is typing...`} /> */}
                         </MessageList>

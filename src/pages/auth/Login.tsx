@@ -78,7 +78,7 @@ const LoginPage = () => {
   }, [sessionExp]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-200 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-white-400 p-4">
       <div className="bg-white shadow-2xl rounded-2xl w-full max-w-md p-8 space-y-6">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-800 mb-2">Chào Mừng Trở Lại</h2>

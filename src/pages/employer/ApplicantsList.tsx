@@ -6,6 +6,8 @@ import {
   Trash,
   CheckCircle,
   XCircle,
+  MessageSquareText,
+  Eye,
 } from 'lucide-react';
 import {
   applicationLists,
@@ -17,6 +19,8 @@ import moment from 'moment';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { toast } from 'react-toastify';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
+import { addMessage } from '../../redux/slice/messageSlice';
+import { ChatMessage } from '../chat/Messenger';
 
 const ApplicantsList = () => {
   const dispatch = useAppDispatch();
@@ -153,52 +157,52 @@ const ApplicantsList = () => {
           </thead>
           <tbody>
             {filteredApplications.map((application) => (
-              <tr key={application.id} className="border-b">
+              <tr key={application?.id} className="border-b">
                 <td className="py-2">
-                  <div className="font-bold">{application.jobTitle}</div>
-                  <div className="text-gray-500">📍 {application.address}</div>
+                  <div className="font-bold">{application?.jobTitle}</div>
+                  <div className="text-gray-500">📍 {application?.address}</div>
                 </td>
                 <td
-                  className="py-2">{application.fullName || 'Chưa có tên'}
+                  className="py-2">{application?.fullName || 'Chưa có tên'}
                   <div className="flex items-center">
-                    {application.resumeId && (
+                    {application?.resumeId && (
                       <a
-                        href={`/generate-cv/${application.resumeId}`}
+                        href={`/generate-cv/${application?.resumeId}`}
                         target="_blank"
-                        className="text-blue-500 underline"
+                        className="flex items-center text-blue-500 hover:text-blue-700 no-underline font-xs"
                       >
-                        Xem trước
+                        <Eye className="w-4 h-4 mr-1" /> <p>Xem trước CV</p>
                       </a>
                     )}
 
-                    {application.cvPdf && application.resumeId == null && (
+                    {application?.cvPdf && application?.resumeId == null && (
                       <a
-                      href={application.cvPdf}
-                      download={`CV_${application.fullName || 'unnamed'}.pdf`}
-                      className="flex items-center text-blue-500 hover:text-blue-700"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      CV: <Download className="w-4 h-4 ml-1" /> Download
-                    </a>
+                        href={application?.cvPdf}
+                        download={`CV_${application?.fullName || 'unnamed'}.pdf`}
+                        className="flex items-center text-blue-500 hover:text-blue-700 no-underline font-xs"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Download className="w-4 h-4 mr-1" /> <p>Tải xuống CV</p>
+                      </a>
                     )}
 
                   </div>
                 </td>
                 <td className="py-2">
-                  {moment(application.createdAt).format('YYYY-MM-DD HH:mm')}
+                  {moment(application?.createdAt).format('YYYY-MM-DD HH:mm')}
                 </td>
                 <td className="py-2">
                   <span
                     className={
-                      application.status === 'ACCEPTED'
+                      application?.status === 'ACCEPTED'
                         ? 'text-green-500'
-                        : application.status === 'REJECTED'
+                        : application?.status === 'REJECTED'
                           ? 'text-red-500'
                           : 'text-yellow-500'
                     }
                   >
-                    {application.status}
+                    {application?.status}
                   </span>
                 </td>
                 <td className="py-2">
@@ -211,7 +215,7 @@ const ApplicantsList = () => {
                     }}
                   />
                   <CheckCircle
-                    className={`inline-block mr-2 ${application.status === ApplicationStatus.ACCEPTED
+                    className={`inline-block mr-2 ${application?.status === ApplicationStatus.ACCEPTED
                       ? 'text-green-500'
                       : 'text-gray-500 hover:text-green-500'
                       }`}
@@ -222,7 +226,7 @@ const ApplicantsList = () => {
                     }}
                   />
                   <XCircle
-                    className={`inline-block ${application.status === ApplicationStatus.REJECTED
+                    className={`inline-block mr-2 ${application?.status === ApplicationStatus.REJECTED
                       ? 'text-red-500'
                       : 'text-gray-500 hover:text-red-500'
                       }`}
@@ -232,6 +236,33 @@ const ApplicantsList = () => {
                       setModalAction('reject');
                     }}
                   />
+                  <MessageSquareText className={'inline-block text-blue-500 cursor-pointer'}
+                    size={18}
+                    onClick={() => {
+                      const msg: ChatMessage = {
+                        receiver: String(application?.userId),
+                        status: 'MESSAGE',
+                        id: null,
+                        senderName: String(application?.fullName),
+                        direction: 'outgoing',
+                        position: 'normal',
+                        message: null,
+                        sender: null,
+                        sentTime: new Date().toISOString(),
+                        type: 'html',
+                      };
+
+                      application
+                        && dispatch(
+                          addMessage({
+                            converId: application?.userId,
+                            avtUrl: application?.avatar,
+                            fullName: application?.fullName ?? '',
+                            msg,
+                            openMessenger: true
+                          })
+                        )
+                    }} />
                 </td>
               </tr>
             ))}
