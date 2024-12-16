@@ -273,9 +273,7 @@ const JobDetail = () => {
                                     <div className="flex items-center gap-4 text-gray-600 text-sm">
                                         <span>Ngày đăng tuyển {new Date(job?.createdAt || '').toLocaleDateString('vi-VN')}</span>
                                         <span>|</span>
-                                        <span>Hạn nộp hồ sơ: {job?.deadline ? `${job?.deadline}` : 'N/A'}</span>
-                                        <span>|</span>
-                                        <span>Email liên hệ: {job?.email}</span>
+                                        <span>Hạn nộp hồ sơ: {formatDateToDDMMYYYY(job?.deadline)}</span>
                                     </div>
                                 </div>
 
