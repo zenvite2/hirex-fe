@@ -305,8 +305,8 @@ const ResumePage: React.FC = () => {
   };
 
   const getIndustryName = (industruId: number): string => {
-    const jobType = jobTypes.find(j => j.id === industruId);
-    return jobType?.name || 'Không xác định';
+    const industryType = industry.find(j => j.id === industruId);
+    return industryType?.name || 'Không xác định';
   };
 
   const formatSalary = (min: number, max: number) => {
