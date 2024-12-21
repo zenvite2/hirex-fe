@@ -241,11 +241,6 @@ const ResumePage: React.FC = () => {
     }
   };
 
-  const handleOpenPopup = (existingSkills?: Skill[]) => {
-    setSelectedSkills(existingSkills || []);
-    setIsSkillPopupOpen(true);
-  };
-
   const handleSkillPopupClose = () => {
     setIsSkillPopupOpen(false);
     fetchSkills();

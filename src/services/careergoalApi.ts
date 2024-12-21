@@ -2,7 +2,6 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import axiosIns from "./axiosIns";
 
-// Create experience
 export const careergoalCreate = createAsyncThunk<any, any>(
     'career-goal/create',
     async (info) => {
@@ -14,7 +13,6 @@ export const careergoalCreate = createAsyncThunk<any, any>(
     }
 );
 
-// Update experience
 export const careergoalUpdate = createAsyncThunk<any, any>(
     'career-goal/update',
     async ({ id, info }) => {
@@ -37,7 +35,6 @@ export const careergoalGet = createAsyncThunk<any>(
     }
 );
 
-// Delete experience
 export const careergoalDelete = createAsyncThunk<any, number>(
     'career-goal/delete',
     async (id) => {

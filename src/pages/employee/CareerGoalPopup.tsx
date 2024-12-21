@@ -250,7 +250,7 @@ const CareerGoalPopup: React.FC<CareerGoalPopups> = ({ isOpen, onClose, onSave, 
                         <label className="block mb-2 text-sm font-medium">Ngành nghề <span className="text-red-500">*</span></label>
                         <select
                             name="industry"
-                            value={formData.id}
+                            value={formData.industry}
                             onChange={handleChange}
                             required
                             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
