@@ -130,11 +130,6 @@ const LoginPage = () => {
 
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="remember"
-                className="mr-2 rounded text-blue-500 focus:ring-blue-400"
-              />
             </div>
             <a href="#" className="text-blue-500 hover:underline">Quên mật khẩu?</a>
           </div>
