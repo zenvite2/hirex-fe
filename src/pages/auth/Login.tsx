@@ -151,7 +151,7 @@ const LoginPage = () => {
         <div className="text-center">
           <p className="text-gray-600">
             Chưa có tài khoản? {' '}
-            <Link to="/login">
+            <Link to="/register-employee">
             <a className="text-blue-500 hover:underline">
               Đăng nhập ngay
             </a>
