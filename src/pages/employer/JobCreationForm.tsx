@@ -151,12 +151,12 @@ const JobCreationForm: React.FC = () => {
     if (!formData.workingTime.trim()) newErrors.workingTime = 'Thời gian làm việc là bắt buộc';
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Return true nếu không có lỗi
+    return Object.keys(newErrors)?.length === 0; // Return true nếu không có lỗi
   };
 
 
   // Filter out already selected skills
-  const filteredSkills = availableSkills.filter(
+  const filteredSkills = availableSkills?.filter(
     skill => !selectedSkills.some(selected => selected.id === skill.id)
   );
 
@@ -168,7 +168,7 @@ const JobCreationForm: React.FC = () => {
       // Update form data with skill ids
       setFormData(prev => ({
         ...prev,
-        skills: updatedSkills.map(s => s.id).filter((id): id is number => id !== undefined)
+        skills: updatedSkills.map(s => s.id)?.filter((id): id is number => id !== undefined)
       }));
     }
     setSearchTerm('');
@@ -177,12 +177,12 @@ const JobCreationForm: React.FC = () => {
 
   // Remove skill handler
   const handleRemoveSkill = (skillToRemove: Skill) => {
-    const updatedSkills = selectedSkills.filter(s => s.id !== skillToRemove.id);
+    const updatedSkills = selectedSkills?.filter(s => s.id !== skillToRemove.id);
     setSelectedSkills(updatedSkills);
     // Update form data with skill ids
     setFormData(prev => ({
       ...prev,
-      skills: updatedSkills.map(s => s.id).filter((id): id is number => id !== undefined)
+      skills: updatedSkills.map(s => s.id)?.filter((id): id is number => id !== undefined)
     }));
   };
 
@@ -574,7 +574,7 @@ const JobCreationForm: React.FC = () => {
                       <div className="p-2 text-center text-gray-500">Đang tải...</div>
                     ) : (
                       <>
-                        {filteredSkills.map((skill) => (
+                        {filteredSkills?.map((skill) => (
                           <button
                             key={skill.id ?? skill.name}
                             type="button"
@@ -584,7 +584,7 @@ const JobCreationForm: React.FC = () => {
                             {skill.name}
                           </button>
                         ))}
-                        {!isLoading && filteredSkills.length === 0 && (
+                        {!isLoading && filteredSkills?.length === 0 && (
                           <div className="p-2 text-center text-gray-500">
                             Không tìm thấy kỹ năng
                           </div>
@@ -595,7 +595,7 @@ const JobCreationForm: React.FC = () => {
                 )}
               </div>
 
-              {selectedSkills.length > 0 && (
+              {selectedSkills?.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {selectedSkills.map((skill) => (
                     <div

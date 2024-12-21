@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { RootState } from '../../redux/store';
 import { login } from '../../services/authApi';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
@@ -135,7 +135,6 @@ const LoginPage = () => {
                 id="remember"
                 className="mr-2 rounded text-blue-500 focus:ring-blue-400"
               />
-              <label htmlFor="remember" className="text-gray-600">Ghi nhớ đăng nhập</label>
             </div>
             <a href="#" className="text-blue-500 hover:underline">Quên mật khẩu?</a>
           </div>
@@ -152,7 +151,11 @@ const LoginPage = () => {
         <div className="text-center">
           <p className="text-gray-600">
             Chưa có tài khoản? {' '}
-            <a href="#" className="text-blue-500 hover:underline">Đăng ký ngay</a>
+            <Link to="/login">
+            <a className="text-blue-500 hover:underline">
+              Đăng nhập ngay
+            </a>
+          </Link>
           </p>
         </div>
       </div>
