@@ -415,16 +415,20 @@ const JobDetail = () => {
                                     >
                                         <div className="flex items-start justify-between">
                                             <div className="flex gap-4 items-center">
-                                                <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
-                                                    <img
-                                                        src={similarJob.companyLogo}
-                                                        alt="Company Logo"
-                                                        className="w-full h-full object-contain p-2"
-                                                    />
+                                                <div className="w-14 h-14 bg-white border border-gray-200  flex items-center justify-center p-2">
+                                                    {job?.company.logo ? (
+                                                        <img
+                                                            src={job?.company.logo}
+                                                            alt={job?.company.companyName}
+                                                            className="w-full h-full object-contain"
+                                                        />
+                                                    ) : (
+                                                        <Building2 className="w-10 h-10 text-gray-400" />
+                                                    )}
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-bold text-gray-800 text-[16px] mb-1 group-hover:text-blue-600 transition-colors">
-                                                        {similarJob.title}
+                                                    <h3 className="text-lg font-semibold truncate">
+                                                        {job?.title?.length > 20 ? `${job.title.slice(0, 20)}...` : job.title}
                                                     </h3>
                                                     <div className="flex items-center gap-2 text-[14px] text-gray-500 mb-1.5">
                                                         <MapPin className="w-4 h-4 text-gray-500" />
