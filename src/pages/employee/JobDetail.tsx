@@ -418,8 +418,7 @@ const JobDetail = () => {
                                                 <div className="w-14 h-14 bg-white border border-gray-200  flex items-center justify-center p-2">
                                                     {job?.company.logo ? (
                                                         <img
-                                                            src={job?.company.logo}
-                                                            alt={job?.company.companyName}
+                                                            src={similarJob?.companyLogo}
                                                             className="w-full h-full object-contain"
                                                         />
                                                     ) : (
@@ -428,7 +427,7 @@ const JobDetail = () => {
                                                 </div>
                                                 <div>
                                                     <h3 className="text-lg font-semibold truncate">
-                                                        {similarJob?.title?.length > 20 ? `${similarJob?.title?.slice(0, 20)}...` : similarJob?.title}
+                                                        {similarJob?.title?.length > 15 ? `${similarJob?.title?.slice(0, 15)}...` : similarJob?.title}
                                                     </h3>
                                                     <div className="flex items-center gap-2 text-[14px] text-gray-500 mb-1.5">
                                                         <MapPin className="w-4 h-4 text-gray-500" />
