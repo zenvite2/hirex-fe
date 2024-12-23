@@ -428,7 +428,7 @@ const JobDetail = () => {
                                                 </div>
                                                 <div>
                                                     <h3 className="text-lg font-semibold truncate">
-                                                        {job?.title?.length > 20 ? `${job?.title?.slice(0, 20)}...` : job.title}
+                                                        {similarJob?.title?.length > 20 ? `${similarJob?.title?.slice(0, 20)}...` : similarJob?.title}
                                                     </h3>
                                                     <div className="flex items-center gap-2 text-[14px] text-gray-500 mb-1.5">
                                                         <MapPin className="w-4 h-4 text-gray-500" />
