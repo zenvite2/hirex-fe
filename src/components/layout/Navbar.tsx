@@ -136,13 +136,22 @@ const Navbar: React.FC<{}> = () => {
     >
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center">
-          <Link to="/" className="flex-shrink-0">
-            <img src={Logo} alt="TopCV Logo" className="h-8 w-auto" />
-          </Link>
+          <img src={Logo} alt="TopCV Logo" className="h-8 w-auto rounded-lg" />
           <div className="hidden lg:flex space-x-6 ml-10">
-            {!isEmployerPage && (!isLoggedIn || role === 'EMPLOYEE') ? (
+            {role === 'ADMIN' ? (
+              // Chỉ hiển thị "Quản trị" khi role là ADMIN
+              <Link
+                to="/admin-dashboard"
+                className={`${getLinkClassName('/admin-dashboard')} ${location.pathname.startsWith('/admin-dashboard')
+                  ? 'text-[#FF5733] font-semibold border-b-2 border-[#FF5733]'
+                  : ''
+                  }`}
+              >
+                Quản trị
+              </Link>
+            ) : !isEmployerPage && (!isLoggedIn || role === 'EMPLOYEE') ? (
+              // Hiển thị menu cho nhân viên hoặc người chưa đăng nhập
               <>
-                {/* Hiển thị "Việc làm" và "Hồ sơ & CV" khi chưa đăng nhập hoặc khi vai trò là 'EMPLOYEE' */}
                 <Link to="/find-jobs" className={getLinkClassName('/find-jobs')}>
                   Việc làm
                 </Link>
@@ -153,33 +162,18 @@ const Navbar: React.FC<{}> = () => {
                   Hồ sơ cá nhân
                 </Link>
               </>
-            ) : role === 'EMPLOYER' ? (
-              <>
-                {/* Hiển thị "Đăng việc làm" khi vai trò là 'EMPLOYER' */}
-                <Link
-                  to="/employer"
-                  className={`${getLinkClassName('/employer')} ${location.pathname.startsWith('/employer')
-                      ? 'text-[#0069DB] font-semibold border-b-2 border-[#0069DB]'
-                      : ''
-                    }`}
-                >
-                  Đăng việc làm
-                </Link>
-              </>
-            ) : (
-              <>
-                {/* Hiển thị "Quản trị" khi vai trò là 'ADMIN' */}
-                <Link
-                  to="/admin-dashboard"
-                  className={`${getLinkClassName('/admin-dashboard')} ${location.pathname.startsWith('/admin-dashboard')
-                      ? 'text-[#FF5733] font-semibold border-b-2 border-[#FF5733]'
-                      : ''
-                    }`}
-                >
-                  Quản trị
-                </Link>
-              </>
-            )}
+            ) : isEmployerPage && (!isLoggedIn || role === 'EMPLOYER') ? (
+              // Hiển thị menu cho nhà tuyển dụng
+              <Link
+                to="/employer"
+                className={`${getLinkClassName('/employer')} ${location.pathname.startsWith('/employer')
+                  ? 'text-[#0069DB] font-semibold border-b-2 border-[#0069DB]'
+                  : ''
+                  }`}
+              >
+                Đăng việc làm
+              </Link>
+            ) : null}
           </div>
         </div>
 

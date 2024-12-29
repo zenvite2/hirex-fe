@@ -209,6 +209,7 @@ function App() {
                         <Route path="/user-profile" element={<UserProfile />} />
                         <Route path="/job-detail/:id" element={<JobDetail />} />
                         <Route path="/login" element={<LoginPage />} />
+                        <Route path="/employer" element={<EmployerLanding />} />
 
                         {/* Routes có Sidebar */}
                         <Route element={<SidebarLayout />}>
@@ -246,7 +247,6 @@ function App() {
                                 <Route path="/job-posts" element={<JobPosts />} />
                             </Route>
 
-                            <Route path="/employer" element={<EmployerLanding />} />
 
                         </Route>
 
