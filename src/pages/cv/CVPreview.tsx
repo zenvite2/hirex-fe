@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import '../../styles/cv.css'
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { fetchResume } from '../../services/resumeApi';
@@ -17,7 +17,7 @@ interface HeaderData {
     email: string;
     phoneNumber: string;
     avatarUrl?: string;
-  }
+}
 
 const CVPreview: React.FC<CVPreviewProps> = ({ passedId }) => {
     const { id } = useParams();
@@ -73,31 +73,37 @@ const CVPreview: React.FC<CVPreviewProps> = ({ passedId }) => {
                     </div>
 
                     {/* Awards and Certifications */}
-                    <div className="font-xs mb-4">
-                        <h2 className="font-md font-semibold mb-1">Chứng chỉ</h2>
-                        {resumeData?.certificates && resumeData.certificates.map((cert) => (
-                            <div key={cert.id}>
-                                <p>{cert.name}</p>
-                                <p>
-                                    {cert.startDate} - {cert.endDate}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
+                    {resumeData?.certificates && resumeData.certificates.length > 0 && (
+                        <div className="font-xs mb-4">
+                            <h2 className="font-md font-semibold mb-1">Chứng chỉ</h2>
+                            {resumeData?.certificates && resumeData.certificates.map((cert) => (
+                                <div key={cert.id}>
+                                    <p>{cert.name}</p>
+                                    <p>
+                                        {cert.startDate} - {cert.endDate}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Skills */}
-                    <div className="font-xs mb-4">
-                        <h2 className="font-md font-semibold mb-1">Kỹ Năng</h2>
-                        {resumeData?.skills && resumeData.skills.map((skill) => (
-                            <p key={skill.id}>{skill.name}</p>
-                        ))}
-                    </div>
+                    {resumeData?.skills && resumeData.skills.length > 0 && (
+                        <div className="font-xs mb-4">
+                            <h2 className="font-md font-semibold mb-1">Kỹ Năng</h2>
+                            {resumeData?.skills && resumeData.skills.map((skill) => (
+                                <p key={skill.id}>{skill.name}</p>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Interests */}
-                    <div className="font-xs mb-4">
-                        <h2 className="font-md font-semibold mb-1">Sở Thích</h2>
-                        <p>{resumeData?.hobby}</p>
-                    </div>
+                    {resumeData?.hobby && resumeData.hobby.length > 0 && (
+                        <div className="font-xs mb-4">
+                            <h2 className="font-md font-semibold mb-1">Sở Thích</h2>
+                            <p>{resumeData?.hobby}</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Main Content (Second Column) */}
@@ -105,36 +111,41 @@ const CVPreview: React.FC<CVPreviewProps> = ({ passedId }) => {
                     {/* Header Section */}
                     <div className="mb-6">
                         <h1 className="font-2xl font-bold">{resumeData?.fullName}</h1>
-                        <p className="font-md font-semibold">Web Developer</p>
+                        {/* <p className="font-md font-semibold">Web Developer</p> */}
                     </div>
 
                     {/* Career Objective Section */}
-                    <div className="mb-6 flex flex-col">
-                        <div className="py-2 rounded-t-md w-full">
-                            <div className="text-blue-800 font-bold mb-2 font-xmd">
-                                Mục tiêu nghề nghiệp
+                    {resumeData?.career && resumeData.career.length > 0 && (
+
+                        <div className="mb-6 flex flex-col">
+                            <div className="py-2 rounded-t-md w-full">
+                                <div className="text-blue-800 font-bold mb-2 font-xmd">
+                                    Mục tiêu nghề nghiệp
+                                </div>
+                                <div className="border-b-2 border-gray-700 rounded-r-md"></div>
                             </div>
-                            <div className="border-b-2 border-gray-700 rounded-r-md"></div>
+                            <p>{resumeData?.career}</p>
                         </div>
-                        <p>{resumeData?.career}</p>
-                    </div>
+                    )}
 
                     {/* Education Section */}
-                    <div className="mb-6">
-                        <div className="py-2 rounded-t-md w-full">
-                            <div className="text-blue-800 font-bold mb-2 font-xmd">
-                                Học vấn
+                    {resumeData?.educations && resumeData.educations.length > 0 && (
+                        <div className="mb-6">
+                            <div className="py-2 rounded-t-md w-full">
+                                <div className="text-blue-800 font-bold mb-2 font-xmd">
+                                    Học vấn
+                                </div>
+                                <div className="border-b-2 border-gray-700 rounded-r-md"></div>
                             </div>
-                            <div className="border-b-2 border-gray-700 rounded-r-md"></div>
+                            {resumeData?.educations && resumeData.educations.map((edu) => (
+                                <div key={edu.id}>
+                                    <p>Ngành: {edu.major} || {edu.startDate} - {edu.endDate}</p>
+                                    <p>{edu.name}</p>
+                                    <p>GPA: {edu.gpa}</p>
+                                </div>
+                            ))}
                         </div>
-                        {resumeData?.educations && resumeData.educations.map((edu) => (
-                            <div key={edu.id}>
-                                <p>Ngành: {edu.major} || {edu.startDate} - {edu.endDate}</p>
-                                <p>{edu.name}</p>
-                                <p>GPA: {edu.gpa}</p>
-                            </div>
-                        ))}
-                    </div>
+                    )}
 
                     {/* Experience Section */}
                     {resumeData?.experiences && resumeData.experiences.length > 0 && (
