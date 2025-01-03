@@ -184,15 +184,18 @@ function App() {
 
     const onNotificationReceive = (payload: MessageStompjs) => {
         const notificationReceived: NotificationType = { ...JSON.parse(payload.body) };
-        const currentNotifications = [...notifications];
+        
+        if (notificationReceived?.read != null) {
+            const currentNotifications = [...notifications];
+    
+            const notificationExists = currentNotifications.some(
+                notification => notification.id === notificationReceived.id
+            );
 
-        const notificationExists = currentNotifications.some(
-            notification => notification.id === notificationReceived.id
-        );
-
-        if (!notificationExists) {
-            dispatch(setNotifications([notificationReceived, ...currentNotifications]));
-            dispatch(setUnreadCount(unreadCount + 1));
+            if (!notificationExists) {
+                dispatch(setNotifications([notificationReceived, ...currentNotifications]));
+                dispatch(setUnreadCount(unreadCount + 1));
+            }
         }
     };
 
