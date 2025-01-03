@@ -76,12 +76,6 @@ const JobCreationForm: React.FC = () => {
   const {
     city,
     district,
-    cities,
-    districts,
-    handleSelectCity,
-    handleSelectDistrict,
-    fetchCities,
-    fetchDistricts,
     setCityFromId,
     setDistrictFromId
   } = useLocationSelector();

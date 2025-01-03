@@ -119,13 +119,14 @@ const JobListings = () => {
                 </td>
                 <td className="py-4">
                   <span
-                    className={`px-2 py-1 rounded-full text-sm ${
-                      job.status === 'Đã duyệt'
+                    className={`px-2 py-1 rounded-full text-sm ${job.active === true
                         ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}
+                        : job.active === false
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}
                   >
-                    {job.status || 'Chờ duyệt'}
+                    {job.active === true ? 'Đã duyệt' : job.active === false ? 'Từ chối' : 'Chờ duyệt'}
                   </span>
                 </td>
                 <td className="py-4">

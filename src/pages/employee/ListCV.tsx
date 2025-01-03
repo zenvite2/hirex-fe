@@ -158,7 +158,6 @@ const ListCV = () => {
                             <tr className="text-left text-pink-500 border-b">
                                 <th className="py-3">Tiêu đề</th>
                                 <th className="py-3">Thời gian cập nhật cuối cùng</th>
-                                <th className="py-3">Trạng thái</th>
                                 <th className="py-3">Thao tác</th>
                             </tr>
                         </thead>
@@ -173,16 +172,7 @@ const ListCV = () => {
                                             {formatDate(resume.updatedAt)}
                                         </div>
                                     </td>
-                                    <td className="py-4">
-                                        <span
-                                            className={`px-2 py-1 rounded-full text-sm ${resume.status
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-yellow-100 text-yellow-800'
-                                                }`}
-                                        >
-                                            {resume.status ? 'Active' : 'Inactive'}
-                                        </span>
-                                    </td>
+            
                                     <td className="py-4">
                                         <div className="flex gap-3">
                                             <button

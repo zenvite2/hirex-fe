@@ -381,46 +381,6 @@ const JobCreationForm: React.FC = () => {
     }
   };
 
-  // const renderField = (name: keyof FormData, label: string, type: string = 'text') => (
-  //   <div className="relative space-y-2">
-  //     <label className="block text-sm font-semibold text-gray-700">
-  //       {label}
-  //     </label>
-  //     <div>
-  //       {type === 'select' ? (
-  //         <select
-  //           id={name}
-  //           name={name}
-  //           value={formData[name] as string}
-  //           onChange={handleInputChange}
-  //           className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-  //         >
-  //           <option value="">Chọn {label}</option>
-  //           {renderSelectOptions(name)}
-  //         </select>
-  //       ) : type === 'textarea' ? (
-  //         <textarea
-  //           id={name}
-  //           name={name}
-  //           value={formData[name] as string}
-  //           onChange={handleInputChange}
-  //           className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm whitespace-pre-wrap"
-  //           rows={4}
-  //         />
-  //       ) : (
-  //         <input
-  //           type={type}
-  //           id={name}
-  //           name={name}
-  //           value={formData[name] as string}
-  //           onChange={handleInputChange}
-  //           className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-  //         />
-  //       )}
-  //     </div>
-  //   </div>
-  // );
-
   const renderField = (
     name: keyof FormData,
     label: string,
