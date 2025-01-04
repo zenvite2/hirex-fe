@@ -15,6 +15,7 @@ import axiosIns from '../../services/axiosIns';
 import { Job } from './FindJobs';
 import { denormalizeTextAreaContent, formatDateToDDMMYYYY } from '../../utils/utils';
 import { deleteApplication } from '../../services/applicationApi';
+import { set } from 'react-hook-form';
 
 interface JobData {
     id: number;
@@ -75,6 +76,7 @@ const JobDetail = () => {
     const [isFollowed, setIsFollowed] = useState(false);
     const [similarJobs, setSimilarJobs] = useState<Job[]>([]);
     const [applicationId, setApplicationId] = useState<number | null>(null); // State lưu id đơn ứng tuyển
+    const [applicationStatus, setApplicationStatus] = useState<string | null>(null); // State lưu id đơn ứng tuyển
 
     useEffect(() => {
         const fetchJobDetail = async () => {
@@ -145,9 +147,11 @@ const JobDetail = () => {
                     if (appliedJob) {
                         setHasApplied(true); // Cập nhật trạng thái đã ứng tuyển
                         setApplicationId(appliedJob.id); // Lưu applicationId
+                        setApplicationStatus(appliedJob.status); // Lưu trạng thái ứng tuyển
                     } else {
                         setHasApplied(false); // Cập nhật trạng thái chưa ứng tuyển
                         setApplicationId(null); // Xóa applicationId nếu không tìm thấy
+                        setApplicationStatus(null); // Xóa trạng thái ứng tuyển
                     }
                 }
             } catch (error) {
@@ -336,12 +340,26 @@ const JobDetail = () => {
                                         Nộp đơn ngay
                                     </button> */}
                                     {hasApplied ? (
-                                        <button
-                                            onClick={() => setShowDeleteConfirm(true)} // Hiển thị popup xác nhận
-                                            className="w-full px-6 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium"
-                                        >
-                                            Đã ứng tuyển
-                                        </button>
+                                        applicationStatus === 'PENDING' ? (
+                                            <button
+                                                onClick={() => setShowDeleteConfirm(true)} // Hiển thị popup xác nhận
+                                                className="w-full px-6 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium"
+                                            >
+                                                Đã ứng tuyển
+                                            </button>
+                                        ) : applicationStatus === 'REJECTED' ? (
+                                            <button
+                                                className="w-full px-6 py-2 bg-red-50 text-red-700 rounded-lg font-medium"
+                                            >
+                                                Đơn bị từ chối
+                                            </button>
+                                        ) : (
+                                            <button
+                                                className="w-full px-6 py-2 bg-green-50 text-green-700 rounded-lg font-medium"
+                                            >
+                                                Đã được chấp nhận
+                                            </button>
+                                        )
                                     ) : (
                                         <button
                                             onClick={handleApplyNow}
