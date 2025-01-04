@@ -18,7 +18,7 @@ const RegistrationForm = () => {
     password: '',
     retryPassword: ''
   });
-  
+
   const [passwordError, setPasswordError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showRetryPassword, setShowRetryPassword] = useState(false);
@@ -39,11 +39,11 @@ const RegistrationForm = () => {
       console.error('Error generating OTP:', error);
     }
   };
-  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Kiểm tra password match
     if (formData.password !== formData.retryPassword) {
       setPasswordError('Passwords do not match');
@@ -53,7 +53,7 @@ const RegistrationForm = () => {
     generateOTP(formData.email)
 
     // Chuyển tới trang OTP với formData và registrationType
-    navigate('/otp', { 
+    navigate('/otp', {
       state: {
         registrationType: 'employee', // hoặc có thể nhận từ props nếu form này được tái sử dụng
         formData: {
@@ -70,7 +70,7 @@ const RegistrationForm = () => {
     <div className="flex min-h-screen bg-gray-100">
       <div className="w-full max-w-md m-auto bg-white rounded-lg shadow-md p-8">
         <h2 className="text-2xl font-semibold text-center text-blue-600 mb-6">
-          Chào mừng bạn đến với HireX
+          Đăng ký Người tìm việc
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">

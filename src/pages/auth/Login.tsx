@@ -81,7 +81,7 @@ const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-white-400 p-4">
       <div className="bg-white shadow-2xl rounded-2xl w-full max-w-md p-8 space-y-6">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">Chào Mừng Trở Lại</h2>
+          <h2 className="text-3xl font-bold text-blue-600 mb-2">Chào Mừng Trở Lại</h2>
           <p className="text-gray-500">Vui lòng đăng nhập vào tài khoản của bạn</p>
         </div>
 
@@ -147,10 +147,10 @@ const LoginPage = () => {
           <p className="text-gray-600">
             Chưa có tài khoản? {' '}
             <Link to="/register-employee">
-            <a className="text-blue-500 hover:underline">
-              Đăng nhập ngay
-            </a>
-          </Link>
+              <a className="text-blue-500 hover:underline">
+                Đăng ký ngay
+              </a>
+            </Link>
           </p>
         </div>
       </div>
