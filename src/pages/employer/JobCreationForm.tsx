@@ -352,7 +352,7 @@ const JobCreationForm: React.FC = () => {
         const result = await dispatch(jobCreate(normalizedData));
         if (result?.payload?.response?.success) {
           toast.success('Tạo job thành công!');
-          navigate('/employer/jobs'); 
+          navigate('/job-posts'); 
         } else {
           toast.error('Tạo job thất bại!');
         }       
