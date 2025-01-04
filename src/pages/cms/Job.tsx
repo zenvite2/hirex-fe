@@ -62,7 +62,6 @@ const JobCMS = () => {
     const [job, setJob] = useState<JobData | null>(null);
     const [error, setError] = useState<string | null>(null);
     const dispatch = useAppDispatch();
-    const { isLoggedIn, userId } = useSelector((state: RootState) => state.authReducer);
     const navigate = useNavigate();
 
     useEffect(() => {

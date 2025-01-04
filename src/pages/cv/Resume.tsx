@@ -9,7 +9,7 @@ import CertificatePopup from './CertificatePopup';
 import EducationPopup from './EducationPopup';
 import ExperiencePopup from './ExperiencePopup';
 import { fetchResume, saveResume } from '../../services/resumeApi';
-
+import { formatDateToMMYYYY } from '../../utils/utils';
 
 const ResumeComponent: React.FC = () => {
     const { id } = useParams();
@@ -565,7 +565,7 @@ const ResumeComponent: React.FC = () => {
                                     )}
                                     {(certificate.startDate || certificate.endDate) && (
                                         <p className="text-sm text-gray-600">
-                                            {certificate.startDate} {certificate.startDate && certificate.endDate && '-'} {certificate.endDate}
+                                            {formatDateToMMYYYY(certificate.startDate)} - {formatDateToMMYYYY(certificate.endDate)}
                                         </p>
                                     )}
                                 </div>
@@ -626,8 +626,8 @@ const ResumeComponent: React.FC = () => {
 
                                     {(project.startDate || project.endDate) && (
                                         <p className="text-sm text-gray-600">
-                                            {project.startDate} {project.startDate && project.endDate && '-'} {project.endDate}
-                                        </p>
+                                            {formatDateToMMYYYY(project.startDate)} - {formatDateToMMYYYY(project.endDate)}
+                                            </p>
                                     )}
 
                                     {project.position && (
@@ -713,7 +713,7 @@ const ResumeComponent: React.FC = () => {
 
                                     {(education.startDate || education.endDate) && (
                                         <p className="text-sm text-gray-600">
-                                            {education.startDate} {education.startDate && education.endDate && '-'} {education.endDate}
+                                            {formatDateToMMYYYY(education.startDate)} - {formatDateToMMYYYY(education.endDate)}
                                         </p>
                                     )}
 
@@ -781,8 +781,8 @@ const ResumeComponent: React.FC = () => {
 
                                     {(experience.startDate || experience.endDate) && (
                                         <p className="text-sm text-gray-600">
-                                            {experience.startDate} {experience.startDate && experience.endDate && '-'} {experience.endDate}
-                                        </p>
+                                            {formatDateToMMYYYY(experience.startDate)} - {formatDateToMMYYYY(experience.endDate)}
+                                            </p>
                                     )}
 
                                     {experience.description && (
