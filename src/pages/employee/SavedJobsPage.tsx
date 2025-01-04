@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2 } from 'lucide-react';
+import { CalendarDays, Trash2 } from 'lucide-react';
 import axiosIns from '../../services/axiosIns';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
+import { formatNumberToVietnameseShort } from '../../utils/utils';
 
 interface JobResponse {
   id: number;
@@ -133,17 +134,20 @@ const SavedJobsPage = () => {
                     >
                       {savedJob.jobResponse.title}
                     </h3>
-                    <p className="text-gray-600">Ngày lưu: {new Date(savedJob.createdAt).toLocaleDateString()}</p>
+                    <div className="mt-2 flex gap-2 text-sm text-gray-500 justify-content-center items-center">
+                    <CalendarDays className="h-6 w-6" />
+                      <p className="text-gray-600">Ngày lưu: {new Date(savedJob.createdAt).toLocaleDateString()}</p>
+                      <span>•</span>
+                      <span>Hạn nộp: {new Date(savedJob.jobResponse.deadline).toLocaleDateString()}</span>
+                    </div>
                   </div>
-                  <span className="text-black font-semibold" style={{ fontSize: 20 }}>
-                    {savedJob.jobResponse.minSalary.toLocaleString()} - {savedJob.jobResponse.maxSalary.toLocaleString()} VND
+                  <span className="font-medium text-lg text-blue-500">
+                    {new Intl.NumberFormat().format(savedJob.jobResponse.minSalary)} - {new Intl.NumberFormat().format(savedJob.jobResponse.maxSalary)} VND
                   </span>
                 </div>
-                <div className="mt-4 flex items-center justify-between">
+                <div className="mt-2 flex items-center justify-between">
                   <div className="flex gap-4 text-sm text-gray-500">
-                    <span>{savedJob.jobResponse.location}</span>
-                    <span>•</span>
-                    <span>Hạn nộp: {new Date(savedJob.jobResponse.deadline).toLocaleDateString()}</span>
+                    <span>📍{savedJob.jobResponse.location}</span>
                   </div>
                   <div className="flex gap-2">
                     <button

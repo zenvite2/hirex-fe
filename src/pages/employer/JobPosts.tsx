@@ -66,7 +66,7 @@ const JobListings = () => {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">Danh sách công việc</h1>
+        <h1 className="text-xl font-bold">Danh sách tin tuyển dụng</h1>
         <Link to="/apply-job">
           <button className="bg-[#0069DB] text-white px-3 py-2 rounded-md hover:bg-[#0050B3] transition duration-300">
             Thêm mới
@@ -114,6 +114,7 @@ const JobListings = () => {
               <th className="py-3">Tiêu đề</th>
               <th className="py-3">Thời gian tạo / Hạn HS</th>
               <th className="py-3">Trạng thái</th>
+              <th className="py-3">Số lượng ứng tuyển</th>
               <th className="py-3">Thao tác</th>
             </tr>
           </thead>
@@ -122,7 +123,7 @@ const JobListings = () => {
               <tr key={index} className="border-b hover:bg-gray-50">
                 <td className="py-4">
                   <div className="font-medium">{job.title}</div>
-                  <div className="text-gray-500 text-sm mt-1">{job.location}</div>
+                  <div className="text-gray-500 text-sm mt-1">📍{job.location}</div>
                 </td>
                 <td className="py-4">
                   <div className="text-sm text-gray-600">{formatDate(job.createdAt)}</div>
@@ -140,6 +141,7 @@ const JobListings = () => {
                     {job.active === true ? 'Đã duyệt' : job.active === false ? 'Từ chối' : 'Chờ duyệt'}
                   </span>
                 </td>
+                <td className="text-center">{job.countApplication}</td>
                 <td className="py-4">
                   <div className="flex gap-3">
                     <button
