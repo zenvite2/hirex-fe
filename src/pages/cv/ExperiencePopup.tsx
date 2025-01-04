@@ -22,7 +22,7 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({
     const [errors, setErrors] = useState<Partial<Record<keyof Experience, string>>>({});
 
     // Validation function
-    const validateProject = () => {
+    const validateExperience = () => {
         const newErrors: Partial<Record<keyof Experience, string>> = {};
         if (!editingExperience.company || editingExperience.company.trim() === '') {
             newErrors.company = 'Tên công ty không được để trống';
@@ -61,7 +61,7 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({
 
 
     const handleSave = () => {
-        if (validateProject()) {
+        if (validateExperience()) {
             onSave();
         }
     };

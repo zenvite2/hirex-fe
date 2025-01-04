@@ -88,8 +88,7 @@ const ProjectPopup: React.FC<ProjectPopupProps> = ({
             onSave();
         }
     };
-
-
+    
     useEffect(() => {
         setErrors({});
     }, [show]);
