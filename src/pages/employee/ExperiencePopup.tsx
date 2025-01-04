@@ -36,10 +36,9 @@ interface ExperiencePopupProps {
   onClose: () => void;
   onSave: (experience: Experience) => void;
   experience: Experience | null;
-  editingExperience?: Experience;
 }
 
-const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSave, experience, editingExperience }) => {
+const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSave, experience }) => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [positionType, setPositions] = useState<Type[]>([]);
@@ -66,7 +65,8 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
         yearExperience: 0
       });
     }
-  }, [experience]);
+    setErrors({});
+  }, [experience, isOpen]);
 
   const [errors, setErrors] = useState<Partial<Record<keyof Experience, string>>>({});
 
@@ -78,15 +78,15 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
-  const handleDateChange = (name: 'startDate' | 'endDate', date: moment.Moment | null) => {
-    const dateString = date ? date.format('MM/YYYY') : '';
-    setFormData((prev) => ({ ...prev, [name]: dateString }));
+
+  const handleDateChange = (name: 'startDate' | 'endDate', value: moment.Moment | null) => {
+    const dateString = value ? value.format('MM/YYYY') : '';
+    setFormData(prev => ({ ...prev, [name]: dateString }));
 
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
-
 
   useEffect(() => {
     const fetchJobTypes = async () => {
@@ -110,7 +110,10 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
     const newErrors: Partial<Record<keyof Experience, string>> = {};
 
     if (!formData.companyName) {
-      newErrors.companyName = 'Vui lòng nhập tên công ty';
+      newErrors.companyName = 'Tên công ty không được để trống';
+    }
+    if (!formData.position) {
+      newErrors.position = 'Vị trí công việc không được để trống';
     }
     if (!formData.startDate) {
       newErrors.startDate = 'Vui lòng chọn ngày bắt đầu';
@@ -257,11 +260,12 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
                 Ngày bắt đầu <span className="text-red-500">*</span>
               </label>
               <DatePicker
-                name="startDate"
+                placeholder="MM/YYYY"
+                format="MM/YYYY"
+                picker="month"
                 value={formData.startDate ? moment(formData.startDate, 'MM/YYYY') : null}
                 onChange={(date) => handleDateChange('startDate', date)}
-                disabled={isSubmitting}
-                format="MM/YYYY"
+                disabledDate={(current) => current && current > moment()}
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.startDate && (
@@ -273,11 +277,12 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
                 Ngày kết thúc <span className="text-red-500">*</span>
               </label>
               <DatePicker
-                name="endDate"
+                placeholder="MM/YYYY"
+                format="MM/YYYY"
+                picker="month"
                 value={formData.endDate ? moment(formData.endDate, 'MM/YYYY') : null}
                 onChange={(date) => handleDateChange('endDate', date)}
-                disabled={isSubmitting}
-                format="MM/YYYY"
+                // disabledDate={(current) => current && current > moment()}
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.endDate && (
