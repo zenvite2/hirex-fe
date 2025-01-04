@@ -15,6 +15,7 @@ import axiosIns from '../../services/axiosIns';
 import { Job } from './FindJobs';
 import { denormalizeTextAreaContent, formatDateToDDMMYYYY } from '../../utils/utils';
 import { deleteApplication } from '../../services/applicationApi';
+import SimilarCard from '../../components/common/SimilarCard';
 import { set } from 'react-hook-form';
 
 interface JobData {
@@ -489,53 +490,7 @@ const JobDetail = () => {
                             <h2 className="text-lg font-semibold text-gray-900 mb-3">Việc làm tương tự</h2>
                             <div className="space-y-4">
                                 {similarJobs?.map((similarJob) => (
-                                    <div
-                                        key={similarJob.id}
-                                        className="p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer group"
-                                        onClick={() => {
-                                            similarJob.id && navigate(`/job-detail/${similarJob.id}`);
-                                        }}
-                                    >
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex gap-4 items-center">
-                                                <div className="w-14 h-14 bg-white border border-gray-200  flex items-center justify-center p-2">
-                                                    {job?.company.logo ? (
-                                                        <img
-                                                            src={similarJob?.companyLogo}
-                                                            className="w-full h-full object-contain"
-                                                        />
-                                                    ) : (
-                                                        <Building2 className="w-10 h-10 text-gray-400" />
-                                                    )}
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-lg font-semibold truncate">
-                                                        {similarJob?.title?.length > 15 ? `${similarJob?.title?.slice(0, 15)}...` : similarJob?.title}
-                                                    </h3>
-                                                    <div className="flex items-center gap-2 text-[14px] text-gray-500 mb-1.5">
-                                                        <MapPin className="w-4 h-4 text-gray-500" />
-                                                        <span className="font-medium">{similarJob.district} - {similarJob.city}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-[14px] text-gray-500 mb-1.5">
-                                                        <div className="flex items-center gap-1.5">
-                                                            <BriefcaseConveyorBelt className="w-4 h-4 text-gray-500" />
-                                                            <span>{similarJob.jobType ?? '...'}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-[14px] text-gray-500">
-                                                        <CalendarCheck className="w-4 h-4 text-gray-500" />
-                                                        <span>Hết hạn {formatDateToDDMMYYYY(similarJob.deadline)}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={handleSaveJob}
-                                                className="p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors group-hover:border-blue-200"
-                                            >
-                                                <Bookmark className="w-5 h-5 text-gray-500 group-hover:text-blue-500 transition-colors" />
-                                            </button>
-                                        </div>
-                                    </div>
+                                   <SimilarCard job={similarJob} key={similarJob.id} />
                                 ))}
                             </div>
                         </section>
