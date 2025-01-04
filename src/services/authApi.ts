@@ -25,6 +25,7 @@ export interface UserInfo {
     email: string;
     phoneNumber: string;
     avatar: string;
+    companyName?: string;
 }
 
 export const getUserInfo = async (userId: number): Promise<UserInfo | null> => {
@@ -36,7 +37,8 @@ export const getUserInfo = async (userId: number): Promise<UserInfo | null> => {
                 fullName: response.data.data.fullName,
                 email: response.data.data.email,
                 phoneNumber: response.data.data.phoneNumber,
-                avatar: response.data.data.avatar
+                avatar: response.data.data.avatar,
+                companyName: response.data.data.companyName
             };
         }
         return null;
@@ -67,7 +69,7 @@ export const registerEmployer = createAsyncThunk<any, any>(
 export const changePassword = createAsyncThunk<any, any>(
     'authReducers/changePassword',
     async (payload) => {
-        return axiosIns.post('/auth/change-password', payload ,
+        return axiosIns.post('/auth/change-password', payload,
             { includeToken: true }
         )
             .then(response => { return { response: response.data } })

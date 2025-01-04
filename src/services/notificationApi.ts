@@ -2,7 +2,9 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
     setNotifications,
     markAsRead,
-    markAllAsRead
+    markAllAsRead,
+    NotificationType,
+    setUnreadCount
 } from '../redux/slice/notificationSlice';
 import axiosIns from './axiosIns';
 
@@ -11,7 +13,10 @@ export const fetchNotifications = createAsyncThunk(
     async (userId: number, { dispatch }) => {
         try {
             const response = await axiosIns.get(`/notifications/${userId}`);
-            dispatch(setNotifications(response.data.data));
+            const notifications: NotificationType[] = response.data.data
+            dispatch(setNotifications(notifications));
+            const unreadCount = notifications.filter(notification => !notification.read).length;
+            dispatch(setUnreadCount(unreadCount));
         } catch (error) {
             console.error(error);
         }

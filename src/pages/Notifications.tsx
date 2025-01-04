@@ -35,7 +35,6 @@ const Notifications: React.FC = () => {
     };
 
     const handleToggleNotifications = () => {
-        setIsOpen(!isOpen);
         if (unreadCount > 0) {
             dispatch(markAllNotificationsAsRead(userId));
         }
@@ -45,7 +44,7 @@ const Notifications: React.FC = () => {
         <div className="relative inline-block">
             <button
                 className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 relative"
-                onClick={handleToggleNotifications}
+                onClick={() => { setIsOpen(prev => !prev) }}
             >
                 <Bell size={20} />
                 {unreadCount > 0 && (
@@ -59,7 +58,15 @@ const Notifications: React.FC = () => {
                 <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-300 rounded-md shadow-lg max-h-80 overflow-y-auto">
                     {notifications?.length > 0 ? (
                         <div className="py-4 px-3">
-                            <div className="font-bold text-gray-800 mb-3 border-b pb-1 text-red-500">Thông báo</div>
+                            <div className="flex justify-between items-center mb-3 border-b pb-1">
+                                <div className="font-bold text-gray-800 text-red-500">Thông báo</div>
+                                <button
+                                    className="font-xs font-bold text-blue-600 hover:underline"
+                                    onClick={handleToggleNotifications}
+                                >
+                                    Đọc tất cả
+                                </button>
+                            </div>
                             {notifications.map((notification) => (
                                 <div
                                     key={notification?.id}
