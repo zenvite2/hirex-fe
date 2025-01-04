@@ -24,8 +24,8 @@ const messagesSlice = createSlice({
   name: 'messages',
   initialState,
   reducers: {
-    addMessage: (state, action: PayloadAction<{ converId: number; msg: ChatMessage; avtUrl?: string; username?: string; fullName?: string; openMessenger?: boolean }>) => {
-      const { converId, msg, openMessenger, avtUrl, username, fullName } = action.payload;
+    addMessage: (state, action: PayloadAction<{ converId: number; msg: ChatMessage; avtUrl?: string; username?: string; fullName?: string; companyName?: string; openMessenger?: boolean }>) => {
+      const { converId, msg, openMessenger, avtUrl, username, fullName, companyName } = action.payload;
       const existingConversationIndex = state.lstConvers.findIndex(item => item.userId === converId);
       if (existingConversationIndex !== -1) {
         const existingConversation = state.lstConvers[existingConversationIndex];
@@ -47,7 +47,8 @@ const messagesSlice = createSlice({
           last10Messages: [msg],
           username,
           fullName,
-          userId: converId
+          userId: converId,
+          companyName
         };
 
         state.lstConvers = [...state.lstConvers, newConversation];
@@ -57,6 +58,14 @@ const messagesSlice = createSlice({
       if (openMessenger) {
         state.showMessenger = true;
       }
+    },
+    updateConverInfo: (state, action: PayloadAction<{ converId: number, avtUrl: string; fullName: string; companyName: string }>) => {
+      const { converId, avtUrl, fullName, companyName } = action.payload;
+      state.lstConvers = state.lstConvers.map(conver =>
+        conver.userId === converId
+          ? { ...conver, avtUrl, fullName, companyName }
+          : conver
+      );
     },
     setCurrentIndex: (state, action: PayloadAction<number>) => {
       state.currentIndex = action.payload;
@@ -99,7 +108,8 @@ export const {
   setCurrentIndex,
   openMessenger,
   closeMessenger,
-  setToCaller
+  setToCaller,
+  updateConverInfo
 } = messagesSlice.actions;
 
 export default messagesSlice.reducer;

@@ -20,7 +20,7 @@ import {
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { addMessage, selectCurrentConver, setCurrentIndex, setToCaller } from '../../redux/slice/messageSlice';
+import { addMessage, selectCurrentConver, setCurrentIndex, setToCaller, updateConverInfo } from '../../redux/slice/messageSlice';
 import { getConversations } from '../../services/messageApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { uploadFile } from '../../services/fileUploadApi';
@@ -28,6 +28,7 @@ import { Inbox } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import websocketService from '../../utils/WebSocketService'
 import MessageJobCard from './MessageJobCard';
+import { getUserInfo, UserInfo } from '../../services/authApi';
 
 export const VIDEO_CALL_RESPONSE = {
     ACCEPT: 'VIDEO_CALL_RESPONSE_ACCEPT',
@@ -61,7 +62,8 @@ export interface Conversation {
     username: string,
     fullName: string,
     avtUrl: string,
-    last10Messages: ChatMessage[]
+    last10Messages: ChatMessage[],
+    companyName?: string,
 }
 
 const wsUrl = process.env.REACT_APP_BASE_WS_URL;
@@ -71,13 +73,25 @@ const Messenger: React.FC = () => {
     const dispatch = useAppDispatch();
     const currentConver = useSelector(selectCurrentConver);
     const [msgInput, setMsgInput] = useState<string>("");
-
     const fileInputRef = useRef(null);
     const { lstConvers } = useSelector((state: RootState) => state.messageReducer);
 
     useEffect(() => {
         userId != null && lstConvers.length == 0 && dispatch(getConversations());
     }, []);
+
+    const getConverInfo = useCallback(async (currentConver: Conversation) => {
+        if (currentConver && currentConver.userId && (!currentConver.companyName || !currentConver.fullName || !currentConver.avtUrl)) {
+            const userData: UserInfo = await getUserInfo(currentConver.userId);
+            dispatch(updateConverInfo({ converId: currentConver.userId, avtUrl: userData.avatar, fullName: userData.fullName, companyName: userData.companyName }));
+        }
+    }, []);
+
+    useEffect(() => {
+        if (userId != null && currentConver) {
+            getConverInfo(currentConver);
+        }
+    }, [userId, currentConver, getConverInfo]);
 
     const handleSendMessage = useCallback((type: MessageType, fileUrl?: string) => {
         if ((msgInput.trim() || fileUrl) && currentConver) {
@@ -158,7 +172,7 @@ const Messenger: React.FC = () => {
                                         ? fullName ?? username
                                         : conversation.fullName}
                                     info={conversation.last10Messages[conversation.last10Messages.length - 1].type == 'html'
-                                        ? 'Đã gửi một liên kết công việc'
+                                        ? conversation.last10Messages[conversation.last10Messages.length - 1].message && 'Đã gửi một liên kết công việc'
                                         : (conversation.last10Messages[conversation.last10Messages.length - 1].type == 'image'
                                             ? 'Đã gửi một ảnh'
                                             : conversation.last10Messages[conversation.last10Messages.length - 1].type == 'custom'
@@ -183,7 +197,7 @@ const Messenger: React.FC = () => {
                         {currentConver && (
                             <ConversationHeader>
                                 <Avatar src={currentConver?.avtUrl} name={currentConver?.fullName ?? currentConver?.username} />
-                                <ConversationHeader.Content userName={currentConver?.fullName ?? currentConver?.username} info="Online" />
+                                <ConversationHeader.Content userName={currentConver?.fullName ?? currentConver?.username} info={currentConver?.companyName} />
                                 <ConversationHeader.Actions>
                                     <VideoCallButton onClick={handleVideoCall} />
                                 </ConversationHeader.Actions>
