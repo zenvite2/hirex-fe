@@ -4,7 +4,6 @@ import { X, ChevronDown } from 'lucide-react';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { jobCreate, jobUpdate, jobGet } from '../../services/jobApi';
 import { skillList } from '../../services/autofillApi';
-import { useLocationSelector } from './useLocationSelector';
 import { toast } from 'react-toastify';
 
 interface Skill {
@@ -73,18 +72,6 @@ const JobCreationForm: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    city,
-    district,
-    cities,
-    districts,
-    handleSelectCity,
-    handleSelectDistrict,
-    fetchCities,
-    fetchDistricts,
-    setCityFromId,
-    setDistrictFromId
-  } = useLocationSelector();
 
   // Utility functions for text formatting
   const normalizeTextAreaContent = (content: string): string => {
@@ -169,13 +156,6 @@ const JobCreationForm: React.FC = () => {
             if (jobData.skills) {
               setSelectedSkills(jobData.skills);
             }
-
-            if (jobData.city) {
-              await setCityFromId(jobData.city);
-              if (jobData.district) {
-                await setDistrictFromId(jobData.district, jobData.city);
-              }
-            }
           }
         }
       } catch (error) {
@@ -186,10 +166,6 @@ const JobCreationForm: React.FC = () => {
     fetchJobData();
   }, [dispatch, id]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -208,8 +184,6 @@ const JobCreationForm: React.FC = () => {
       requirement: normalizeTextAreaContent(formData.requirement),
       benefit: normalizeTextAreaContent(formData.benefit),
       workingTime: normalizeTextAreaContent(formData.workingTime),
-      city: city?.id,
-      district: district?.id,
     };
 
     try {
@@ -225,45 +199,6 @@ const JobCreationForm: React.FC = () => {
       toast.error('Có lỗi xảy ra. Vui lòng thử lại sau.');
     }
   };
-
-  const renderField = (name: keyof FormData, label: string, type: string = 'text') => (
-    <div className="relative space-y-2">
-      <label className="block text-sm font-semibold text-gray-700">
-        {label}
-      </label>
-      <div>
-        {type === 'select' ? (
-          <select
-            id={name}
-            name={name}
-            value={formData[name] as string}
-            onChange={handleInputChange}
-            className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-          >
-            <option value="">Chọn {label}</option>
-          </select>
-        ) : type === 'textarea' ? (
-          <textarea
-            id={name}
-            name={name}
-            value={formData[name] as string}
-            onChange={handleInputChange}
-            className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm whitespace-pre-wrap"
-            rows={4}
-          />
-        ) : (
-          <input
-            type={type}
-            id={name}
-            name={name}
-            value={formData[name] as string}
-            onChange={handleInputChange}
-            className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-          />
-        )}
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">

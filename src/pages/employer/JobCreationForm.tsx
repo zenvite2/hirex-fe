@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { experienceList, positionList, jobTypeList, industryList, contracTypeList, educationList } from '../../services/autofillApi';
-import { jobCreate, jobUpdate, jobGetWith, jobGet } from '../../services/jobApi';
+import { jobCreate, jobUpdate, getJobSkillsById, jobGet } from '../../services/jobApi';
 import { useLocationSelector } from './useLocationSelector';
 import { LocationSelector } from '../../components/registration/LocationSelector';
 import { toast } from 'react-toastify';
@@ -154,6 +154,29 @@ const JobCreationForm: React.FC = () => {
     return Object.keys(newErrors)?.length === 0; // Return true nếu không có lỗi
   };
 
+    const fetchListSkill = async () => {
+      try {
+        const result = await getJobSkillsById(id);
+        console.log('result', result.success);
+        if (result?.success) {
+          const skillsData = result?.data.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+          }));
+          setSelectedSkills(skillsData);
+          console.log('skillsData', skillsData);
+        }
+      } catch (error) {
+        console.error('Failed to fetch skills:', error);
+        toast.error('Không thể tải danh sách kỹ năng. Vui lòng thử lại.');
+      }
+    };
+
+    useEffect(() => {
+      if (id) {
+        fetchListSkill();
+      }
+    }, [id]);
 
   // Filter out already selected skills
   const filteredSkills = availableSkills?.filter(
@@ -319,13 +342,21 @@ const JobCreationForm: React.FC = () => {
 
     try {
       if (formData.id) {
-        await dispatch(jobUpdate({ id: formData.id, info: normalizedData }));
-        toast.success('Cập nhật job thành công!');
+        const result = await dispatch(jobUpdate({ id: formData.id, info: normalizedData }));
+        if (result?.payload?.response?.success) {
+          toast.success('Cập nhật job thành công!');
+        } else {
+          toast.error('Cập nhật job thất bại!');
+        }
       } else {
-        await dispatch(jobCreate(normalizedData));
-        toast.success('Tạo job thành công!');
+        const result = await dispatch(jobCreate(normalizedData));
+        if (result?.payload?.response?.success) {
+          toast.success('Tạo job thành công!');
+          navigate('/employer/jobs'); 
+        } else {
+          toast.error('Tạo job thất bại!');
+        }       
       }
-      navigate('/job-posts');
     } catch (error) {
       toast.error('Có lỗi xảy ra. Vui lòng thử lại sau.');
     }
@@ -380,46 +411,6 @@ const JobCreationForm: React.FC = () => {
         return [];
     }
   };
-
-  // const renderField = (name: keyof FormData, label: string, type: string = 'text') => (
-  //   <div className="relative space-y-2">
-  //     <label className="block text-sm font-semibold text-gray-700">
-  //       {label}
-  //     </label>
-  //     <div>
-  //       {type === 'select' ? (
-  //         <select
-  //           id={name}
-  //           name={name}
-  //           value={formData[name] as string}
-  //           onChange={handleInputChange}
-  //           className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-  //         >
-  //           <option value="">Chọn {label}</option>
-  //           {renderSelectOptions(name)}
-  //         </select>
-  //       ) : type === 'textarea' ? (
-  //         <textarea
-  //           id={name}
-  //           name={name}
-  //           value={formData[name] as string}
-  //           onChange={handleInputChange}
-  //           className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm whitespace-pre-wrap"
-  //           rows={4}
-  //         />
-  //       ) : (
-  //         <input
-  //           type={type}
-  //           id={name}
-  //           name={name}
-  //           value={formData[name] as string}
-  //           onChange={handleInputChange}
-  //           className="block w-full px-3 py-1.5 text-base border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-  //         />
-  //       )}
-  //     </div>
-  //   </div>
-  // );
 
   const renderField = (
     name: keyof FormData,

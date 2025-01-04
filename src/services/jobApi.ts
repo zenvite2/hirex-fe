@@ -290,3 +290,9 @@ export const getFullJobById = async (id: number) => {
         .then(response => response.data)
         .catch(error => { });
 }
+
+export const getJobSkillsById = async (id: string) => {
+    return axiosIns.get(`/job/skills/${id}`)
+        .then(response => response.data)
+        .catch(error => { });
+}
