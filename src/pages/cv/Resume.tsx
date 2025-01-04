@@ -274,11 +274,10 @@ const ResumeComponent: React.FC = () => {
             try {
                 const savedResume = await saveResume(updatedResume);
                 setResumeData(savedResume);
+                setShowExperiencePopup(false);
                 resetExperienceForm();
             } catch (error) {
                 console.error('Failed to save experience', error);
-            } finally {
-                setShowExperiencePopup(false);
             }
         }
     };
@@ -294,11 +293,10 @@ const ResumeComponent: React.FC = () => {
                 experiences: updatedExperience
             });
             setResumeData(savedResume);
+            setShowExperiencePopup(false);
             resetEducationForm();
         } catch (error) {
             console.error('Failed to update experience', error);
-        } finally {
-            setShowExperiencePopup(false);
         }
     };
 

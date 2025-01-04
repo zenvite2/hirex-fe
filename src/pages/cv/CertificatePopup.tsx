@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { DatePicker } from 'antd';
 import moment, { Moment } from 'moment';
@@ -57,12 +57,23 @@ const CertificatePopup: React.FC<CertificatePopupProps> = ({
         return Object.keys(newErrors).length === 0;
     };
 
+    const handleDateChange = (field: 'startDate' | 'endDate', value: Moment | null) => {
+        const dateString = value ? value.format('MM/YYYY') : '';
+        onUpdateCertificate(field, dateString);
+        setErrors(prev => ({ ...prev, [field]: undefined }));
+    };
+
+
     // Modify onSave to include validation
     const handleSave = () => {
         if (validateCertificate()) {
             onSave();
         }
     };
+
+    useEffect(() => {
+        setErrors({});
+    }, [show]);
 
     return (
         <Transition
@@ -121,13 +132,15 @@ const CertificatePopup: React.FC<CertificatePopupProps> = ({
                                 <DatePicker
                                     picker="month"
                                     style={{ width: '100%' }}
-                                    placeholder="Chọn tháng/năm bắt đầu"
+                                    placeholder="MM/YYYY"
                                     format="MM/YYYY"
-                                    value={editingCertificate.startDate ? moment(editingCertificate.startDate) : null}
-                                    onChange={(date) => {
-                                        onUpdateCertificate('startDate', date);
-                                        setErrors(prev => ({ ...prev, startDate: undefined }));
-                                    }}
+                                    value={editingCertificate.startDate ? moment(editingCertificate.startDate, 'MM/YYYY') : null}
+                                    onChange={(date) => handleDateChange('startDate', date)}
+                                        disabledDate={(current) => current && current > moment()}
+                                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 
+                                    ${errors.startDate
+                                    ? 'border-red-500 focus:ring-red-200'
+                                        : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'}`}
                                 />
                                 {errors.startDate && (
                                     <p className="text-red-500 text-xs mt-1">{errors.startDate}</p>
@@ -140,13 +153,15 @@ const CertificatePopup: React.FC<CertificatePopupProps> = ({
                                 <DatePicker
                                     picker="month"
                                     style={{ width: '100%' }}
-                                    placeholder="Chọn tháng/năm kết thúc"
+                                    placeholder="MM/YYYY"
                                     format="MM/YYYY"
-                                    value={editingCertificate.endDate ? moment(editingCertificate.endDate) : null}
-                                    onChange={(date) => {
-                                        onUpdateCertificate('endDate', date);
-                                        setErrors(prev => ({ ...prev, endDate: undefined }));
-                                    }}
+                                    value={editingCertificate.endDate ? moment(editingCertificate.endDate, 'MM/YYYY') : null}
+                                    onChange={(date) => handleDateChange('endDate', date)}
+                                        // disabledDate={(current) => current && current > moment()}
+                                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 
+                                    ${errors.endDate
+                                    ? 'border-red-500 focus:ring-red-200'
+                                        : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'}`}
                                 />
                                 {errors.endDate && (
                                     <p className="text-red-500 text-xs mt-1">{errors.endDate}</p>
