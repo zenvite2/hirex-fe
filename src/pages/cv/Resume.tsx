@@ -259,7 +259,6 @@ const ResumeComponent: React.FC = () => {
         }
     };
 
-
     const handleAddExperience = async () => {
         if (editingExperience.company.trim() && editingExperience.position.trim()) {
             const newExperience = {
@@ -275,10 +274,11 @@ const ResumeComponent: React.FC = () => {
             try {
                 const savedResume = await saveResume(updatedResume);
                 setResumeData(savedResume);
-                setShowExperiencePopup(false);
                 resetExperienceForm();
             } catch (error) {
                 console.error('Failed to save experience', error);
+            } finally {
+                setShowExperiencePopup(false);
             }
         }
     };
@@ -294,10 +294,11 @@ const ResumeComponent: React.FC = () => {
                 experiences: updatedExperience
             });
             setResumeData(savedResume);
-            setShowEducationPopup(false);
             resetEducationForm();
         } catch (error) {
             console.error('Failed to update experience', error);
+        } finally {
+            setShowExperiencePopup(false);
         }
     };
 
@@ -771,42 +772,42 @@ const ResumeComponent: React.FC = () => {
 
                 {resumeData.experiences?.length > 0 ? (
                     resumeData.experiences?.map((experience) => (
-                    <div key={experience.id} className="mb-6 bg-gray-100 p-4 rounded-lg">
-                        <div className="flex justify-between items-center">
-                            <div>
-                                {experience.company && <h3 className="text-xl font-semibold text-gray-800">{experience.company}</h3>}
+                        <div key={experience.id} className="mb-6 bg-gray-100 p-4 rounded-lg">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    {experience.company && <h3 className="text-xl font-semibold text-gray-800">{experience.company}</h3>}
 
-                                {experience.position && (
-                                    <p className="text-sm text-gray-600">Vị trí: {experience.position}</p>
-                                )}
+                                    {experience.position && (
+                                        <p className="text-sm text-gray-600">Vị trí: {experience.position}</p>
+                                    )}
 
-                                {(experience.startDate || experience.endDate) && (
-                                    <p className="text-sm text-gray-600">
-                                        {experience.startDate} {experience.startDate && experience.endDate && '-'} {experience.endDate}
-                                    </p>
-                                )}
+                                    {(experience.startDate || experience.endDate) && (
+                                        <p className="text-sm text-gray-600">
+                                            {experience.startDate} {experience.startDate && experience.endDate && '-'} {experience.endDate}
+                                        </p>
+                                    )}
 
-                                {experience.description && (
-                                    <p className="text-sm text-gray-600">Mô tả: {experience.description} </p>
-                                )}
-                            </div>
-                            <div className="flex space-x-2">
-                                <button
-                                    onClick={() => openEditExperiencePopup(experience)}
-                                    className="text-blue-600 hover:bg-blue-100 p-1 rounded"
-                                >
-                                    <Edit size={18} />
-                                </button>
-                                <button
-                                    onClick={() => handleDeleteExperience(experience.id!)}
-                                    className="text-red-600 hover:bg-red-100 p-1 rounded"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
+                                    {experience.description && (
+                                        <p className="text-sm text-gray-600">Mô tả: {experience.description} </p>
+                                    )}
+                                </div>
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => openEditExperiencePopup(experience)}
+                                        className="text-blue-600 hover:bg-blue-100 p-1 rounded"
+                                    >
+                                        <Edit size={18} />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteExperience(experience.id!)}
+                                        className="text-red-600 hover:bg-red-100 p-1 rounded"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                 ))
+                    ))
                 ) : (
                     <div className="text-gray-400">
                         <p>Tên công ty</p>

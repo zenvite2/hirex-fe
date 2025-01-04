@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { educationList } from '../../services/autofillApi';
 import { DatePicker } from 'antd';
 import moment from 'moment';
+import { Transition } from '@headlessui/react';
 
 interface Education {
   id?: number;
@@ -215,7 +216,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
       setIsSubmitting(false);
     }
   };
-  
+
   const renderEducationLevelSelect = () => {
     return (
       <div className="mb-4">
@@ -245,137 +246,145 @@ const EducationForm: React.FC<EducationFormProps> = ({
   };
 
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
-        <div className="flex justify-between items-center p-4 bg-gray-100 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-800">
-            {education?.id ? 'Cập nhật học vấn' : 'Thêm học vấn'}
-          </h2>
-          <button
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6">
-          {renderEducationLevelSelect()}
-
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Tên trường <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="universityName"
-              value={formData.universityName}
-              onChange={handleChange}
-              disabled={isSubmitting}
-              className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.universityName ? 'border-red-500' : 'border-gray-300'
-                }`}
-              placeholder="Nhập tên trường"
-            />
-            {errors.universityName && (
-              <p className="mt-1 text-sm text-red-500">{errors.universityName}</p>
-            )}
-          </div>
-
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Chuyên môn <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="expertise"
-              value={formData.expertise}
-              onChange={handleChange}
-              disabled={isSubmitting}
-              className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.expertise ? 'border-red-500' : 'border-gray-300'
-                }`}
-              placeholder="Nhập chuyên môn"
-            />
-            {errors.expertise && (
-              <p className="mt-1 text-sm text-red-500">{errors.expertise}</p>
-            )}
-          </div>
-
-          <div className="mb-4 flex justify-between">
-            <div className="w-1/2 pr-2">
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Ngày bắt đầu <span className="text-red-500">*</span>
-              </label>
-              <DatePicker
-                name="startDate"
-                value={formData.startDate ? moment(formData.startDate, 'MM/YYYY') : null}
-                onChange={(date) => handleDateChange('startDate', date)}
-                disabled={isSubmitting}
-                format="MM/YYYY"
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="MM/YYYY"
-              />
-              {errors.startDate && (
-                <p className="mt-1 text-sm text-red-500">{errors.startDate}</p>
-              )}
-            </div>
-            <div className="w-1/2 pl-2">
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Ngày kết thúc <span className="text-red-500">*</span>
-              </label>
-              <DatePicker
-                name="endDate"
-                value={formData.endDate ? moment(formData.endDate, 'MM/YYYY') : null}
-                onChange={(date) => handleDateChange('endDate', date)}
-                disabled={isSubmitting}
-                format="MM/YYYY"
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="MM/YYYY"
-              />
-              {errors.endDate && (
-                <p className="mt-1 text-sm text-red-500">{errors.endDate}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Quá trình học vấn
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              disabled={isSubmitting}
-              placeholder="(Tùy chọn) Mô tả quá trình học vấn"
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={4}
-            />
-          </div>
-
-          <div className="flex justify-end">
+    <Transition
+      show={isOpen}
+      enter="transition ease-out duration-300"
+      enterFrom="opacity-0 transform scale-95 translate-y-4"
+      enterTo="opacity-100 transform scale-100 translate-y-0"
+      leave="transition ease-in duration-200"
+      leaveFrom="opacity-100 transform scale-100 translate-y-0"
+      leaveTo="opacity-0 transform scale-95 translate-y-4"
+    >
+      <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+          <div className="flex justify-between items-center p-4 bg-gray-100 border-b border-gray-200">
+            <h2 className="text-xl font-bold text-gray-800">
+              {education?.id ? 'Cập nhật học vấn' : 'Thêm học vấn'}
+            </h2>
             <button
-              type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="mr-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="text-gray-600 hover:text-gray-800"
             >
-              Hủy
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? 'Đang xử lý...' : education?.id ? 'Cập nhật' : 'Tạo'}
+              <X size={24} />
             </button>
           </div>
-        </form>
+
+          <form onSubmit={handleSubmit} className="p-6">
+            {renderEducationLevelSelect()}
+
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Tên trường <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="universityName"
+                value={formData.universityName}
+                onChange={handleChange}
+                disabled={isSubmitting}
+                className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.universityName ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                placeholder="Nhập tên trường"
+              />
+              {errors.universityName && (
+                <p className="mt-1 text-sm text-red-500">{errors.universityName}</p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Chuyên môn <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="expertise"
+                value={formData.expertise}
+                onChange={handleChange}
+                disabled={isSubmitting}
+                className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.expertise ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                placeholder="Nhập chuyên môn"
+              />
+              {errors.expertise && (
+                <p className="mt-1 text-sm text-red-500">{errors.expertise}</p>
+              )}
+            </div>
+
+            <div className="mb-4 flex justify-between">
+              <div className="w-1/2 pr-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Ngày bắt đầu <span className="text-red-500">*</span>
+                </label>
+                <DatePicker
+                  name="startDate"
+                  value={formData.startDate ? moment(formData.startDate, 'MM/YYYY') : null}
+                  onChange={(date) => handleDateChange('startDate', date)}
+                  disabled={isSubmitting}
+                  format="MM/YYYY"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="MM/YYYY"
+                />
+                {errors.startDate && (
+                  <p className="mt-1 text-sm text-red-500">{errors.startDate}</p>
+                )}
+              </div>
+              <div className="w-1/2 pl-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Ngày kết thúc <span className="text-red-500">*</span>
+                </label>
+                <DatePicker
+                  name="endDate"
+                  value={formData.endDate ? moment(formData.endDate, 'MM/YYYY') : null}
+                  onChange={(date) => handleDateChange('endDate', date)}
+                  disabled={isSubmitting}
+                  format="MM/YYYY"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="MM/YYYY"
+                />
+                {errors.endDate && (
+                  <p className="mt-1 text-sm text-red-500">{errors.endDate}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Quá trình học vấn
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                disabled={isSubmitting}
+                placeholder="(Tùy chọn) Mô tả quá trình học vấn"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows={4}
+              />
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={isSubmitting}
+                className="mr-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? 'Đang xử lý...' : education?.id ? 'Cập nhật' : 'Tạo'}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </Transition>
   );
 };
 

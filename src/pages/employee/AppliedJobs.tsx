@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
+import { Transition } from '@headlessui/react';
+import { useNavigate } from 'react-router-dom';
 
 const AppliedJob = () => {
   const { userId } = useSelector((state: RootState) => state.authReducer);
@@ -16,7 +18,7 @@ const AppliedJob = () => {
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null); // ID của ứng dụng được chọn
   const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái mở modal
-
+  const navigate = useNavigate()
   const [filterStatus, setFilterStatus] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -152,8 +154,10 @@ const AppliedJob = () => {
               </thead>
               <tbody>
                 {filteredApplications.map((application) => (
-                  <tr key={application.id} className="border-b">
-                    <td className="py-2">
+                  <tr key={application.id} className="border-b cursor-pointer">
+                    <td className="py-2" onClick={() => {
+                      navigate(`/job-detail/${application.jobId}`)
+                    }}>
                       <div className="font-bold">{application.jobTitle}</div>
                       <div className="text-gray-500">📍 {application.address}</div>
                     </td>
@@ -190,7 +194,15 @@ const AppliedJob = () => {
           </div>
         )}
 
-        {isModalOpen && (
+        <Transition
+          show={isModalOpen}
+          enter="transition ease-out duration-300"
+          enterFrom="opacity-0 transform scale-95 translate-y-4"
+          enterTo="opacity-100 transform scale-100 translate-y-0"
+          leave="transition ease-in duration-200"
+          leaveFrom="opacity-100 transform scale-100 translate-y-0"
+          leaveTo="opacity-0 transform scale-95 translate-y-4"
+        >
           <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-96">
               <h3 className="text-xl font-semibold mb-4">Xác nhận</h3>
@@ -201,7 +213,7 @@ const AppliedJob = () => {
               </div>
             </div>
           </div>
-        )}
+        </Transition>
       </div>
     </div>
   );

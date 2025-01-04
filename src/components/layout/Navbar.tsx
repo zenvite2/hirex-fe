@@ -136,7 +136,9 @@ const Navbar: React.FC<{}> = () => {
     >
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center">
-          <img src={Logo} alt="TopCV Logo" className="h-8 w-auto rounded-lg" />
+          <img src={Logo} alt="TopCV Logo" className="h-8 w-auto rounded-lg cursor-pointer" onClick={() => {
+            role == 'EMPLOYEE' ? navigate('/find-jobs') : navigate('/employer')
+          }} />
           <div className="hidden lg:flex space-x-6 ml-10">
             {role === 'ADMIN' ? (
               // Chỉ hiển thị "Quản trị" khi role là ADMIN

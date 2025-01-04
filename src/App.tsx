@@ -54,6 +54,7 @@ import JobCMS from "./pages/cms/Job";
 import AdminRoute from "./routes/AdminRoute";
 import Footer from "./components/layout/Footer";
 import NotificationManagement from "./pages/cms/NotificationManagement";
+import HelpSupport from "./pages/HelpSupport";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -184,10 +185,10 @@ function App() {
 
     const onNotificationReceive = (payload: MessageStompjs) => {
         const notificationReceived: NotificationType = { ...JSON.parse(payload.body) };
-        
+
         if (notificationReceived?.read != null) {
             const currentNotifications = [...notifications];
-    
+
             const notificationExists = currentNotifications.some(
                 notification => notification.id === notificationReceived.id
             );
@@ -213,6 +214,7 @@ function App() {
                         <Route path="/job-detail/:id" element={<JobDetail />} />
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/employer" element={<EmployerLanding />} />
+                        <Route path="/help-support" element={<HelpSupport />} />
 
                         {/* Routes có Sidebar */}
                         <Route element={<SidebarLayout />}>
@@ -281,7 +283,7 @@ function App() {
                 stacked
             />
             <Loading />
-            {showMessenger && <CustomModal isOpen={showMessenger} width='large' height='large' onClose={() => { dispatch(closeMessenger()); }} children={<Messenger />} />}
+            {<CustomModal isOpen={showMessenger} width='large' height='large' onClose={() => { dispatch(closeMessenger()); }} children={<Messenger />} />}
             {showCallRqModal && <CustomModal isOpen={showCallRqModal} onClose={() => setShowCallRqModal(false)} width='small' height='small'>
                 <VideoCallRequest
                     fromUser={toCaller.id}

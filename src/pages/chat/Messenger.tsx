@@ -197,7 +197,7 @@ const Messenger: React.FC = () => {
                         {currentConver && (
                             <ConversationHeader>
                                 <Avatar src={currentConver?.avtUrl} name={currentConver?.fullName ?? currentConver?.username} />
-                                <ConversationHeader.Content userName={currentConver?.fullName ?? currentConver?.username} info={currentConver?.companyName} />
+                                <ConversationHeader.Content userName={currentConver?.fullName ?? currentConver?.username} info={currentConver?.companyName ?? 'Người tìm việc'} />
                                 <ConversationHeader.Actions>
                                     <VideoCallButton onClick={handleVideoCall} />
                                 </ConversationHeader.Actions>

@@ -21,6 +21,7 @@ import { toast } from 'react-toastify';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { addMessage } from '../../redux/slice/messageSlice';
 import { ChatMessage } from '../chat/Messenger';
+import { Transition } from '@headlessui/react';
 
 const ApplicantsList = () => {
   const dispatch = useAppDispatch();
@@ -270,7 +271,15 @@ const ApplicantsList = () => {
         </table>
       )}
 
-      {modalData && (
+      <Transition
+        show={modalData}
+        enter="transition ease-out duration-300"
+        enterFrom="opacity-0 transform scale-95 translate-y-4"
+        enterTo="opacity-100 transform scale-100 translate-y-0"
+        leave="transition ease-in duration-200"
+        leaveFrom="opacity-100 transform scale-100 translate-y-0"
+        leaveTo="opacity-0 transform scale-95 translate-y-4"
+      >
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <h2 className="text-lg font-bold mb-4">Xác nhận thao tác</h2>
@@ -299,7 +308,7 @@ const ApplicantsList = () => {
             </div>
           </div>
         </div>
-      )}
+      </Transition>
     </div>
   );
 };

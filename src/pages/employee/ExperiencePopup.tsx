@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { positionList } from '../../services/autofillApi';
 import { DatePicker } from 'antd';
 import moment from 'moment';
+import { Transition } from '@headlessui/react';
 
 interface Experience {
   id?: number;
@@ -194,129 +195,137 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
-        <div className="flex justify-between items-center p-4 bg-gray-100 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-800">
-            {/* {education?.id ? 'Cập nhật học vấn' : 'Thêm học vấn'} */}
-            Thêm kinh nghiệm
-          </h2>
-          <button
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6">
-
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Tên công ty <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="companyName"
-              value={formData.companyName}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.companyName && (
-              <p className="mt-1 text-sm text-red-500">{errors.companyName}</p>
-            )}
-          </div>
-
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium">Vị trí <span className="text-red-500">*</span></label>
-            <select
-              name="position"
-              value={formData.position}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {positionType.map(type => (
-                <option key={type.id} value={type.id}>
-                  {type.name}
-                </option>
-              ))}
-            </select>
-            {errors.position && (
-              <p className="mt-1 text-sm text-red-500">{errors.position}</p>
-            )}
-          </div>
-
-          <div className="mb-4 flex justify-between">
-            <div className="w-1/2 pr-2">
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Ngày bắt đầu <span className="text-red-500">*</span>
-              </label>
-              <DatePicker
-                name="startDate"
-                value={formData.startDate ? moment(formData.startDate, 'MM/YYYY') : null}
-                onChange={(date) => handleDateChange('startDate', date)}
-                disabled={isSubmitting}
-                format="MM/YYYY"
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.startDate && (
-                <p className="mt-1 text-sm text-red-500">{errors.startDate}</p>
-              )}
-            </div>
-            <div className="w-1/2 pl-2">
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Ngày kết thúc <span className="text-red-500">*</span>
-              </label>
-              <DatePicker
-                name="endDate"
-                value={formData.endDate ? moment(formData.endDate, 'MM/YYYY') : null}
-                onChange={(date) => handleDateChange('endDate', date)}
-                disabled={isSubmitting}
-                format="MM/YYYY"
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.endDate && (
-                <p className="mt-1 text-sm text-red-500">{errors.endDate}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium">Mô tả</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={4}
-            />
-          </div>
-
-          <div className="flex justify-end">
+    <Transition
+      show={isOpen}
+      enter="transition ease-out duration-300"
+      enterFrom="opacity-0 transform scale-95 translate-y-4"
+      enterTo="opacity-100 transform scale-100 translate-y-0"
+      leave="transition ease-in duration-200"
+      leaveFrom="opacity-100 transform scale-100 translate-y-0"
+      leaveTo="opacity-0 transform scale-95 translate-y-4"
+    >
+      <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+          <div className="flex justify-between items-center p-4 bg-gray-100 border-b border-gray-200">
+            <h2 className="text-xl font-bold text-gray-800">
+              {/* {education?.id ? 'Cập nhật học vấn' : 'Thêm học vấn'} */}
+              Thêm kinh nghiệm
+            </h2>
             <button
-              type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="mr-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="text-gray-600 hover:text-gray-800"
             >
-              Hủy
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Cập nhật
+              <X size={24} />
             </button>
           </div>
-        </form>
+
+          <form onSubmit={handleSubmit} className="p-6">
+
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Tên công ty <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {errors.companyName && (
+                <p className="mt-1 text-sm text-red-500">{errors.companyName}</p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">Vị trí <span className="text-red-500">*</span></label>
+              <select
+                name="position"
+                value={formData.position}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {positionType.map(type => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
+              </select>
+              {errors.position && (
+                <p className="mt-1 text-sm text-red-500">{errors.position}</p>
+              )}
+            </div>
+
+            <div className="mb-4 flex justify-between">
+              <div className="w-1/2 pr-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Ngày bắt đầu <span className="text-red-500">*</span>
+                </label>
+                <DatePicker
+                  name="startDate"
+                  value={formData.startDate ? moment(formData.startDate, 'MM/YYYY') : null}
+                  onChange={(date) => handleDateChange('startDate', date)}
+                  disabled={isSubmitting}
+                  format="MM/YYYY"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                {errors.startDate && (
+                  <p className="mt-1 text-sm text-red-500">{errors.startDate}</p>
+                )}
+              </div>
+              <div className="w-1/2 pl-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Ngày kết thúc <span className="text-red-500">*</span>
+                </label>
+                <DatePicker
+                  name="endDate"
+                  value={formData.endDate ? moment(formData.endDate, 'MM/YYYY') : null}
+                  onChange={(date) => handleDateChange('endDate', date)}
+                  disabled={isSubmitting}
+                  format="MM/YYYY"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                {errors.endDate && (
+                  <p className="mt-1 text-sm text-red-500">{errors.endDate}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">Mô tả</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows={4}
+              />
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={isSubmitting}
+                className="mr-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Cập nhật
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </Transition>
   );
 };
 

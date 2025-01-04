@@ -3,6 +3,7 @@ import { applicationCreate } from '../../services/applicationApi';
 import { resumeGet } from '../../services/resumeApi';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
+import { Transition } from '@headlessui/react';
 
 interface Resume {
     id: string;
@@ -148,189 +149,199 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg w-full max-w-xl mx-4 shadow-xl">
-                <div className="flex items-center justify-between p-4 border-b">
-                    <h2 className="text-xl font-medium">Ứng Tuyển</h2>
-                    <button
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
-                    >
-                        ×
-                    </button>
-                </div>
+        <Transition
+            show={isOpen}
+            enter="transition ease-out duration-300"
+            enterFrom="opacity-0 transform scale-95 translate-y-4"
+            enterTo="opacity-100 transform scale-100 translate-y-0"
+            leave="transition ease-in duration-200"
+            leaveFrom="opacity-100 transform scale-100 translate-y-0"
+            leaveTo="opacity-0 transform scale-95 translate-y-4"
+        >
+            <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center">
+                <div className="bg-white rounded-lg w-full max-w-xl mx-4 shadow-xl">
+                    <div className="flex items-center justify-between p-4 border-b">
+                        <h2 className="text-xl font-medium">Ứng Tuyển</h2>
+                        <button
+                            onClick={onClose}
+                            className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+                        >
+                            ×
+                        </button>
+                    </div>
 
-                <form onSubmit={handleSubmit} className="p-4">
-                    <div className="mb-6">
-                        <h3 className="font-medium mb-3">Chọn CV</h3>
+                    <form onSubmit={handleSubmit} className="p-4">
+                        <div className="mb-6">
+                            <h3 className="font-medium mb-3">Chọn CV</h3>
 
-                        <div className="mb-3">
-                            <label className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded">
-                                <div className="flex items-center">
+                            <div className="mb-3">
+                                <label className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded">
+                                    <div className="flex items-center">
+                                        <input
+                                            type="radio"
+                                            checked={useProfile}
+                                            onChange={() => setUseProfile(true)}
+                                            className="w-4 h-4 text-blue-600"
+                                        />
+                                        <span className="ml-2">CV từ Hồ Sơ</span>
+                                    </div>
+                                </label>
+
+                                {useProfile && (
+                                    <div className="mt-2 ml-6 flex items-center space-x-2">
+                                        {resumes.length > 0 ? (
+                                            <div className="flex-grow">
+                                                <select
+                                                    value={selectedResumeId}
+                                                    onChange={(e) => setSelectedResumeId(e.target.value)}
+                                                    className="w-full p-2 border rounded"
+                                                >
+                                                    {resumes.map((resume) => (
+                                                        <option key={resume.id} value={resume.id}>
+                                                            {resume.title} - {formatDate(resume.updatedAt)}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        ) : (
+                                            <div className="text-gray-500">
+                                                Chưa có hồ sơ. Vui lòng tạo hồ sơ.
+                                            </div>
+                                        )}
+
+                                        {resumes.length > 0 && (
+                                            <div
+                                                onClick={handlePreviewCV}
+                                                className="cursor-pointer text-blue-500 hover:underline"
+                                            >
+                                                Xem trước
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="flex items-center cursor-pointer p-2 hover:bg-gray-50 rounded">
                                     <input
                                         type="radio"
-                                        checked={useProfile}
-                                        onChange={() => setUseProfile(true)}
+                                        checked={!useProfile}
+                                        onChange={() => setUseProfile(false)}
                                         className="w-4 h-4 text-blue-600"
                                     />
-                                    <span className="ml-2">CV từ Hồ Sơ</span>
-                                </div>
-                            </label>
+                                    <span className="ml-2">Tải lên hồ sơ ứng tuyển</span>
+                                </label>
 
-                            {useProfile && (
-                                <div className="mt-2 ml-6 flex items-center space-x-2">
-                                    {resumes.length > 0 ? (
-                                        <div className="flex-grow">
-                                            <select
-                                                value={selectedResumeId}
-                                                onChange={(e) => setSelectedResumeId(e.target.value)}
-                                                className="w-full p-2 border rounded"
-                                            >
-                                                {resumes.map((resume) => (
-                                                    <option key={resume.id} value={resume.id}>
-                                                        {resume.title} - {formatDate(resume.updatedAt)}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    ) : (
-                                        <div className="text-gray-500">
-                                            Chưa có hồ sơ. Vui lòng tạo hồ sơ.
-                                        </div>
-                                    )}
-
-                                    {resumes.length > 0 && (
-                                        <div
-                                            onClick={handlePreviewCV}
-                                            className="cursor-pointer text-blue-500 hover:underline"
-                                        >
-                                            Xem trước
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-
-                        <div>
-                            <label className="flex items-center cursor-pointer p-2 hover:bg-gray-50 rounded">
-                                <input
-                                    type="radio"
-                                    checked={!useProfile}
-                                    onChange={() => setUseProfile(false)}
-                                    className="w-4 h-4 text-blue-600"
-                                />
-                                <span className="ml-2">Tải lên hồ sơ ứng tuyển</span>
-                            </label>
-
-                            {!useProfile && (
-                                <div className="mt-3 relative">
-                                    {!selectedFile ? (
-                                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                                            <input
-                                                type="file"
-                                                onChange={handleFileChange}
-                                                accept=".pdf,.doc,.docx"
-                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                            />
-                                            <div className="space-y-2">
-                                                <div className="text-blue-500">
-                                                    Nhấp để thêm tệp hoặc kéo thả tại đây
-                                                </div>
-                                                <div className="text-gray-400 text-sm">
-                                                    Định dạng: DOC, DOCX, PDF
-                                                </div>
-                                                <div className="text-gray-400 text-sm">
-                                                    Kích thước tối đa: 10MB
+                                {!useProfile && (
+                                    <div className="mt-3 relative">
+                                        {!selectedFile ? (
+                                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                                                <input
+                                                    type="file"
+                                                    onChange={handleFileChange}
+                                                    accept=".pdf,.doc,.docx"
+                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                />
+                                                <div className="space-y-2">
+                                                    <div className="text-blue-500">
+                                                        Nhấp để thêm tệp hoặc kéo thả tại đây
+                                                    </div>
+                                                    <div className="text-gray-400 text-sm">
+                                                        Định dạng: DOC, DOCX, PDF
+                                                    </div>
+                                                    <div className="text-gray-400 text-sm">
+                                                        Kích thước tối đa: 10MB
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center justify-between border-2 border-dashed border-gray-300 rounded-lg p-3">
-                                            <div className="flex items-center">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    className="h-6 w-6 text-blue-500 mr-2"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
+                                        ) : (
+                                            <div className="flex items-center justify-between border-2 border-dashed border-gray-300 rounded-lg p-3">
+                                                <div className="flex items-center">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="h-6 w-6 text-blue-500 mr-2"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                                        />
+                                                    </svg>
+                                                    <span className="truncate max-w-[200px]">
+                                                        {selectedFile.name}
+                                                    </span>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleFileRemove}
+                                                    className="text-red-500 hover:text-red-700"
                                                 >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                                    />
-                                                </svg>
-                                                <span className="truncate max-w-[200px]">
-                                                    {selectedFile.name}
-                                                </span>
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="h-5 w-5"
+                                                        viewBox="0 0 20 20"
+                                                        fill="currentColor"
+                                                    >
+                                                        <path
+                                                            fillRule="evenodd"
+                                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                            clipRule="evenodd"
+                                                        />
+                                                    </svg>
+                                                </button>
                                             </div>
-                                            <button
-                                                type="button"
-                                                onClick={handleFileRemove}
-                                                className="text-red-500 hover:text-red-700"
-                                            >
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    className="h-5 w-5"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="mb-6">
-                        <h3 className="font-medium mb-2">Thư Ứng Tuyển</h3>
-                        <p className="text-gray-600 text-sm mb-3">
-                            Thư ứng tuyển giúp bạn trở nên chuyên nghiệp và gây ấn tượng với nhà tuyển dụng.
-                        </p>
-                        <div className="border rounded-lg">
-                            <textarea
-                                value={coverLetter}
-                                onChange={(e) => setCoverLetter(e.target.value)}
-                                maxLength={2000}
-                                className="w-full p-3 min-h-[120px] focus:outline-none resize-none"
-                                placeholder="Thêm mô tả"
-                            />
-                            <div className="border-t p-2 flex items-center">
-                                <span className="ml-auto text-sm text-gray-500">
-                                    {coverLetter.length} / 2000
-                                </span>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    </div>
 
-                    <div className="flex justify-end space-x-3">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 border rounded-lg hover:bg-gray-50"
-                            disabled={loading}
-                        >
-                            Hủy
-                        </button>
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
-                            disabled={loading}
-                        >
-                            {loading ? 'Đang xử lý...' : 'Lưu'}
-                        </button>
-                    </div>
-                </form>
+                        <div className="mb-6">
+                            <h3 className="font-medium mb-2">Thư Ứng Tuyển</h3>
+                            <p className="text-gray-600 text-sm mb-3">
+                                Thư ứng tuyển giúp bạn trở nên chuyên nghiệp và gây ấn tượng với nhà tuyển dụng.
+                            </p>
+                            <div className="border rounded-lg">
+                                <textarea
+                                    value={coverLetter}
+                                    onChange={(e) => setCoverLetter(e.target.value)}
+                                    maxLength={2000}
+                                    className="w-full p-3 min-h-[120px] focus:outline-none resize-none"
+                                    placeholder="Thêm mô tả"
+                                />
+                                <div className="border-t p-2 flex items-center">
+                                    <span className="ml-auto text-sm text-gray-500">
+                                        {coverLetter.length} / 2000
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                                disabled={loading}
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                type="submit"
+                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+                                disabled={loading}
+                            >
+                                {loading ? 'Đang xử lý...' : 'Lưu'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
+        </Transition>
     );
 };
 

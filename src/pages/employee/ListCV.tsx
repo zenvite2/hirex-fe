@@ -5,6 +5,7 @@ import { resumeGet, deleteResume, resumeCreate } from '../../services/resumeApi'
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
+import { Transition } from '@headlessui/react';
 
 const ListCV = () => {
     const [resume, setResume] = useState([]);
@@ -106,9 +107,15 @@ const ListCV = () => {
                         Tạo CV mới
                     </button>
                 </div>
-
-                {/* Popup Tạo CV */}
-                {showPopup && (
+                <Transition
+                    show={showPopup}
+                    enter="transition ease-out duration-300"
+                    enterFrom="opacity-0 transform scale-95 translate-y-4"
+                    enterTo="opacity-100 transform scale-100 translate-y-0"
+                    leave="transition ease-in duration-200"
+                    leaveFrom="opacity-100 transform scale-100 translate-y-0"
+                    leaveTo="opacity-0 transform scale-95 translate-y-4"
+                >
                     <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
                         <div className="bg-white p-6 rounded-lg shadow-lg w-96">
                             <h2 className="text-lg font-bold mb-4">Nhập tên CV</h2>
@@ -135,10 +142,17 @@ const ListCV = () => {
                             </div>
                         </div>
                     </div>
-                )}
+                </Transition>
 
-                {/* Modal Xóa */}
-                {showDeleteModal && (
+                <Transition
+                    show={showDeleteModal}
+                    enter="transition ease-out duration-300"
+                    enterFrom="opacity-0 transform scale-95 translate-y-4"
+                    enterTo="opacity-100 transform scale-100 translate-y-0"
+                    leave="transition ease-in duration-200"
+                    leaveFrom="opacity-100 transform scale-100 translate-y-0"
+                    leaveTo="opacity-0 transform scale-95 translate-y-4"
+                >
                     <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
                         <div className="bg-white p-6 rounded-lg shadow-lg w-96">
                             <h3 className="text-xl font-semibold mb-4">Xác nhận</h3>
@@ -149,7 +163,7 @@ const ListCV = () => {
                             </div>
                         </div>
                     </div>
-                )}
+                </Transition>
 
                 {/* Resume Table */}
                 <div className="overflow-x-auto">
@@ -172,7 +186,7 @@ const ListCV = () => {
                                             {formatDate(resume.updatedAt)}
                                         </div>
                                     </td>
-            
+
                                     <td className="py-4">
                                         <div className="flex gap-3">
                                             <button
