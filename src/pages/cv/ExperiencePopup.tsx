@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { Experience } from './types';
 import { Transition } from '@headlessui/react';
-import { DatePicker } from 'antd';
 import moment, { Moment } from 'moment';
 
 interface ExperiencePopupProps {
@@ -53,13 +52,6 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-
-    const handleDateChange = (field: 'startDate' | 'endDate', value: Moment | null) => {
-        const dateString = value ? value.format('MM/YYYY') : '';
-        onUpdateExperience(field, dateString);
-        setErrors(prev => ({ ...prev, [field]: undefined }));
-    };
-
 
     const handleSave = () => {
         if (validateExperience()) {
@@ -144,45 +136,31 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm mb-1">
                                     Ngày bắt đầu <span className="text-red-500">*</span>
                                 </label>
-                                <DatePicker
-                                    picker="month"
-                                    style={{ width: '100%' }}
-                                    placeholder="MM/YYYY"
-                                    format="MM/YYYY"
-                                    value={editingExperience.startDate ? moment(editingExperience.startDate, 'MM/YYYY') : null}
-                                    onChange={(date) => handleDateChange('startDate', date)}
-                                    disabledDate={(current) => current && current > moment()}
-                                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2
-                                    ${errors.startDate
-                                            ? 'border-red-500 focus:ring-red-200'
-                                            : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'}`}
+                                <input
+                                    type="date"
+                                    value={editingExperience.startDate}
+                                    onChange={(e) => onUpdateExperience('startDate', e.target.value)}
+                                    className="w-full p-2 border rounded"
                                 />
-                                {errors.startDate && (
-                                    <p className="text-red-500 text-xs mt-1">{errors.startDate}</p>
+                                {errors.endDate && (
+                                    <p className="mt-1 text-sm text-red-500">{errors.endDate}</p>
                                 )}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm mb-1">
                                     Ngày kết thúc <span className="text-red-500">*</span>
                                 </label>
-                                <DatePicker
-                                    picker="month"
-                                    style={{ width: '100%' }}
-                                    placeholder="MM/YYYY"
-                                    format="MM/YYYY"
-                                    value={editingExperience.endDate ? moment(editingExperience.endDate, 'MM/YYYY') : null}
-                                    onChange={(date) => handleDateChange('endDate', date)}
-                                    // disabledDate={(current) => current && current > moment()}
-                                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2
-                                    ${errors.endDate
-                                            ? 'border-red-500 focus:ring-red-200'
-                                            : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'}`}
+                                <input
+                                    type="date"
+                                    value={editingExperience.endDate}
+                                    onChange={(e) => onUpdateExperience('endDate', e.target.value)}
+                                    className="w-full p-2 border rounded"
                                 />
                                 {errors.endDate && (
-                                    <p className="text-red-500 text-xs mt-1">{errors.endDate}</p>
+                                    <p className="mt-1 text-sm text-red-500">{errors.endDate}</p>
                                 )}
                             </div>
                         </div>

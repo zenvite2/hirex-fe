@@ -267,13 +267,12 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
                 <label className="block mb-2 text-sm font-medium text-gray-700">
                   Ngày bắt đầu <span className="text-red-500">*</span>
                 </label>
-                <DatePicker
-                  placeholder="MM/YYYY"
-                  format="MM/YYYY"
-                  picker="month"
-                  value={formData.startDate ? moment(formData.startDate, 'MM/YYYY') : null}
-                  onChange={(date) => handleDateChange('startDate', date)}
-                  disabledDate={(current) => current && current > moment()}
+                <input
+                  type="date"
+                  name="startDate"
+                  value={formData.startDate}
+                  onChange={handleChange}
+                  disabled={isSubmitting}
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {errors.startDate && (
@@ -284,13 +283,12 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
                 <label className="block mb-2 text-sm font-medium text-gray-700">
                   Ngày kết thúc <span className="text-red-500">*</span>
                 </label>
-                <DatePicker
-                  placeholder="MM/YYYY"
-                  format="MM/YYYY"
-                  picker="month"
-                  value={formData.endDate ? moment(formData.endDate, 'MM/YYYY') : null}
-                  onChange={(date) => handleDateChange('endDate', date)}
-                  // disabledDate={(current) => current && current > moment()}
+                <input
+                  type="date"
+                  name="endDate"
+                  value={formData.endDate}
+                  onChange={handleChange}
+                  disabled={isSubmitting}
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {errors.endDate && (

@@ -14,6 +14,7 @@ import { careergoalGet } from '../../services/careergoalApi';
 import { jobTypeList, positionList, industryList } from '../../services/autofillApi';
 import { toast } from 'react-toastify';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
+import { formatDateToMMYYYY } from '../../utils/utils';
 
 interface Experience {
   id?: number;
@@ -370,7 +371,7 @@ const ResumePage: React.FC = () => {
                   <div>
                     <p className="text-gray-600">{edu.expertise}</p>
                     <p className="font-semibold text-lg">{edu.universityName}</p>
-                    <p className="text-sm text-gray-500">{edu.startDate} - {edu.endDate}</p>
+                    <p className="text-sm text-gray-500">{formatDateToMMYYYY(edu.startDate)} - {formatDateToMMYYYY(edu.endDate)}</p>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -419,7 +420,7 @@ const ResumePage: React.FC = () => {
                 <div>
                   <p className="font-semibold text-lg">{exp.companyName}</p>
                   <p className="text-gray-600">{exp?.position ? getPositionName(exp.position) : ''}</p>
-                  <p className="text-sm text-gray-500">{exp.startDate} - {exp.endDate}</p>
+                  <p className="text-sm text-gray-500">{formatDateToMMYYYY(exp.startDate)} - {formatDateToMMYYYY(exp.endDate)}</p>
                 </div>
                 <div className="flex gap-2">
                   <button

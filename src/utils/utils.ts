@@ -33,3 +33,13 @@ export const denormalizeTextAreaContent = (content: string): string => {
     if (!content) return '';
     return content.replace(/\\n/g, '<br />').replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
 };
+
+export function formatDateToMMYYYY(dateString) {
+    const date = new Date(dateString);
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${month}/${year}`;
+}

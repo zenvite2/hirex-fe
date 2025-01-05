@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Building2, MapPin, Bookmark, MessageCircle, CalendarCheck, Navigation, BriefcaseConveyorBelt, Users, Heart } from 'lucide-react';
-import { fetchFollowCompany, fetchSavedJobs, getSimilarJobs, jobGetWith } from '../../services/jobApi';
+import { deleteApplicationId, fetchAppliedJobs, fetchFollowCompany, fetchSavedJobs, getSimilarJobs, jobGetWith } from '../../services/jobApi';
 import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { Link } from "react-router-dom";
@@ -14,6 +14,9 @@ import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import axiosIns from '../../services/axiosIns';
 import { Job } from './FindJobs';
 import { denormalizeTextAreaContent, formatDateToDDMMYYYY } from '../../utils/utils';
+import { deleteApplication } from '../../services/applicationApi';
+import SimilarCard from '../../components/common/SimilarCard';
+import { set } from 'react-hook-form';
 
 interface JobData {
     id: number;
@@ -69,8 +72,12 @@ const JobDetail = () => {
     const { isLoggedIn, userId } = useSelector((state: RootState) => state.authReducer);
     const navigate = useNavigate();
     const [isSaved, setIsSaved] = useState(false);
+    const [hasApplied, setHasApplied] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [isFollowed, setIsFollowed] = useState(false);
     const [similarJobs, setSimilarJobs] = useState<Job[]>([]);
+    const [applicationId, setApplicationId] = useState<number | null>(null); // State lưu id đơn ứng tuyển
+    const [applicationStatus, setApplicationStatus] = useState<string | null>(null); // State lưu id đơn ứng tuyển
 
     useEffect(() => {
         const fetchJobDetail = async () => {
@@ -125,11 +132,58 @@ const JobDetail = () => {
             }
         };
 
+        const checkAppliedJobs = async () => {
+            try {
+                if (!isLoggedIn) return; // Nếu chưa đăng nhập thì không kiểm tra
+
+                // Gọi API để lấy danh sách công việc đã ứng tuyển
+                const appliedJobs = await fetchAppliedJobs();
+
+                if (job) {
+                    // Kiểm tra xem công việc hiện tại có trong danh sách đã ứng tuyển hay chưa
+                    // const hasApplied = appliedJobs.some((appliedJob) => appliedJob.jobId === job.id);
+
+                    const appliedJob = appliedJobs.find((appliedJob) => appliedJob.jobId === job.id);
+
+                    if (appliedJob) {
+                        setHasApplied(true); // Cập nhật trạng thái đã ứng tuyển
+                        setApplicationId(appliedJob.id); // Lưu applicationId
+                        setApplicationStatus(appliedJob.status); // Lưu trạng thái ứng tuyển
+                    } else {
+                        setHasApplied(false); // Cập nhật trạng thái chưa ứng tuyển
+                        setApplicationId(null); // Xóa applicationId nếu không tìm thấy
+                        setApplicationStatus(null); // Xóa trạng thái ứng tuyển
+                    }
+                }
+            } catch (error) {
+                console.error("Lỗi khi kiểm tra danh sách việc làm đã ứng tuyển:", error);
+            }
+        };
+
         if (id) {
             checkSavedJobs();
             checkFollowCompany();
+            checkAppliedJobs();
         }
     }, [isLoggedIn, job, id]);
+
+    const handleDeleteApplication = async () => {
+        if (!applicationId) return; // Không làm gì nếu không có applicationId
+
+        try {
+            await deleteApplication({ id: applicationId }); // Gọi API xóa với applicationId
+            setHasApplied(false); // Cập nhật trạng thái về "chưa ứng tuyển"
+            setApplicationId(null); // Xóa applicationId sau khi xóa thành công
+            setShowDeleteConfirm(false); // Đóng popup
+            toast.success("Đã xóa đơn ứng tuyển");
+        } catch (error) {
+            console.error("Lỗi khi xóa đơn ứng tuyển:", error);
+        }
+    };
+
+    const handleCancelDelete = () => {
+        setShowDeleteConfirm(false); // Đóng popup khi nhấn "Không"
+    };
 
     const handleApplyNow = () => {
         if (!isLoggedIn) {
@@ -141,6 +195,7 @@ const JobDetail = () => {
 
     const handleSubmit = () => {
         setIsModalOpen(false);
+        setHasApplied(true);
     };
 
     const handleSaveJob = async () => {
@@ -279,12 +334,41 @@ const JobDetail = () => {
 
                                 {/* Action Buttons */}
                                 <div className="flex flex-col gap-4">
-                                    <button
+                                    {/* <button
                                         onClick={handleApplyNow}
                                         className="w-full px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium"
                                     >
                                         Nộp đơn ngay
-                                    </button>
+                                    </button> */}
+                                    {hasApplied ? (
+                                        applicationStatus === 'PENDING' ? (
+                                            <button
+                                                onClick={() => setShowDeleteConfirm(true)} // Hiển thị popup xác nhận
+                                                className="w-full px-6 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium"
+                                            >
+                                                Đã ứng tuyển
+                                            </button>
+                                        ) : applicationStatus === 'REJECTED' ? (
+                                            <button
+                                                className="w-full px-6 py-2 bg-red-50 text-red-700 rounded-lg font-medium"
+                                            >
+                                                Đơn bị từ chối
+                                            </button>
+                                        ) : (
+                                            <button
+                                                className="w-full px-6 py-2 bg-green-50 text-green-700 rounded-lg font-medium"
+                                            >
+                                                Đã được chấp nhận
+                                            </button>
+                                        )
+                                    ) : (
+                                        <button
+                                            onClick={handleApplyNow}
+                                            className="w-full px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium"
+                                        >
+                                            Nộp đơn ngay
+                                        </button>
+                                    )}
 
                                     <button
                                         onClick={() => { isLoggedIn ? setShowContactModal(true) : navigate('/login') }}
@@ -406,53 +490,7 @@ const JobDetail = () => {
                             <h2 className="text-lg font-semibold text-gray-900 mb-3">Việc làm tương tự</h2>
                             <div className="space-y-4">
                                 {similarJobs?.map((similarJob) => (
-                                    <div
-                                        key={similarJob.id}
-                                        className="p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer group"
-                                        onClick={() => {
-                                            similarJob.id && navigate(`/job-detail/${similarJob.id}`);
-                                        }}
-                                    >
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex gap-4 items-center">
-                                                <div className="w-14 h-14 bg-white border border-gray-200  flex items-center justify-center p-2">
-                                                    {job?.company.logo ? (
-                                                        <img
-                                                            src={similarJob?.companyLogo}
-                                                            className="w-full h-full object-contain"
-                                                        />
-                                                    ) : (
-                                                        <Building2 className="w-10 h-10 text-gray-400" />
-                                                    )}
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-lg font-semibold truncate">
-                                                        {similarJob?.title?.length > 15 ? `${similarJob?.title?.slice(0, 15)}...` : similarJob?.title}
-                                                    </h3>
-                                                    <div className="flex items-center gap-2 text-[14px] text-gray-500 mb-1.5">
-                                                        <MapPin className="w-4 h-4 text-gray-500" />
-                                                        <span className="font-medium">{similarJob.district} - {similarJob.city}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-[14px] text-gray-500 mb-1.5">
-                                                        <div className="flex items-center gap-1.5">
-                                                            <BriefcaseConveyorBelt className="w-4 h-4 text-gray-500" />
-                                                            <span>{similarJob.jobType ?? '...'}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-[14px] text-gray-500">
-                                                        <CalendarCheck className="w-4 h-4 text-gray-500" />
-                                                        <span>Hết hạn {formatDateToDDMMYYYY(similarJob.deadline)}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={handleSaveJob}
-                                                className="p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors group-hover:border-blue-200"
-                                            >
-                                                <Bookmark className="w-5 h-5 text-gray-500 group-hover:text-blue-500 transition-colors" />
-                                            </button>
-                                        </div>
-                                    </div>
+                                   <SimilarCard job={similarJob} key={similarJob.id} />
                                 ))}
                             </div>
                         </section>
@@ -475,6 +513,30 @@ const JobDetail = () => {
             >
                 {job?.employer && job.id && <ContactNow employer={job.employer} jobId={job.id} />}
             </CustomModal>
+
+            {/* Modal */}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                        <h3 className="text-xl font-semibold mb-4">Xác nhận</h3>
+                        <p>Bạn có chắc muốn xóa đơn ứng tuyển này không?</p>
+                        <div className="flex justify-end mt-4 gap-2">
+                            <button
+                                className="px-4 py-2 bg-gray-300 text-black rounded"
+                                onClick={handleCancelDelete}
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                className="px-4 py-2 bg-red-500 text-white rounded"
+                                onClick={() => handleDeleteApplication()}
+                            >
+                                Xác nhận
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

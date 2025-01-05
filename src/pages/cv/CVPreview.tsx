@@ -5,6 +5,7 @@ import useAppDispatch from '../../hooks/useAppDispatch';
 import { fetchResume } from '../../services/resumeApi';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
+import { formatDateToMMYYYY } from '../../utils/utils';
 
 interface CVPreviewProps {
     passedId?: number;
@@ -80,7 +81,7 @@ const CVPreview: React.FC<CVPreviewProps> = ({ passedId }) => {
                                 <div key={cert.id}>
                                     <p>{cert.name}</p>
                                     <p>
-                                        {cert.startDate} - {cert.endDate}
+                                        {formatDateToMMYYYY(cert.startDate)} - {formatDateToMMYYYY(cert.endDate)}
                                     </p>
                                     <p>{cert.description}</p>
                                 </div>
@@ -140,7 +141,8 @@ const CVPreview: React.FC<CVPreviewProps> = ({ passedId }) => {
                             </div>
                             {resumeData?.educations && resumeData.educations.map((edu) => (
                                 <div key={edu.id}>
-                                    <p>Ngành: {edu.major} || {edu.startDate} - {edu.endDate}</p>
+                                    <p>Ngành: {edu.major} </p>
+                                    <p>Thời gian:{formatDateToMMYYYY(edu.startDate)} - {formatDateToMMYYYY(edu.endDate)}</p>
                                     <p>{edu.name}</p>
                                     <p>GPA: {edu.gpa}</p>
                                 </div>
@@ -161,7 +163,7 @@ const CVPreview: React.FC<CVPreviewProps> = ({ passedId }) => {
                                 <div key={exp.id} className="mt-2">
                                     <h3 className="font-semibold font-md">{exp.company}</h3>
                                     <p>Vị trí: {exp.position}</p>
-                                    <p>Thời gian: {exp.startDate} - {exp.endDate}</p>
+                                    <p>Thời gian: {formatDateToMMYYYY(exp.startDate)} - {formatDateToMMYYYY(exp.endDate)}</p>
                                     <p>Mô tả: {exp.description}</p>
                                 </div>
                             ))}
@@ -180,7 +182,7 @@ const CVPreview: React.FC<CVPreviewProps> = ({ passedId }) => {
                             {resumeData.projects.map((project) => (
                                 <div key={project.id} className="mt-2">
                                     <h3 className="font-semibold font-md">{project.name}</h3>
-                                    <p>Thời gian: {project.startDate} - {project.endDate}</p>
+                                    <p>Thời gian: {formatDateToMMYYYY(project.startDate)} - {formatDateToMMYYYY(project.endDate)}</p>
                                     <p>Vị trí: {project.position}</p>
                                     <p>Mô tả: {project.description}</p>
                                     {project.link && (

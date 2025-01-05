@@ -142,6 +142,27 @@ export const fetchFollowCompany = async (): Promise<any[]> => {
     }
 };
 
+// Hàm lấy danh sách công việc đã ứng tuyển
+export const fetchAppliedJobs = async (): Promise<any[]> => {
+    try {
+        const response = await axiosIns.get(`/application`, { includeToken: true });
+        return response.data.data; // Trả về danh sách công việc đã ứng tuyển
+    } catch (error) {
+        console.error("Lỗi khi lấy danh sách việc làm đã ứng tuyển:", error);
+        throw error; // Ném lỗi để component xử lý
+    }
+};
+
+export const deleteApplicationId = async (jobId: number) => {
+    try {
+        const response = await axiosIns.delete(`/application/delete/${jobId}`, { includeToken: true });
+        console.log("Xóa đơn ứng tuyển thành công:", response.data);
+    } catch (error) {
+        console.error("Lỗi khi xóa đơn ứng tuyển:", error);
+        throw error; // Ném lỗi để xử lý thêm nếu cần
+    }
+};
+
 // Get job with company
 export const jobGetWithCompany = createAsyncThunk<any>(
     'job/getJobWithComapany',
