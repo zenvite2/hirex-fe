@@ -17,6 +17,7 @@ import { denormalizeTextAreaContent, formatDateToDDMMYYYY } from '../../utils/ut
 import { deleteApplication, deleteApplicationNew } from '../../services/applicationApi';
 import SimilarCard from '../../components/common/SimilarCard';
 import { set } from 'react-hook-form';
+import { Transition } from '@headlessui/react';
 
 interface JobData {
     id: number;
@@ -516,8 +517,15 @@ const JobDetail = () => {
                 {job?.employer && job.id && <ContactNow employer={job.employer} jobId={job.id} />}
             </CustomModal>
 
-            {/* Modal */}
-            {showDeleteConfirm && (
+            <Transition
+                show={showDeleteConfirm}
+                enter="transition ease-out duration-300"
+                enterFrom="opacity-0 transform scale-95 translate-y-4"
+                enterTo="opacity-100 transform scale-100 translate-y-0"
+                leave="transition ease-in duration-200"
+                leaveFrom="opacity-100 transform scale-100 translate-y-0"
+                leaveTo="opacity-0 transform scale-95 translate-y-4"
+            >
                 <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-96">
                         <h3 className="text-xl font-semibold mb-4">Xác nhận</h3>
@@ -538,7 +546,7 @@ const JobDetail = () => {
                         </div>
                     </div>
                 </div>
-            )}
+            </Transition>
         </div>
     );
 };
