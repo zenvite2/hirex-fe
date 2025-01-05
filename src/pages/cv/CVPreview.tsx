@@ -83,6 +83,7 @@ const CVPreview: React.FC<CVPreviewProps> = ({ passedId }) => {
                                     <p>
                                         {formatDateToMMYYYY(cert.startDate)} - {formatDateToMMYYYY(cert.endDate)}
                                     </p>
+                                    <p>{cert.description}</p>
                                 </div>
                             ))}
                         </div>
