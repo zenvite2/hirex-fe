@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import useAppDispatch from '../../hooks/useAppDispatch';
-import { registerEmployee } from '../../services/authApi';
+import { registerEmployee, validateRegister } from '../../services/authApi';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { toast } from 'react-toastify';
 import { Link, useNavigate } from "react-router-dom";
 import axiosIns from '../../services/axiosIns';
+import { set } from 'react-hook-form';
 
 const RegistrationForm = () => {
   const dispatch = useAppDispatch();
@@ -20,6 +21,8 @@ const RegistrationForm = () => {
   });
 
   const [passwordError, setPasswordError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showRetryPassword, setShowRetryPassword] = useState(false);
 
@@ -30,6 +33,7 @@ const RegistrationForm = () => {
       [name]: value
     }));
   };
+
 
   const generateOTP = async (email) => {
     try {
@@ -47,6 +51,12 @@ const RegistrationForm = () => {
     // Kiểm tra password match
     if (formData.password !== formData.retryPassword) {
       setPasswordError('Passwords do not match');
+      return;
+    }
+
+    const result = await validateRegister(formData.username, formData.email);
+    if (result.status === 400) {
+      toast.error(result.data)
       return;
     }
 
@@ -87,6 +97,9 @@ const RegistrationForm = () => {
               placeholder="username"
               required
             />
+            {usernameError && (
+              <p className="text-red-500 text-sm mt-2">{usernameError}</p>
+            )}
           </div>
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
@@ -102,6 +115,9 @@ const RegistrationForm = () => {
               placeholder="Nhập email"
               required
             />
+            {emailError && (
+              <p className="text-red-500 text-sm mt-2">{emailError}</p>
+            )}
           </div>
           <div className="mb-4 relative">
             <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">

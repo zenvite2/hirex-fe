@@ -88,3 +88,20 @@ export const applyForgotPassword = async ({ newPassword, token }: { newPassword:
         .then(response => { return { response: response.data } })
         .catch(error => { console.error("Error applying forgot password:", error); });
 }
+
+
+interface ValidateRegisterResponse {
+    status: number;
+    message: string;
+    data: any;
+}
+
+export const validateRegister = async (username: string, email: string): Promise<ValidateRegisterResponse> => {
+    return axiosIns.post<ValidateRegisterResponse>('/auth/validate-register', { username, email })
+        .then(response => {
+            return response.data;
+        })
+        .catch(error => {
+            return error.response;
+        });
+};

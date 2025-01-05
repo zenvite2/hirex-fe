@@ -22,6 +22,8 @@ import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import { addMessage } from '../../redux/slice/messageSlice';
 import { ChatMessage } from '../chat/Messenger';
 import { Transition } from '@headlessui/react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 const ApplicantsList = () => {
   const dispatch = useAppDispatch();
@@ -30,7 +32,7 @@ const ApplicantsList = () => {
   const [error, setError] = useState(null);
   const [modalData, setModalData] = useState(null); // Data for the modal
   const [modalAction, setModalAction] = useState(''); // Action type: delete, accept, reject
-
+  const { fullName, userId } = useSelector((state: RootState) => state.authReducer);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
@@ -244,7 +246,7 @@ const ApplicantsList = () => {
                         receiver: String(application?.userId),
                         status: 'MESSAGE',
                         id: null,
-                        senderName: String(application?.fullName),
+                        senderName: null,
                         direction: 'outgoing',
                         position: 'normal',
                         message: null,
@@ -252,13 +254,14 @@ const ApplicantsList = () => {
                         sentTime: new Date().toISOString(),
                         type: 'html',
                       };
-
+                      console.log('application', application)
                       application
                         && dispatch(
                           addMessage({
                             converId: application?.userId,
                             avtUrl: application?.avatar,
                             fullName: application?.fullName ?? '',
+                            username: application?.username ?? '',
                             msg,
                             openMessenger: true
                           })

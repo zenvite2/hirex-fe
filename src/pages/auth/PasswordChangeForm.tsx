@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { changePassword } from '../../services/authApi'; 
+import { changePassword } from '../../services/authApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { toast } from 'react-toastify';
 
@@ -9,7 +9,7 @@ const PasswordChangeForm: React.FC = () => {
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    
+
     // Validation states
     const [errors, setErrors] = useState({
         oldPassword: '',
@@ -39,8 +39,8 @@ const PasswordChangeForm: React.FC = () => {
         if (!newPassword.trim()) {
             newErrors.newPassword = 'Vui lòng nhập mật khẩu mới';
             isValid = false;
-        } else if (newPassword.length < 8) {
-            newErrors.newPassword = 'Mật khẩu phải có ít nhất 8 ký tự';
+        } else if (newPassword.length < 4) {
+            newErrors.newPassword = 'Mật khẩu phải có ít nhất 4 ký tự';
             isValid = false;
         }
 
@@ -100,9 +100,8 @@ const PasswordChangeForm: React.FC = () => {
                         type={showPassword ? 'text' : 'password'}
                         value={oldPassword}
                         onChange={(e) => setOldPassword(e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
-                            errors.oldPassword ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${errors.oldPassword ? 'border-red-500' : 'border-gray-300'
+                            }`}
                         placeholder="Nhập mật khẩu hiện tại"
                     />
                     {errors.oldPassword && (
@@ -118,9 +117,8 @@ const PasswordChangeForm: React.FC = () => {
                         type={showPassword ? 'text' : 'password'}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
-                            errors.newPassword ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${errors.newPassword ? 'border-red-500' : 'border-gray-300'
+                            }`}
                         placeholder="Nhập mật khẩu mới"
                     />
                     {errors.newPassword && (
@@ -136,9 +134,8 @@ const PasswordChangeForm: React.FC = () => {
                         type={showPassword ? 'text' : 'password'}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
-                            errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                            }`}
                         placeholder="Nhập lại mật khẩu mới"
                     />
                     {errors.confirmPassword && (

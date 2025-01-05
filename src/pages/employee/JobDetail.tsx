@@ -14,7 +14,7 @@ import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
 import axiosIns from '../../services/axiosIns';
 import { Job } from './FindJobs';
 import { denormalizeTextAreaContent, formatDateToDDMMYYYY } from '../../utils/utils';
-import { deleteApplication } from '../../services/applicationApi';
+import { deleteApplication, deleteApplicationNew } from '../../services/applicationApi';
 import SimilarCard from '../../components/common/SimilarCard';
 import { set } from 'react-hook-form';
 
@@ -168,10 +168,12 @@ const JobDetail = () => {
     }, [isLoggedIn, job, id]);
 
     const handleDeleteApplication = async () => {
+        console.log('applicationId', applicationId);
         if (!applicationId) return; // Không làm gì nếu không có applicationId
 
         try {
-            await deleteApplication({ id: applicationId }); // Gọi API xóa với applicationId
+            const result = await deleteApplicationNew({ id: applicationId });
+            console.log(result)
             setHasApplied(false); // Cập nhật trạng thái về "chưa ứng tuyển"
             setApplicationId(null); // Xóa applicationId sau khi xóa thành công
             setShowDeleteConfirm(false); // Đóng popup
@@ -341,24 +343,24 @@ const JobDetail = () => {
                                         Nộp đơn ngay
                                     </button> */}
                                     {hasApplied ? (
-                                        applicationStatus === 'PENDING' ? (
+                                        applicationStatus === 'ACCEPTED' ? (
                                             <button
-                                                onClick={() => setShowDeleteConfirm(true)} // Hiển thị popup xác nhận
-                                                className="w-full px-6 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium"
+                                                className="w-full px-6 py-2 bg-green-100 text-green-800 rounded-lg font-medium"
                                             >
-                                                Đã ứng tuyển
+                                                Đã được chấp nhận
                                             </button>
                                         ) : applicationStatus === 'REJECTED' ? (
                                             <button
-                                                className="w-full px-6 py-2 bg-red-50 text-red-700 rounded-lg font-medium"
+                                                className="w-full px-6 py-2 bg-red-100 text-red-800 rounded-lg font-medium"
                                             >
                                                 Đơn bị từ chối
                                             </button>
                                         ) : (
                                             <button
-                                                className="w-full px-6 py-2 bg-green-50 text-green-700 rounded-lg font-medium"
+                                                onClick={() => setShowDeleteConfirm(true)} // Hiển thị popup xác nhận
+                                                className="w-full px-6 py-2 bg-yellow-100 text-yellow-800 rounded-lg font-medium"
                                             >
-                                                Đã được chấp nhận
+                                                Chờ duyệt
                                             </button>
                                         )
                                     ) : (
@@ -490,7 +492,7 @@ const JobDetail = () => {
                             <h2 className="text-lg font-semibold text-gray-900 mb-3">Việc làm tương tự</h2>
                             <div className="space-y-4">
                                 {similarJobs?.map((similarJob) => (
-                                   <SimilarCard job={similarJob} key={similarJob.id} />
+                                    <SimilarCard job={similarJob} key={similarJob.id} />
                                 ))}
                             </div>
                         </section>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRegistrationForm } from './useRegistrationForm';
 import { FormInput } from '../../components/registration/FormInput';
 import { LocationSelector } from '../../components/registration/LocationSelector';
-import { registerEmployer } from '../../services/authApi';
+import { registerEmployer, validateRegister } from '../../services/authApi';
 import { getListCompany } from '../../services/companyApi';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { startLoading, stopLoading } from '../../redux/slice/loadingSlice';
@@ -23,6 +23,8 @@ const RegistrationForm: React.FC = () => {
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(null);
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const navigate = useNavigate();
+  const [usernameError, setUsernameError] = useState('');
+  const [emailError, setEmailError] = useState('');
 
   const generateOTP = async (email) => {
     try {
@@ -158,13 +160,19 @@ const RegistrationForm: React.FC = () => {
   //     dispatch(stopLoading());
   //   }
   // };
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const submissionData = {
       ...formData,
       companyId: selectedCompanyId,
     };
     if (!selectedCompanyId) delete submissionData.companyId;
+
+    const result = await validateRegister(formData.username, formData.email);
+    if (result.status === 400) {
+      toast.error(result.data)
+      return;
+    }
 
     generateOTP(submissionData.email)
 
@@ -189,6 +197,9 @@ const RegistrationForm: React.FC = () => {
               onChange={handleInputChange}
               required
             />
+            {usernameError && (
+              <p className="text-red-500 text-sm mt-2">{usernameError}</p>
+            )}
             <FormInput
               name="email"
               label="Email đăng nhập"
@@ -197,6 +208,9 @@ const RegistrationForm: React.FC = () => {
               onChange={handleInputChange}
               required
             />
+            {emailError && (
+              <p className="text-red-500 text-sm mt-2">{emailError}</p>
+            )}
             <FormInput
               name="password"
               label="Mật khẩu"

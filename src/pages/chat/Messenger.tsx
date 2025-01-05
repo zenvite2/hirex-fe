@@ -74,11 +74,11 @@ const Messenger: React.FC = () => {
     const currentConver = useSelector(selectCurrentConver);
     const [msgInput, setMsgInput] = useState<string>("");
     const fileInputRef = useRef(null);
-    const { lstConvers } = useSelector((state: RootState) => state.messageReducer);
+    const { lstConvers, currentIndex } = useSelector((state: RootState) => state.messageReducer);
 
     useEffect(() => {
         userId != null && lstConvers.length == 0 && dispatch(getConversations());
-    }, []);
+    }, [lstConvers]);
 
     const getConverInfo = useCallback(async (currentConver: Conversation) => {
         if (currentConver && currentConver.userId && (!currentConver.companyName || !currentConver.fullName || !currentConver.avtUrl)) {
@@ -88,10 +88,10 @@ const Messenger: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        if (userId != null && currentConver) {
+        if (userId != null) {
             getConverInfo(currentConver);
         }
-    }, [userId, currentConver, getConverInfo]);
+    }, [userId, currentIndex]);
 
     const handleSendMessage = useCallback((type: MessageType, fileUrl?: string) => {
         if ((msgInput.trim() || fileUrl) && currentConver) {
@@ -167,10 +167,13 @@ const Messenger: React.FC = () => {
                             {lstConvers.map(conversation => (
                                 <Conversation
                                     key={conversation.userId}
-                                    name={conversation.fullName ?? conversation.username}
-                                    lastSenderName={conversation.last10Messages[conversation.last10Messages.length - 1].sender == String(userId)
-                                        ? fullName ?? username
-                                        : conversation.fullName}
+                                    name={conversation.fullName ?? conversation.username ?? 'Người dùng không tên'}
+                                    lastSenderName={conversation.last10Messages[conversation.last10Messages.length - 1]?.sender == null
+                                        ? null
+                                        : (conversation.last10Messages[conversation.last10Messages.length - 1].sender == String(userId)
+                                            ? 'Bạn'
+                                            : conversation.fullName ?? conversation.username ?? 'Nguời dùng')
+                                    }
                                     info={conversation.last10Messages[conversation.last10Messages.length - 1].type == 'html'
                                         ? conversation.last10Messages[conversation.last10Messages.length - 1].message && 'Đã gửi một liên kết công việc'
                                         : (conversation.last10Messages[conversation.last10Messages.length - 1].type == 'image'
@@ -197,7 +200,7 @@ const Messenger: React.FC = () => {
                         {currentConver && (
                             <ConversationHeader>
                                 <Avatar src={currentConver?.avtUrl} name={currentConver?.fullName ?? currentConver?.username} />
-                                <ConversationHeader.Content userName={currentConver?.fullName ?? currentConver?.username} info={currentConver?.companyName ?? 'Người tìm việc'} />
+                                <ConversationHeader.Content userName={currentConver?.fullName ?? currentConver?.username ?? 'Người dùng không tên'} info={currentConver?.companyName ?? 'Người tìm việc'} />
                                 <ConversationHeader.Actions>
                                     <VideoCallButton onClick={handleVideoCall} />
                                 </ConversationHeader.Actions>

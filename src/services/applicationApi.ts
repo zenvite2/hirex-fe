@@ -33,7 +33,7 @@ export const applicationLists = createAsyncThunk<any>(
 );
 
 // Get appliedJob
-export const appliedJob = createAsyncThunk<any, { userId: number}>(
+export const appliedJob = createAsyncThunk<any, { userId: number }>(
     'application/getList',
     async ({ userId }) => {
         return axiosIns.get(`/application/${userId}`)
@@ -63,13 +63,12 @@ export const applicationUpdate = createAsyncThunk<any, { id: number; status: App
 )
 
 // Delete application
-export const deleteApplication = createAsyncThunk<any, { id: number}>(
+export const deleteApplication = createAsyncThunk<any, { id: number }>(
     'application/updateStatus',
     async ({ id }) => {
         const url = `/application/delete/${id}`;
-        return axiosIns.patch(
+        return axiosIns.delete(
             url,
-            {},  // empty body
             {
                 includeToken: true
             }
@@ -81,3 +80,18 @@ export const deleteApplication = createAsyncThunk<any, { id: number}>(
             });
     }
 )
+
+export const deleteApplicationNew = async ({ id }) => {
+    const url = `/application/delete/${id}`;
+    return axiosIns.delete(
+        url,
+        {
+            includeToken: true
+        }
+    )
+        .then(response => ({ response: response.data }))
+        .catch(error => {
+            toast.error('Có lỗi xảy ra');
+            throw error;
+        });
+}
