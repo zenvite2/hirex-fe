@@ -104,7 +104,7 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({
                                     ${errors.position
                                             ? 'border-red-500 focus:ring-red-200'
                                             : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'}`}
-                                    placeholder="Nhập tên trường"
+                                    placeholder="Nhập tên công ty"
                                 />
                                 {errors.company && (
                                     <p className="text-red-500 text-xs mt-1">{errors.company}</p>
@@ -126,7 +126,7 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({
                                     ${errors.position
                                             ? 'border-red-500 focus:ring-red-200'
                                             : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'}`}
-                                    placeholder="Nhập tên trường"
+                                    placeholder="Nhập vi trí công việc"
                                 />
                                 {errors.position && (
                                     <p className="text-red-500 text-xs mt-1">{errors.position}</p>

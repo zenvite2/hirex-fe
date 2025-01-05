@@ -236,6 +236,7 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
                 value={formData.companyName}
                 onChange={handleChange}
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Nhập tên công ty"
               />
               {errors.companyName && (
                 <p className="mt-1 text-sm text-red-500">{errors.companyName}</p>
@@ -248,7 +249,6 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
                 name="position"
                 value={formData.position}
                 onChange={handleChange}
-                required
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {positionType.map(type => (
@@ -305,6 +305,7 @@ const ExperiencePopup: React.FC<ExperiencePopupProps> = ({ isOpen, onClose, onSa
                 onChange={handleChange}
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows={4}
+                placeholder="Nhập mô tả kinh nghiệm"
               />
             </div>
 
