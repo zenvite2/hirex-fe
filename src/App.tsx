@@ -55,6 +55,8 @@ import AdminRoute from "./routes/AdminRoute";
 import Footer from "./components/layout/Footer";
 import NotificationManagement from "./pages/cms/NotificationManagement";
 import HelpSupport from "./pages/HelpSupport";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ApplyForgotPassword from "./pages/auth/ApplyForgotPassword";
 
 function SidebarLayout() {
     const location = useLocation();
@@ -215,6 +217,8 @@ function App() {
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/employer" element={<EmployerLanding />} />
                         <Route path="/help-support" element={<HelpSupport />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/apply-forgot-password" element={<ApplyForgotPassword />} />
 
                         {/* Routes có Sidebar */}
                         <Route element={<SidebarLayout />}>

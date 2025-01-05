@@ -131,7 +131,7 @@ const LoginPage = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center">
             </div>
-            <a href="#" className="text-blue-500 hover:underline">Quên mật khẩu?</a>
+            <a href="/forgot-password" className="text-blue-500 hover:underline">Quên mật khẩu?</a>
           </div>
 
           <button

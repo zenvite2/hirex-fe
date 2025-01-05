@@ -76,3 +76,15 @@ export const changePassword = createAsyncThunk<any, any>(
             .catch(error => { });
     }
 )
+
+export const forgotPassword = async (username) => {
+    return axiosIns.post('/auth/forgot-password', { username })
+        .then(response => { return { response: response.data } })
+        .catch(error => { });
+}
+
+export const applyForgotPassword = async ({ newPassword, token }: { newPassword: string, token: string }) => {
+    return axiosIns.post('/auth/apply-forgot-password', { newPassword, token })
+        .then(response => { return { response: response.data } })
+        .catch(error => { console.error("Error applying forgot password:", error); });
+}
