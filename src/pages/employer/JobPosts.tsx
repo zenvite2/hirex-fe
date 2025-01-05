@@ -121,7 +121,7 @@ const JobListings = () => {
           <tbody>
             {jobs.map((job, index) => (
               <tr key={index} className="border-b hover:bg-gray-50">
-                <td className="py-4">
+                <td className="py-4 cursor-pointer" onClick={() => navigate(`/job-detail/${job.id}`)}>
                   <div className="font-medium">{job.title}</div>
                   <div className="text-gray-500 text-sm mt-1">📍{job.location}</div>
                 </td>
