@@ -107,7 +107,7 @@ const ProjectPopup: React.FC<ProjectPopupProps> = ({
                 <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl p-6">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl font-bold text-gray-800">
-                            {editingProject.id ? 'Chỉnh Sửa Dự Án' : 'Thêm Dự Án Mới'}
+                            {editingProject.id ? 'Chỉnh sửa dự án' : 'Thêm mới dự án'}
                         </h2>
                         <button
                             onClick={onClose}
@@ -118,7 +118,7 @@ const ProjectPopup: React.FC<ProjectPopupProps> = ({
                     </div>
 
                     <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Tên dự án <span className="text-red-500">*</span>
@@ -134,7 +134,7 @@ const ProjectPopup: React.FC<ProjectPopupProps> = ({
                                     ${errors.name
                                             ? 'border-red-500 focus:ring-red-200'
                                             : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'}`}
-                                    placeholder="Nhập tên trường"
+                                    placeholder="Nhập tên dự án"
                                 />
                                 {errors.name && (
                                     <p className="text-red-500 text-xs mt-1">{errors.name}</p>
@@ -200,7 +200,7 @@ const ProjectPopup: React.FC<ProjectPopupProps> = ({
                                     ${errors.position
                                             ? 'border-red-500 focus:ring-red-200'
                                             : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'}`}
-                                    placeholder="Nhập tên trường"
+                                    placeholder="Nhập vị trí công việc"
                                 />
                                 {errors.position && (
                                     <p className="text-red-500 text-xs mt-1">{errors.position}</p>
@@ -222,7 +222,7 @@ const ProjectPopup: React.FC<ProjectPopupProps> = ({
                                 ${errors.description
                                         ? 'border-red-500 focus:ring-red-200'
                                         : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'}`}
-                                placeholder="Mô tả chi tiết về chứng chỉ"
+                                placeholder="Mô tả chi tiết về dự án"
                                 rows={4}
                             />
                             {errors.description && (

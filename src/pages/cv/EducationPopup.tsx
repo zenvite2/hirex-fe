@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { Education } from './types';
 import { Transition } from '@headlessui/react';
+import moment, { Moment } from 'moment';
 
 interface EducationPopupProps {
     show: boolean;
@@ -31,18 +32,28 @@ const EducationPopup: React.FC<EducationPopupProps> = ({
         }
 
         if (!editingEducation.major || editingEducation.major.trim() === '') {
-            newErrors.name = 'Ngành học không được để trống';
+            newErrors.major = 'Ngành học không được để trống';
         }
 
-        // Validate start date
-        if (!editingEducation.startDate) {
-            newErrors.startDate = 'Ngày bắt đầu không được để trống';
-        }
-
-        if (editingEducation.startDate && editingEducation.endDate && new Date(editingEducation.startDate) > new Date(editingEducation.endDate)) {
-            newErrors.endDate = 'Ngày kết thúc phải sau ngày bắt đầu';
-        }
-
+         // Validate start date
+         if (!editingEducation.startDate) {
+             newErrors.startDate = 'Ngày bắt đầu không được để trống';
+         }
+ 
+         // Validate end date
+         if (!editingEducation.endDate) {
+             newErrors.endDate = 'Ngày kết thúc không được để trống';
+         } else if (editingEducation.startDate && editingEducation.endDate) {
+             const startDate = moment(editingEducation.startDate);
+             const endDate = moment(editingEducation.endDate);
+ 
+             if (endDate.isSameOrBefore(startDate)) {
+                 newErrors.endDate = 'Ngày kết thúc phải sau ngày bắt đầu';
+             }
+         }
+ 
+         setErrors(newErrors);
+         return Object.keys(newErrors).length === 0;
         if (editingEducation.gpa && editingEducation.gpa.toString().trim() !== '') {
             const gpaValue = parseFloat(editingEducation.gpa as string);
             if (isNaN(gpaValue)) {
@@ -100,7 +111,7 @@ const EducationPopup: React.FC<EducationPopupProps> = ({
                     </div>
 
                     <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Tên trường <span className="text-red-500">*</span>

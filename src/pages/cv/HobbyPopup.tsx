@@ -30,12 +30,12 @@ const HobbyPopup: React.FC<HobbyPopupProps> = ({
             leaveFrom="opacity-100 transform scale-100 translate-y-0"
             leaveTo="opacity-0 transform scale-95 translate-y-4"
         >
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white p-6 rounded-lg shadow-xl w-96">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-xl font-semibold">
+            <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl p-6">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-bold text-gray-800">
                             {existingGoal ? 'Chỉnh sửa sở thích' : 'Thêm sở thích'}
-                        </h3>
+                        </h2>
                         <button
                             onClick={onClose}
                             className="text-gray-600 hover:text-gray-900"
