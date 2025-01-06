@@ -52,8 +52,6 @@ const EducationPopup: React.FC<EducationPopupProps> = ({
              }
          }
  
-         setErrors(newErrors);
-         return Object.keys(newErrors).length === 0;
         if (editingEducation.gpa && editingEducation.gpa.toString().trim() !== '') {
             const gpaValue = parseFloat(editingEducation.gpa as string);
             if (isNaN(gpaValue)) {

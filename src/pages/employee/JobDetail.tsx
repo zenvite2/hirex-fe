@@ -70,7 +70,7 @@ const JobDetail = () => {
     const dispatch = useAppDispatch();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showContactModal, setShowContactModal] = useState(false);
-    const { isLoggedIn, userId } = useSelector((state: RootState) => state.authReducer);
+    const { isLoggedIn, userId, role } = useSelector((state: RootState) => state.authReducer);
     const navigate = useNavigate();
     const [isSaved, setIsSaved] = useState(false);
     const [hasApplied, setHasApplied] = useState(false);
@@ -336,77 +336,78 @@ const JobDetail = () => {
                                 </div>
 
                                 {/* Action Buttons */}
-                                <div className="flex flex-col gap-4">
-                                    {/* <button
+                                {role !== 'EMPLOYER' && (
+                                    <div className="flex flex-col gap-4">
+                                        {/* <button
                                         onClick={handleApplyNow}
                                         className="w-full px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium"
                                     >
                                         Nộp đơn ngay
                                     </button> */}
-                                    {hasApplied ? (
-                                        applicationStatus === 'ACCEPTED' ? (
-                                            <button
-                                                className="w-full px-6 py-2 bg-green-100 text-green-800 rounded-lg font-medium"
-                                            >
-                                                Đã được chấp nhận
-                                            </button>
-                                        ) : applicationStatus === 'REJECTED' ? (
-                                            <button
-                                                className="w-full px-6 py-2 bg-red-100 text-red-800 rounded-lg font-medium"
-                                            >
-                                                Đơn bị từ chối
-                                            </button>
+                                        {hasApplied ? (
+                                            applicationStatus === 'ACCEPTED' ? (
+                                                <button
+                                                    className="w-full px-6 py-2 bg-green-100 text-green-800 rounded-lg font-medium"
+                                                >
+                                                    Đã được chấp nhận
+                                                </button>
+                                            ) : applicationStatus === 'REJECTED' ? (
+                                                <button
+                                                    className="w-full px-6 py-2 bg-red-100 text-red-800 rounded-lg font-medium"
+                                                >
+                                                    Đơn bị từ chối
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => setShowDeleteConfirm(true)} // Hiển thị popup xác nhận
+                                                    className="w-full px-6 py-2 bg-yellow-100 text-yellow-800 rounded-lg font-medium"
+                                                >
+                                                    Chờ duyệt
+                                                </button>
+                                            )
                                         ) : (
                                             <button
-                                                onClick={() => setShowDeleteConfirm(true)} // Hiển thị popup xác nhận
-                                                className="w-full px-6 py-2 bg-yellow-100 text-yellow-800 rounded-lg font-medium"
+                                                onClick={handleApplyNow}
+                                                className="w-full px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium"
                                             >
-                                                Chờ duyệt
+                                                Nộp đơn ngay
                                             </button>
-                                        )
-                                    ) : (
+                                        )}
+
                                         <button
-                                            onClick={handleApplyNow}
-                                            className="w-full px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium"
+                                            onClick={() => { isLoggedIn ? setShowContactModal(true) : navigate('/login') }}
+                                            className="w-full px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium flex items-center justify-center gap-2"
                                         >
-                                            Nộp đơn ngay
+                                            <MessageCircle className="w-4 h-4" />
+                                            Liên hệ
                                         </button>
-                                    )}
 
-                                    <button
-                                        onClick={() => { isLoggedIn ? setShowContactModal(true) : navigate('/login') }}
-                                        className="w-full px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium flex items-center justify-center gap-2"
-                                    >
-                                        <MessageCircle className="w-4 h-4" />
-                                        Liên hệ
-                                    </button>
-
-                                    <button
-                                        onClick={(e) => {
-                                            handleSaveJob();
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                        }}
-                                        className={`w-full px-6 py-2 bg-blue-50 rounded-lg hover:bg-blue-100 font-medium flex items-center justify-center gap-2 ${isSaved ? "text-blue-600" : "text-gray-600"
-                                            }`}
-                                    >
-                                        <Bookmark className={`w-4 h-4 ${isSaved ? "fill-current" : "stroke-current"}`} />
-                                        Lưu việc làm
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            handleFollowCompany();
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                        }}
-                                        className={`w-full px-6 py-2 bg-blue-50 rounded-lg hover:bg-blue-100 font-medium flex items-center justify-center gap-2 ${isFollowed ? "text-blue-600" : "text-gray-600"
-                                            }`}
-                                    >
-                                        <Heart className={`w-4 h-4 ${isFollowed ? "fill-current" : "stroke-current"}`} />
-                                        Theo dõi công ty
-                                    </button>
-                                </div>
-
+                                        <button
+                                            onClick={(e) => {
+                                                handleSaveJob();
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                            }}
+                                            className={`w-full px-6 py-2 bg-blue-50 rounded-lg hover:bg-blue-100 font-medium flex items-center justify-center gap-2 ${isSaved ? "text-blue-600" : "text-gray-600"
+                                                }`}
+                                        >
+                                            <Bookmark className={`w-4 h-4 ${isSaved ? "fill-current" : "stroke-current"}`} />
+                                            Lưu việc làm
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                handleFollowCompany();
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                            }}
+                                            className={`w-full px-6 py-2 bg-blue-50 rounded-lg hover:bg-blue-100 font-medium flex items-center justify-center gap-2 ${isFollowed ? "text-blue-600" : "text-gray-600"
+                                                }`}
+                                        >
+                                            <Heart className={`w-4 h-4 ${isFollowed ? "fill-current" : "stroke-current"}`} />
+                                            Theo dõi công ty
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <hr />
