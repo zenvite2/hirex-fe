@@ -196,9 +196,10 @@ const JobDetail = () => {
         }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = (data: any) => {
         setIsModalOpen(false);
         setHasApplied(true);
+        setApplicationId(data.id)    
     };
 
     const handleSaveJob = async () => {
